@@ -1,4 +1,4 @@
-import {initMionRouter, route, Routes} from '@mionkit/router';
+import {initMionRouter, route, Routes} from '@mionjs/router';
 import {ordersRoutes} from './features/orders/orders-handlers.ts';
 
 const routes = {

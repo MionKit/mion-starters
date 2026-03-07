@@ -6,7 +6,7 @@ Starter templates and CLI for scaffolding [mion](https://mion.io) into new or ex
 
 ```
 mion-starters/
-├── cli/                  # CLI tool (@mionkit/starter)
+├── cli/                  # CLI tool (@mionjs/starter)
 ├── nextjs/
 │   └── 16/               # Next.js 16 starter
 ├── nuxt/                 # (planned)
@@ -30,12 +30,12 @@ Full-stack Next.js 16 app with mion API showcasing:
 
 ## CLI
 
-The `@mionkit/starter` CLI can:
+The `@mionjs/starter` CLI can:
 - **Create a new project** — copies a full starter into an empty directory
 - **Scaffold into existing project** — copies mion-specific files into an already initialized project
 
 ```bash
-npx @mionkit/starter init
+npx @mionjs/starter init
 ```
 
 ## Linking Mion Packages
@@ -45,11 +45,11 @@ Mion packages are not yet published to npm. Link them locally from the [mion mon
 ```bash
 # From the mion monorepo, link each package:
 cd /path/to/mion
-npm link -w @mionkit/core -w @mionkit/router -w @mionkit/client -w @mionkit/http # ... etc
+npm link -w @mionjs/core -w @mionjs/router -w @mionjs/client -w @mionjs/http # ... etc
 
 # Then in a starter directory:
 cd nextjs/16/api
-npm link @mionkit/core @mionkit/router @mionkit/client @mionkit/http # ... etc
+npm link @mionjs/core @mionjs/router @mionjs/client @mionjs/http # ... etc
 ```
 
 ## License

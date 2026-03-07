@@ -1,7 +1,7 @@
 'use client';
 
 import {useState, useEffect} from 'react';
-import {initClient, routesFlow, mapFrom} from '@mionkit/client';
+import {initClient, routesFlow, mapFrom} from '@mionjs/client';
 import type {MyApi} from '@mion-app/api';
 import type {Order, OrderEvent} from '@/api/src/features/orders/orders-models';
 

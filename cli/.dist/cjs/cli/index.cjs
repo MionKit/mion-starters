@@ -9,10 +9,10 @@ if (command === "init") {
   });
 } else {
   console.log(`
-@mionkit/starter — Scaffold mion into your meta-framework project
+@mionjs/starter — Scaffold mion into your meta-framework project
 
 Usage:
-  npx @mionkit/starter init    Scaffold mion API into the current project
+  npx @mionjs/starter init    Scaffold mion API into the current project
 
 Options:
   --help                       Show this help message

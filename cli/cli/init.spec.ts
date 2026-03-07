@@ -112,11 +112,11 @@ describe('starter CLI init', () => {
             expect(apiPkg.name).toBe('@mion-app/api');
             expect(apiPkg.private).toBe(true);
             expect(apiPkg.type).toBe('module');
-            expect(apiPkg.dependencies['@mionkit/core']).toBeDefined();
-            expect(apiPkg.dependencies['@mionkit/router']).toBeDefined();
-            expect(apiPkg.dependencies['@mionkit/platform-vercel']).toBeDefined();
-            expect(apiPkg.devDependencies['@mionkit/platform-node']).toBeDefined();
-            expect(apiPkg.devDependencies['@mionkit/devtools']).toBeDefined();
+            expect(apiPkg.dependencies['@mionjs/core']).toBeDefined();
+            expect(apiPkg.dependencies['@mionjs/router']).toBeDefined();
+            expect(apiPkg.dependencies['@mionjs/platform-vercel']).toBeDefined();
+            expect(apiPkg.devDependencies['@mionjs/platform-node']).toBeDefined();
+            expect(apiPkg.devDependencies['@mionjs/devtools']).toBeDefined();
 
             // Verify api/tsconfig.json
             const apiTsConfig = readJson(join(apiDir, 'tsconfig.json'));
@@ -152,7 +152,7 @@ describe('starter CLI init', () => {
             // Verify root package.json was updated
             const rootPkg = readJson(join(testDir, 'package.json'));
             expect(rootPkg.workspaces).toContain('api');
-            expect(rootPkg.dependencies['@mionkit/client']).toBeDefined();
+            expect(rootPkg.dependencies['@mionjs/client']).toBeDefined();
             expect(rootPkg.scripts['mion:dev']).toContain('concurrently');
             expect(rootPkg.scripts['mion:build']).toContain('next build');
         });
@@ -172,8 +172,8 @@ describe('starter CLI init', () => {
 
             const apiDir = join(testDir, 'api');
             const apiPkg = readJson(join(apiDir, 'package.json'));
-            expect(apiPkg.dependencies['@mionkit/platform-node']).toBeDefined();
-            expect(apiPkg.dependencies['@mionkit/platform-vercel']).toBeUndefined();
+            expect(apiPkg.dependencies['@mionjs/platform-node']).toBeDefined();
+            expect(apiPkg.dependencies['@mionjs/platform-vercel']).toBeUndefined();
 
             const server = readFileSync(join(apiDir, 'src/server.ts'), 'utf-8');
             expect(server).toContain('startNodeServer');
@@ -190,8 +190,8 @@ describe('starter CLI init', () => {
 
             const apiDir = join(testDir, 'api');
             const apiPkg = readJson(join(apiDir, 'package.json'));
-            expect(apiPkg.dependencies['@mionkit/platform-bun']).toBeDefined();
-            expect(apiPkg.dependencies['@mionkit/platform-vercel']).toBeUndefined();
+            expect(apiPkg.dependencies['@mionjs/platform-bun']).toBeDefined();
+            expect(apiPkg.dependencies['@mionjs/platform-vercel']).toBeUndefined();
 
             const server = readFileSync(join(apiDir, 'src/server.ts'), 'utf-8');
             expect(server).toContain('startBunServer');

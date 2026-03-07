@@ -22,7 +22,7 @@
     ],
     "paths": {
       "@/*": ["./*"],
-      "@mionkit/*": ["../../../packages/*"],
+      "@mionjs/*": ["../../../packages/*"],
       "@mion-app/api": ["./api/src/api.ts"]
     }
   },

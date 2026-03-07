@@ -1,5 +1,5 @@
-import {route, Routes} from '@mionkit/router';
-import {FormatUUIDv7} from '@mionkit/type-formats/StringFormats';
+import {route, Routes} from '@mionjs/router';
+import {FormatUUIDv7} from '@mionjs/type-formats/StringFormats';
 import {Order, OrderEvent} from './orders-models.ts';
 import {findAllOrders, findOrderById, insertOrder, findEventsByOrderId, findEventsByOrderIds} from './orders-repository.ts';
 

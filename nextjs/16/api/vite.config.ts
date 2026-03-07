@@ -1,6 +1,6 @@
 import {defineConfig} from 'vite';
 import {resolve} from 'path';
-import {mionPlugin} from '@mionkit/devtools/vite-plugin';
+import {mionPlugin} from '@mionjs/devtools/vite-plugin';
 
 export default defineConfig({
     plugins: [
@@ -15,7 +15,7 @@ export default defineConfig({
         sourcemap: true,
         minify: false,
         rollupOptions: {
-            external: [/^@mionkit\//, /^[^./]/],
+            external: [/^@mionjs\//, /^[^./]/],
             output: {format: 'es', entryFileNames: '[name].js'},
         },
     },

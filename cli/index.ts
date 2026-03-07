@@ -1,2 +1,2 @@
-// @mionkit/starter — CLI-only package
-// Use: npx @mionkit/starter init
+// @mionjs/starter — CLI-only package
+// Use: npx @mionjs/starter init

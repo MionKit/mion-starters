@@ -1,4 +1,4 @@
-import {FormatUUIDv7} from '@mionkit/type-formats/StringFormats';
+import {FormatUUIDv7} from '@mionjs/type-formats/StringFormats';
 
 export interface Order {
     id: FormatUUIDv7;

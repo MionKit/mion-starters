@@ -12,7 +12,7 @@ const SERVER_FILES = {
   "standalone-bun": "nextjs-16/mion-app/api/src/server.bun.ts"
 };
 async function init(cwd, providedOptions) {
-  console.log("\n@mionkit/starter — Scaffold mion API\n");
+  console.log("\n@mionjs/starter — Scaffold mion API\n");
   const project = detectFramework(cwd);
   if (!project) {
     throw new Error(
@@ -72,7 +72,7 @@ async function init(cwd, providedOptions) {
   console.log("\nCreating files:");
   writeFiles(cwd, files);
   console.log("\nUpdating root package.json:");
-  const rootDependencies = { "@mionkit/client": "^0.7.2" };
+  const rootDependencies = { "@mionjs/client": "^0.7.2" };
   updateRootPackageJson(cwd, rootScripts, rootDependencies);
   printInstructions(options.deployTarget);
 }
@@ -106,7 +106,7 @@ function updateRootPackageJson(cwd, scripts, dependencies) {
 }
 function generateMinimalApi(prefix) {
   return [
-    `import {initMionRouter, route, Routes} from '@mionkit/router';`,
+    `import {initMionRouter, route, Routes} from '@mionjs/router';`,
     ``,
     `const routes = {`,
     `    hello: route((ctx, name: string): string => \`Hello \${name}!\`),`,

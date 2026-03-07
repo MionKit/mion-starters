@@ -7,7 +7,7 @@
 
 ```
 mion-starters/
-├── cli/                          # @mionkit/starter CLI
+├── cli/                          # @mionjs/starter CLI
 ├── nextjs/
 │   └── 16/                       # Next.js 16 starter
 ├── nuxt/                         # (planned)
@@ -44,15 +44,15 @@ All starters implement the same showcase Orders API to demonstrate mion features
 
 ```ts
 // WRONG - breaks reflection
-import type {TypeFormatParams, Brand} from '@mionkit/core';
+import type {TypeFormatParams, Brand} from '@mionjs/core';
 
 // CORRECT
-import {TypeFormatParams, Brand} from '@mionkit/core';
+import {TypeFormatParams, Brand} from '@mionjs/core';
 ```
 
 ## Mion Route Pattern
 ```ts
-import {route, Routes} from '@mionkit/router';
+import {route, Routes} from '@mionjs/router';
 
 export const myRoutes = {
     myHandler: route((ctx, param1: string, param2: number): ReturnType => {
@@ -65,10 +65,10 @@ export const myRoutes = {
 Packages are not published to npm yet. Link from local mion monorepo:
 ```bash
 # In mion monorepo:
-npm link -w @mionkit/core -w @mionkit/router -w @mionkit/client ...
+npm link -w @mionjs/core -w @mionjs/router -w @mionjs/client ...
 # In starter's api directory:
-npm link @mionkit/core @mionkit/router @mionkit/client ...
+npm link @mionjs/core @mionjs/router @mionjs/client ...
 ```
 
 ## CLI
-The CLI (`cli/`) scaffolds mion into projects — either copying a full starter or specific files into an existing repo. It is a separate package (`@mionkit/starter`).
+The CLI (`cli/`) scaffolds mion into projects — either copying a full starter or specific files into an existing repo. It is a separate package (`@mionjs/starter`).

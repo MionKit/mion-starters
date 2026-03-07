@@ -1,5 +1,5 @@
-import {randomUUID_V7} from '@mionkit/core';
-import {FormatUUIDv7} from '@mionkit/type-formats/StringFormats';
+import {randomUUID_V7} from '@mionjs/core';
+import {FormatUUIDv7} from '@mionjs/type-formats/StringFormats';
 import {Order, OrderEvent} from './orders-models.ts';
 
 // ---- In-memory store with seed data ----

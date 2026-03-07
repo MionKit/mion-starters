@@ -1,4 +1,4 @@
-import {toDrizzlePGTable} from '@mionkit/drizzle';
+import {toDrizzlePGTable} from '@mionjs/drizzle';
 import {uuid, timestamp} from 'drizzle-orm/pg-core';
 import {Order, OrderEvent} from '../features/orders/orders-models.ts';
 

@@ -15,7 +15,7 @@ const SERVER_FILES: Record<DeployTarget, string> = {
 
 /** Main init command: scaffolds mion into the current project */
 export async function init(cwd: string, providedOptions?: InitOptions): Promise<void> {
-    console.log('\n@mionkit/starter — Scaffold mion API\n');
+    console.log('\n@mionjs/starter — Scaffold mion API\n');
 
     // 1. Detect project type
     const project = detectFramework(cwd);
@@ -104,7 +104,7 @@ export async function init(cwd: string, providedOptions?: InitOptions): Promise<
 
     // 7. Modify root package.json
     console.log('\nUpdating root package.json:');
-    const rootDependencies: Record<string, string> = {'@mionkit/client': '^0.7.2'};
+    const rootDependencies: Record<string, string> = {'@mionjs/client': '^0.7.2'};
     updateRootPackageJson(cwd, rootScripts, rootDependencies);
 
     // 8. Print instructions
@@ -153,7 +153,7 @@ function updateRootPackageJson(cwd: string, scripts: Record<string, string>, dep
 /** Generates a minimal api.ts with hello/getTime routes */
 function generateMinimalApi(prefix: string): string {
     return [
-        `import {initMionRouter, route, Routes} from '@mionkit/router';`,
+        `import {initMionRouter, route, Routes} from '@mionjs/router';`,
         ``,
         `const routes = {`,
         `    hello: route((ctx, name: string): string => \`Hello \${name}!\`),`,

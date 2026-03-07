@@ -2,7 +2,7 @@ import {defineConfig} from 'vite';
 import {resolve} from 'path';
 import {readdirSync, statSync} from 'fs';
 import dts from 'vite-plugin-dts';
-import {cjsPackageJsonPlugin} from '@mionkit/devtools/vite-plugin';
+import {cjsPackageJsonPlugin} from '@mionjs/devtools/vite-plugin';
 
 function getSourceFiles(dir: string, base = ''): Record<string, string> {
     const entries: Record<string, string> = {};

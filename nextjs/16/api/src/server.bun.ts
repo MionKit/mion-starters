@@ -1,5 +1,5 @@
 import {initApi} from './api.ts';
-import {startBunServer} from '@mionkit/platform-bun';
+import {startBunServer} from '@mionjs/platform-bun';
 
 await initApi();
 startBunServer({port: 3001});

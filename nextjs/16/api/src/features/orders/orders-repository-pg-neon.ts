@@ -1,8 +1,8 @@
 import {eq, inArray} from 'drizzle-orm';
 import {getDb} from '../../db/client.ts';
 import {ordersTable, orderEventsTable} from '../../db/schema.ts';
-import {FormatUUIDv7} from '@mionkit/type-formats/StringFormats';
-import {randomUUID_V7} from '@mionkit/core';
+import {FormatUUIDv7} from '@mionjs/type-formats/StringFormats';
+import {randomUUID_V7} from '@mionjs/core';
 import {Order, OrderEvent} from './orders-models.ts';
 
 export async function findAllOrders(): Promise<Order[]> {
