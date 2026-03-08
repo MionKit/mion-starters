@@ -1,23 +1,23 @@
-import {route, Routes} from '@mionjs/router';
+import {query, mutation, Routes} from '@mionjs/router';
 import {FormatUUIDv7} from '@mionjs/type-formats/StringFormats';
 import {Order, OrderEvent} from './orders-models.ts';
 import {findAllOrders, findOrderById, insertOrder, findEventsByOrderId, findEventsByOrderIds} from './orders-repository.ts';
 
 export const ordersRoutes = {
-    listOrders: route((): Order[] => {
+    listOrders: query((): Order[] => {
         return findAllOrders();
     }),
-    getOrder: route((ctx, id: FormatUUIDv7): Order | undefined => {
+    getOrder: query((ctx, id: FormatUUIDv7): Order | undefined => {
         return findOrderById(id);
     }),
-    createOrder: route((ctx, customer: string, total: number, id?: FormatUUIDv7): Order => {
+    createOrder: mutation((ctx, customer: string, total: number, id?: FormatUUIDv7): Order => {
         return insertOrder(customer, total, id);
     }),
 
-    getOrderEvents: route((ctx, orderId: FormatUUIDv7): OrderEvent[] => {
+    getOrderEvents: query((ctx, orderId: FormatUUIDv7): OrderEvent[] => {
         return findEventsByOrderId(orderId);
     }),
-    getOrdersEvents: route((ctx, orderIds: FormatUUIDv7[]): OrderEvent[] => {
+    getOrdersEvents: query((ctx, orderIds: FormatUUIDv7[]): OrderEvent[] => {
         return findEventsByOrderIds(orderIds);
     }),
 } satisfies Routes;

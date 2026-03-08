@@ -52,10 +52,15 @@ import {TypeFormatParams, Brand} from '@mionjs/core';
 
 ## Mion Route Pattern
 ```ts
-import {route, Routes} from '@mionjs/router';
+import {query, mutation, Routes} from '@mionjs/router';
 
 export const myRoutes = {
-    myHandler: route((ctx, param1: string, param2: number): ReturnType => {
+    // Use query for read-only handlers
+    myQuery: query((ctx, param1: string): ReturnType => {
+        return fetchSomething(param1);
+    }),
+    // Use mutation for handlers that modify data
+    myMutation: mutation((ctx, param1: string, param2: number): ReturnType => {
         return doSomething(param1, param2);
     }),
 } satisfies Routes;

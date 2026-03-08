@@ -1,9 +1,9 @@
-import { initMionRouter, PublicApi, route, Routes } from "@mionjs/router";
+import { initMionRouter, PublicApi, query, Routes } from "@mionjs/router";
 import { ordersRoutes } from "./features/orders/orders-handlers.ts";
 
 const routes = {
-  hello: route((ctx, name: string): string => `Hello ${name}!`),
-  getTime: route((ctx): Date => new Date()),
+  hello: query((ctx, name: string): string => `Hello ${name}!`),
+  getTime: query((ctx): Date => new Date()),
   orders: ordersRoutes,
 } satisfies Routes;
 
