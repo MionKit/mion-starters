@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { routesFlow, mapFrom } from "@mionjs/client";
 import { initAOTClient } from "@mionjs/client/aot";
 import type { MyApi } from "@mion-app/api";
@@ -189,8 +190,10 @@ export default function OrdersPage() {
   useEffect(() => {
     // Single HTTP request: listOrders -> mapFrom extracts IDs server-side -> getOrdersEvents
     const ordersList = routes.orders.listOrders();
-    const orderIds = mapFrom(ordersList, (orders) =>
-      orders!.map((o) => o.id), 'mapFromOrdersToOrderEvents',
+    const orderIds = mapFrom(
+      ordersList,
+      (orders) => orders!.map((o) => o.id),
+      "mapFromOrdersToOrderEvents",
     ).type();
 
     routesFlow([ordersList, routes.orders.getOrdersEvents(orderIds)]).then(
@@ -216,29 +219,52 @@ export default function OrdersPage() {
     );
 
   return (
-    <div
-      style={{
-        maxWidth: "900px",
-        margin: "0 auto",
-        padding: "40px 20px",
-        fontFamily: "system-ui, sans-serif",
-      }}
-    >
-      <h1 style={{ fontSize: "24px", fontWeight: 700, marginBottom: "8px" }}>
-        Orders
-      </h1>
-      <p style={{ color: "#6b7280", marginBottom: "32px" }}>
-        Mion showcase: routesFlow batches multiple routes into a single HTTP
-        request
-      </p>
-
-      {orders.map((order) => (
-        <OrderCard
-          key={order.id}
-          order={order}
-          events={eventsByOrder[order.id] || []}
+    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-16 px-16 bg-white dark:bg-black">
+        <Image
+          src="/mion-logo-dark.svg"
+          alt="Mion logo"
+          width={300}
+          height={80}
+          priority
         />
-      ))}
+        <div className="flex flex-col items-center gap-6 text-center py-8">
+          <h1 className="text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
+            Mion Orders Showcase
+          </h1>
+          <p className="text-lg leading-8 text-zinc-600 dark:text-zinc-400">
+            <a
+              href="https://mion.io"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-zinc-950 dark:text-zinc-50"
+            >
+              Mion
+            </a>{" "}
+            is a lightweight TypeScript API framework with end-to-end type
+            safety, automatic serialization, and built-in validation. This
+            showcase demonstrates how{" "}
+            <code className="rounded bg-zinc-100 px-1.5 py-0.5 text-sm dark:bg-zinc-800">
+              routesFlow
+            </code>{" "}
+            resolves related data across multiple routes in a single HTTP
+            request — a lightweight alternative to GraphQL, but fully typed and
+            without a schema layer.
+          </p>
+        </div>
+        <div
+          className="w-full max-w-3xl"
+          style={{ fontFamily: "system-ui, sans-serif" }}
+        >
+          {orders.map((order) => (
+            <OrderCard
+              key={order.id}
+              order={order}
+              events={eventsByOrder[order.id] || []}
+            />
+          ))}
+        </div>
+      </main>
     </div>
   );
 }

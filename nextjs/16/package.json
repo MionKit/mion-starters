@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "npm-run-all2 --parallel dev:*",
+    "dev": "npm-run-all2 --parallel --race dev:*",
     "dev:next": "next dev",
     "dev:api": "npm run --prefix api dev",
     "build": "npm-run-all2 build:*",
