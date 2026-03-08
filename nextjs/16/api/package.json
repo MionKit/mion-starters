@@ -9,8 +9,9 @@
     "./dist/*": "./dist/*"
   },
   "scripts": {
-    "dev": "vite-node src/vercel-serverless.ts",
-    "build": "vite build"
+    "dev": "vite-node --watch src/dev-server.ts",
+    "build": "vite build",
+"mionlink": "npm link @mionjs/core @mionjs/router @mionjs/platform-vercel @mionjs/platform-node @mionjs/platform-bun @mionjs/drizzle @mionjs/type-formats @mionjs/devtools"
   },
   "dependencies": {
     "@mionjs/core": "^0.7.2",
@@ -18,7 +19,8 @@
     "@mionjs/platform-vercel": "^0.7.2",
     "@mionjs/platform-node": "^0.7.2",
     "@mionjs/platform-bun": "^0.7.2",
-    "@mionjs/drizzle": "^0.7.2"
+    "@mionjs/drizzle": "^0.7.2",
+    "@mionjs/type-formats": "^0.7.2"
   },
   "devDependencies": {
     "@mionjs/devtools": "^0.8.0",

@@ -22,7 +22,6 @@
     ],
     "paths": {
       "@/*": ["./*"],
-      "@mionjs/*": ["../../../packages/*"],
       "@mion-app/api": ["./api/src/api.ts"]
     }
   },

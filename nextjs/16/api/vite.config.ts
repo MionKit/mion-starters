@@ -6,16 +6,24 @@ export default defineConfig({
     plugins: [
         mionPlugin({
             runTypes: {tsConfig: resolve(__dirname, 'tsconfig.json')},
+            serverPureFunctions: {
+                clientSrcPath: resolve(__dirname, '../app'),
+                noViteClient: true,
+            },
         }),
     ],
+    resolve: {conditions: ['source']},
+    ssr: {resolve: {conditions: ['source']}},
     build: {
-        lib: {entry: resolve(__dirname, 'src/vercel-serverless.ts'), formats: ['es']},
+        ssr: resolve(__dirname, 'src/vercel-serverless.ts'),
         outDir: 'dist',
         emptyOutDir: true,
         sourcemap: true,
         minify: false,
         rollupOptions: {
-            external: [/^@mionjs\//, /^[^./]/],
+            // Bundle @mionjs/* so the output is self-contained for Next.js route handler
+            // Only externalize Node.js builtins (both node: and bare names)
+            external: [/^node:/, /^(fs|path|os|crypto|http|https|url|stream|events|util|buffer|net|tls|zlib|child_process|worker_threads)(\/|$)/],
             output: {format: 'es', entryFileNames: '[name].js'},
         },
     },

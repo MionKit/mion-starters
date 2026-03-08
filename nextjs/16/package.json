@@ -3,17 +3,27 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "npm-run-all2 --parallel dev:*",
+    "dev:next": "next dev",
+    "dev:api": "npm run --prefix api dev",
+    "build": "npm-run-all2 build:*",
+    "build:api": "npm run --prefix api build",
+    "build:next": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "playwright test",
+    "test:install": "playwright install chromium",
+    "mionlink": "npm link @mionjs/client @mionjs/core @mionjs/type-formats && node ../../scripts/copy-mion-packages.js nextjs/16 client core type-formats"
   },
   "dependencies": {
+    "@mionjs/client": "^0.7.2",
+    "@mionjs/core": "^0.7.2",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
   "devDependencies": {
+    "npm-run-all2": "^7",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -21,6 +31,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
+    "@playwright/test": "^1",
     "typescript": "^5"
   }
 }
