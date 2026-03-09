@@ -10,10 +10,7 @@
     "sourceMap": true,
     "isolatedModules": true,
     "allowImportingTsExtensions": true,
-    "rewriteRelativeImportExtensions": true,
-    "paths": {
-      "@mionjs/*": ["../../../../packages/*"]
-    }
+    "rewriteRelativeImportExtensions": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"],

@@ -11,7 +11,7 @@
   "scripts": {
     "dev": "vite-node --watch src/dev-server.ts",
     "build": "vite build",
-"mionlink": "npm link @mionjs/core @mionjs/router @mionjs/platform-vercel @mionjs/platform-node @mionjs/platform-bun @mionjs/drizzle @mionjs/type-formats @mionjs/devtools"
+    "mionlink": "npm link @mionjs/core @mionjs/router @mionjs/platform-vercel @mionjs/platform-node @mionjs/platform-bun @mionjs/drizzle @mionjs/type-formats @mionjs/devtools"
   },
   "dependencies": {
     "@mionjs/core": "^0.7.2",

@@ -10,8 +10,8 @@ mion-starters/
 ├── cli/                          # @mionjs/starter CLI
 ├── nextjs/
 │   └── 16/                       # Next.js 16 starter
-├── nuxt/                         # (planned)
-│   └── 4/
+├── nuxt/
+│   └── 4/                       # Nuxt 4 starter
 └── standalone/                   # (planned)
 ```
 
@@ -67,13 +67,17 @@ export const myRoutes = {
 ```
 
 ## Linking Mion Packages
-Packages are not published to npm yet. Link from local mion monorepo:
-```bash
-# In mion monorepo:
-npm link -w @mionjs/core -w @mionjs/router -w @mionjs/client ...
-# In starter's api directory:
-npm link @mionjs/core @mionjs/router @mionjs/client ...
-```
+Packages are not published to npm yet. They must be linked from the local mion monorepo and then copied (some runtimes like Bun and Turbopack fail with symlinks).
+After any `npm install` or changes to mion packages, run from the repo root run: `npm run mionlink`
+This runs `mionlink` in every starter and its `api/` sub-package. Each `mionlink` script:
+1. `npm link` — creates symlinks to the local mion monorepo
+2. `scripts/copy-mion-packages.js` — replaces symlinks with real copies (removes TS sources to avoid bundler confusion)
+
+
+## Testing & Validation
+- Each starter has e2e tests (`npm test` / Playwright). **All e2e tests must pass** before a starter is considered working.
+- If any test fails, **stop and investigate the failure** before making further changes. Do not assume failures are unrelated or pre-existing.
+- Starters serve as integration/e2e tests for mion itself. If a failure originates in a mion package (build error, missing export, runtime bug), **fix it in the mion repo first** rather than working around it in the starter.
 
 ## CLI
 The CLI (`cli/`) scaffolds mion into projects — either copying a full starter or specific files into an existing repo. It is a separate package (`@mionjs/starter`).
