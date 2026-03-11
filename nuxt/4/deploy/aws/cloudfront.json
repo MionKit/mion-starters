@@ -1,0 +1,38 @@
+{
+  "Comment": "Mion Nuxt Starter — S3 static + Lambda API",
+  "Origins": {
+    "Items": [
+      {
+        "Id": "s3-static",
+        "DomainName": "YOUR_BUCKET.s3.amazonaws.com",
+        "S3OriginConfig": {
+          "OriginAccessIdentity": ""
+        }
+      },
+      {
+        "Id": "lambda-api",
+        "DomainName": "YOUR_LAMBDA_URL.lambda-url.REGION.on.aws",
+        "CustomOriginConfig": {
+          "HTTPSPort": 443,
+          "OriginProtocolPolicy": "https-only"
+        }
+      }
+    ]
+  },
+  "DefaultCacheBehavior": {
+    "TargetOriginId": "s3-static",
+    "ViewerProtocolPolicy": "redirect-to-https",
+    "CachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6"
+  },
+  "CacheBehaviors": {
+    "Items": [
+      {
+        "PathPattern": "/api/mion/*",
+        "TargetOriginId": "lambda-api",
+        "ViewerProtocolPolicy": "https-only",
+        "AllowedMethods": ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"],
+        "CachePolicyId": "4135ea2d-6df8-44a3-9df3-4b5a84be39ad"
+      }
+    ]
+  }
+}

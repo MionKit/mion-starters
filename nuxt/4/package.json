@@ -1,17 +1,38 @@
 {
-  "name": "4",
+  "name": "mion-nuxt-starter",
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
+    "build:api": "vite build --config api/vite.config.ts",
+    "build:api:node": "vite build --config api/vite.config.ts --ssr api/src/server.node.ts",
+    "build:api:bun": "vite build --config api/vite.config.ts --ssr api/src/server.bun.ts",
+    "build:api:vercel": "vite build --config api/vite.config.ts --ssr api/src/vercel-serverless.ts",
+    "build:api:cloudflare": "vite build --config api/vite.config.ts --ssr api/src/cloudflare-worker.ts",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "test": "playwright test",
+    "test:install": "playwright install chromium",
+    "postinstall": "nuxt prepare",
+    "mionlink": "npm link @mionjs/client @mionjs/core @mionjs/router @mionjs/platform-node @mionjs/platform-bun @mionjs/platform-vercel @mionjs/platform-cloudflare @mionjs/type-formats @mionjs/devtools"
   },
   "dependencies": {
+    "@mionjs/client": "^0.7.2",
+    "@mionjs/core": "^0.7.2",
+    "@mionjs/router": "^0.7.2",
+    "@mionjs/platform-node": "^0.7.2",
+    "@mionjs/platform-bun": "^0.7.2",
+    "@mionjs/platform-vercel": "^0.7.2",
+    "@mionjs/platform-cloudflare": "^0.7.2",
+    "@mionjs/type-formats": "^0.7.2",
     "nuxt": "^4.3.1",
     "vue": "^3.5.29",
     "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "@mionjs/devtools": "^0.8.0",
+    "@playwright/test": "^1.58.2",
+    "vite-node": "^5.3.0",
+    "typescript": "^5"
   }
 }

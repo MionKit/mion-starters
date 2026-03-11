@@ -1,0 +1,16 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "nuxt generate",
+  "outputDirectory": ".output/public",
+  "rewrites": [
+    {
+      "source": "/api/mion/:path*",
+      "destination": "/api/mion/:path*"
+    }
+  ],
+  "functions": {
+    "api/mion/**": {
+      "runtime": "nodejs20.x"
+    }
+  }
+}

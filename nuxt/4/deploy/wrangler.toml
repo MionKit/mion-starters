@@ -1,0 +1,10 @@
+# Cloudflare Workers + Pages configuration
+# Static files served from Pages, API from Worker
+
+name = "mion-nuxt-api"
+main = "../api/dist/cloudflare-worker.js"
+compatibility_date = "2025-03-01"
+
+# Routes: forward /api/mion/* to this Worker
+# Static files are deployed separately to Cloudflare Pages
+# Pages custom domain routes /api/mion/* to this Worker via _routes.json
