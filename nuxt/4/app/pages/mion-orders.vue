@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {routesFlow, mapFrom} from '@mionjs/client';
-import {Order, OrderEvent} from '../../api/src/features/orders/orders-models';
+import type {Order, OrderEvent} from '../../api/src/features/orders/orders-models';
 
 const {$mionClient} = useNuxtApp();
 const {routes} = $mionClient;
@@ -50,8 +50,8 @@ const {status, error: asyncError} = useAsyncData('orders', async () => {
     }
 
     return {orders: ordersData, events: allEvents};
-  } catch (e: any) {
-    apiErrors.value.push(`Unexpected error: ${e?.message || e}`);
+  } catch (e: unknown) {
+    apiErrors.value.push(`Unexpected error: ${e instanceof Error ? e.message : e}`);
     throw e;
   }
 }, {server: false});
