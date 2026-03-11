@@ -14,8 +14,7 @@
     "test": "playwright test",
     "test:install": "playwright install chromium",
     "lint": "eslint",
-    "postinstall": "nuxt prepare",
-    "mionlink": "npm link @mionjs/client @mionjs/core @mionjs/router @mionjs/platform-node @mionjs/platform-bun @mionjs/platform-vercel @mionjs/platform-cloudflare @mionjs/type-formats @mionjs/devtools"
+    "postinstall": "nuxt prepare"
   },
   "dependencies": {
     "@mionjs/client": "^0.7.2",

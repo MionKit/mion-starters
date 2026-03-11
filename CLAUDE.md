@@ -68,10 +68,10 @@ export const myRoutes = {
 
 ## Linking Mion Packages
 Packages are not published to npm yet. They must be linked from the local mion monorepo and then copied (some runtimes like Bun and Turbopack fail with symlinks).
-After any `npm install` or changes to mion packages, run from the repo root run: `npm run mionlink`
-This runs `mionlink` in every starter and its `api/` sub-package. Each `mionlink` script:
+After any `npm install` or changes to mion packages, run from the repo root: `npm run mionlink`
+The mionlink scripts live only in the root `package.json` (not in individual starters, since they are dev-only). You can also run per-starter: `npm run mionlink:nextjs` or `npm run mionlink:nuxt`. Each script:
 1. `npm link` — creates symlinks to the local mion monorepo
-2. `scripts/copy-mion-packages.js` — replaces symlinks with real copies (removes TS sources to avoid bundler confusion)
+2. For Next.js: `scripts/copy-mion-packages.js` — replaces symlinks with real copies (removes TS sources to avoid bundler confusion)
 
 
 ## Testing & Validation

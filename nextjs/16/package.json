@@ -12,8 +12,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "playwright test",
-    "test:install": "playwright install chromium",
-    "mionlink": "npm link @mionjs/client @mionjs/core @mionjs/type-formats @mionjs/devtools && node ../../scripts/copy-mion-packages.js nextjs/16 client core type-formats"
+    "test:install": "playwright install chromium"
   },
   "dependencies": {
     "@mionjs/client": "^0.7.2",
