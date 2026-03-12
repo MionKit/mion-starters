@@ -2,12 +2,13 @@
   "name": "mion-app",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "npm-run-all2 --parallel --race dev:*",
     "dev:next": "next dev",
-    "dev:api": "npm run --prefix api dev",
+    "dev:api": "vite-node --watch api/src/dev-server.ts",
     "build": "npm-run-all2 build:*",
-    "build:api": "npm run --prefix api build",
+    "build:api": "vite build --config api/vite.config.ts",
     "build:next": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -17,21 +18,29 @@
   "dependencies": {
     "@mionjs/client": "^0.7.2",
     "@mionjs/core": "^0.7.2",
+    "@mionjs/drizzle": "^0.7.2",
+    "@mionjs/platform-bun": "^0.7.2",
+    "@mionjs/platform-node": "^0.7.2",
+    "@mionjs/platform-vercel": "^0.7.2",
+    "@mionjs/router": "^0.7.2",
+    "@mionjs/type-formats": "^0.7.2",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
   "devDependencies": {
-    "npm-run-all2": "^7",
     "@mionjs/devtools": "^0.8.0",
+    "@playwright/test": "^1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "npm-run-all2": "^7",
     "tailwindcss": "^4",
-    "@playwright/test": "^1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite": "^7.3.1",
+    "vite-node": "^5.3.0"
   }
 }

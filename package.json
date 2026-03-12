@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "mionlink": "npm run mionlink:nextjs && npm run mionlink:nuxt",
-    "mionlink:nextjs": "cd nextjs/16 && npm link @mionjs/client @mionjs/core @mionjs/type-formats @mionjs/devtools && node ../../scripts/copy-mion-packages.js nextjs/16 client core type-formats && cd api && npm link @mionjs/core @mionjs/router @mionjs/platform-vercel @mionjs/platform-node @mionjs/platform-bun @mionjs/drizzle @mionjs/type-formats @mionjs/devtools",
+    "mionlink:nextjs": "cd nextjs/16 && npm link @mionjs/client @mionjs/core @mionjs/router @mionjs/platform-vercel @mionjs/platform-node @mionjs/platform-bun @mionjs/drizzle @mionjs/type-formats @mionjs/devtools && node ../../scripts/copy-mion-packages.js nextjs/16 client core type-formats",
     "mionlink:nuxt": "cd nuxt/4 && npm link @mionjs/client @mionjs/core @mionjs/router @mionjs/platform-node @mionjs/platform-bun @mionjs/platform-vercel @mionjs/platform-cloudflare @mionjs/type-formats @mionjs/devtools"
   }
 }
