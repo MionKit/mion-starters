@@ -1,7 +1,13 @@
 {
-  "name": "mion-nuxt-starter",
+  "name": "@mionjs/create-starter-nuxt",
+  "version": "0.1.0",
   "type": "module",
-  "private": true,
+  "bin": {
+    "create-starter-nuxt": "./create.mjs"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "nuxt dev",
     "generate": "nuxt generate",

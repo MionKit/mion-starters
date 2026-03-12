@@ -1,19 +1,27 @@
 # Mion Starters
 
 ## Repo Structure
-- **Not a monorepo** — each starter and the CLI are independent packages with own `package.json`, `tsconfig.json`, etc.
+- **Not a monorepo** — each starter is an independent `npm create` package with own `package.json`, `tsconfig.json`, etc.
 - Starters are versioned by framework major version: `nextjs/16`, `nuxt/4`, `standalone/1`
-- Starters can be copied as root directory when creating a new project
+- Each starter is published as a `create-*` package and can be used via `npm create`
 
 ```
 mion-starters/
-├── cli/                          # @mionjs/starter CLI
 ├── nextjs/
-│   └── 16/                       # Next.js 16 starter
+│   └── 16/                       # @mionjs/create-starter-nextjs
 ├── nuxt/
-│   └── 4/                       # Nuxt 4 starter
-└── standalone/                   # (planned)
+│   └── 4/                       # @mionjs/create-starter-nuxt
+├── standalone/                   # (planned)
+└── tests/                        # Root-level e2e tests for create scripts
 ```
+
+## Creating a New Project
+```bash
+npm create @mionjs/starter-nextjs my-app
+npm create @mionjs/starter-nuxt my-app
+```
+
+Each starter contains a `create.mjs` bin script that copies the starter files into a new project directory, cleans up the `package.json`, and runs `npm install`.
 
 ## Mion API Structure (shared across all starters)
 Each starter contains an `api/` sub-package with the same folder structure:
@@ -79,5 +87,5 @@ The mionlink scripts live only in the root `package.json` (not in individual sta
 - If any test fails, **stop and investigate the failure** before making further changes. Do not assume failures are unrelated or pre-existing.
 - Starters serve as integration/e2e tests for mion itself. If a failure originates in a mion package (build error, missing export, runtime bug), **fix it in the mion repo first** rather than working around it in the starter.
 
-## CLI
-The CLI (`cli/`) scaffolds mion into projects — either copying a full starter or specific files into an existing repo. It is a separate package (`@mionjs/starter`).
+## Root Tests
+Root-level e2e tests (`tests/create-starter.test.ts`) verify that each `create.mjs` script correctly copies files and modifies `package.json`. Run with `npm test` from root. Uses vitest.

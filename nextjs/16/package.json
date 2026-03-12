@@ -1,8 +1,13 @@
 {
-  "name": "mion-app",
+  "name": "@mionjs/create-starter-nextjs",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
+  "bin": {
+    "create-starter-nextjs": "./create.mjs"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "npm-run-all2 --parallel --race dev:*",
     "dev:next": "next dev",
