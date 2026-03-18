@@ -4,4 +4,4 @@
 
 name = "mion-vue-app"
 compatibility_date = "2025-03-01"
-pages_build_output_dir = "../dist"
+pages_build_output_dir = "../dist/app"

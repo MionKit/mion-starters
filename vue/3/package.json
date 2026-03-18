@@ -10,15 +10,15 @@
   },
   "scripts": {
     "dev": "vite",
-    "build:app": "vite build",
+    "build:app": "vite build --config vite.app.build.config.ts",
     "build:api": "vite build --config api/vite.config.ts",
-    "build:api:node": "vite build --config api/vite.config.ts --ssr api/src/server.node.ts",
-    "build:api:bun": "vite build --config api/vite.config.ts --ssr api/src/server.bun.ts",
-    "build:api:vercel": "vite build --config api/vite.config.ts --ssr api/src/vercel-serverless.ts",
-    "build:api:cloudflare": "vite build --config api/vite.config.ts --ssr api/src/cloudflare-worker.ts",
     "build": "npm run build:app && npm run build:api",
-    "preview": "vite preview",
-    "test": "playwright test",
+    "preview": "npm run preview:api & npm run preview:app",
+    "preview:app": "vite preview --config vite.app.build.config.ts",
+    "preview:api": "node dist/api/server.node.js",
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test",
+    "test": "vitest run && playwright test",
     "test:install": "playwright install chromium",
     "lint": "eslint"
   },
@@ -37,11 +37,13 @@
   "devDependencies": {
     "@mionjs/devtools": "file:../../mion-tarballs/mionjs-devtools.tgz",
     "@playwright/test": "^1.58.2",
-    "@vitejs/plugin-vue": "^5",
+    "@vitejs/plugin-vue": "^6",
     "eslint": "^9",
     "eslint-plugin-vue": "^10",
     "typescript": "^5",
     "typescript-eslint": "^8",
-    "vite": "^6"
+    "vite": "^7.3.1",
+    "vite-node": "^5.3.0",
+    "vitest": "^4.0.18"
   }
 }
