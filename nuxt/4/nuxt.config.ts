@@ -17,5 +17,8 @@ export default defineNuxtConfig({
     plugins: [
       createMionPlugin(),
     ],
+    ssr: {
+      noExternal: [/@mionjs\//],
+    },
   },
 })

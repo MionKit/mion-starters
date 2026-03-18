@@ -11,7 +11,7 @@
   "scripts": {
     "dev": "npm-run-all2 --parallel --race dev:*",
     "dev:next": "next dev",
-    "dev:api": "vite-node --watch api/src/dev-server.ts",
+    "dev:api": "vite-node -c api/vite.config.ts --watch api/src/dev-server.ts",
     "build": "npm-run-all2 build:*",
     "build:api": "vite build --config api/vite.config.ts",
     "build:next": "next build",
@@ -21,20 +21,20 @@
     "test:install": "playwright install chromium"
   },
   "dependencies": {
-    "@mionjs/client": "^0.7.2",
-    "@mionjs/core": "^0.7.2",
-    "@mionjs/drizzle": "^0.7.2",
-    "@mionjs/platform-bun": "^0.7.2",
-    "@mionjs/platform-node": "^0.7.2",
-    "@mionjs/platform-vercel": "^0.7.2",
-    "@mionjs/router": "^0.7.2",
-    "@mionjs/type-formats": "^0.7.2",
+    "@mionjs/client": "file:../../mion-tarballs/mionjs-client.tgz",
+    "@mionjs/core": "file:../../mion-tarballs/mionjs-core.tgz",
+    "@mionjs/drizzle": "file:../../mion-tarballs/mionjs-drizzle.tgz",
+    "@mionjs/platform-bun": "file:../../mion-tarballs/mionjs-platform-bun.tgz",
+    "@mionjs/platform-node": "file:../../mion-tarballs/mionjs-platform-node.tgz",
+    "@mionjs/platform-vercel": "file:../../mion-tarballs/mionjs-platform-vercel.tgz",
+    "@mionjs/router": "file:../../mion-tarballs/mionjs-router.tgz",
+    "@mionjs/type-formats": "file:../../mion-tarballs/mionjs-type-formats.tgz",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
   "devDependencies": {
-    "@mionjs/devtools": "^0.8.0",
+    "@mionjs/devtools": "file:../../mion-tarballs/mionjs-devtools.tgz",
     "@playwright/test": "^1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",

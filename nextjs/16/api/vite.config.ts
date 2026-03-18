@@ -11,8 +11,12 @@ export default defineConfig({
         clientSrcPath: resolve(__dirname, "../app"),
         noViteClient: true,
       },
+      aotCaches: true,
     }),
   ],
+  ssr: {
+    noExternal: [/@mionjs\//],
+  },
   build: {
     ssr: resolve(__dirname, "src/vercel-serverless.ts"),
     outDir: "dist",

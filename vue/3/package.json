@@ -1,26 +1,26 @@
 {
-  "name": "@mionjs/create-starter-nuxt",
+  "name": "@mionjs/create-starter-vue",
   "version": "0.1.0",
   "type": "module",
   "bin": {
-    "create-starter-nuxt": "./create.mjs"
+    "create-starter-vue": "./create.mjs"
   },
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
-    "dev": "nuxt dev",
-    "generate": "nuxt generate",
+    "dev": "vite",
+    "build:app": "vite build",
     "build:api": "vite build --config api/vite.config.ts",
     "build:api:node": "vite build --config api/vite.config.ts --ssr api/src/server.node.ts",
     "build:api:bun": "vite build --config api/vite.config.ts --ssr api/src/server.bun.ts",
     "build:api:vercel": "vite build --config api/vite.config.ts --ssr api/src/vercel-serverless.ts",
     "build:api:cloudflare": "vite build --config api/vite.config.ts --ssr api/src/cloudflare-worker.ts",
-    "preview": "nuxt preview",
+    "build": "npm run build:app && npm run build:api",
+    "preview": "vite preview",
     "test": "playwright test",
     "test:install": "playwright install chromium",
-    "lint": "eslint",
-    "postinstall": "nuxt prepare"
+    "lint": "eslint"
   },
   "dependencies": {
     "@mionjs/client": "file:../../mion-tarballs/mionjs-client.tgz",
@@ -31,16 +31,17 @@
     "@mionjs/platform-vercel": "file:../../mion-tarballs/mionjs-platform-vercel.tgz",
     "@mionjs/platform-cloudflare": "file:../../mion-tarballs/mionjs-platform-cloudflare.tgz",
     "@mionjs/type-formats": "file:../../mion-tarballs/mionjs-type-formats.tgz",
-    "@nuxt/eslint": "^1.15.2",
-    "nuxt": "^4.3.1",
     "vue": "^3.5.29",
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
     "@mionjs/devtools": "file:../../mion-tarballs/mionjs-devtools.tgz",
     "@playwright/test": "^1.58.2",
+    "@vitejs/plugin-vue": "^5",
     "eslint": "^9",
-    "vite-node": "^5.3.0",
-    "typescript": "^5"
+    "eslint-plugin-vue": "^10",
+    "typescript": "^5",
+    "typescript-eslint": "^8",
+    "vite": "^6"
   }
 }

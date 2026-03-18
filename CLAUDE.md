@@ -2,7 +2,7 @@
 
 ## Repo Structure
 - **Not a monorepo** — each starter is an independent `npm create` package with own `package.json`, `tsconfig.json`, etc.
-- Starters are versioned by framework major version: `nextjs/16`, `nuxt/4`, `standalone/1`
+- Starters are versioned by framework major version: `nextjs/16`, `nuxt/4`, `vue/3`, `standalone/1`
 - Each starter is published as a `create-*` package and can be used via `npm create`
 
 ```
@@ -11,6 +11,8 @@ mion-starters/
 │   └── 16/                       # @mionjs/create-starter-nextjs
 ├── nuxt/
 │   └── 4/                       # @mionjs/create-starter-nuxt
+├── vue/
+│   └── 3/                       # @mionjs/create-starter-vue
 ├── standalone/                   # (planned)
 └── tests/                        # Root-level e2e tests for create scripts
 ```
@@ -19,6 +21,7 @@ mion-starters/
 ```bash
 npm create @mionjs/starter-nextjs my-app
 npm create @mionjs/starter-nuxt my-app
+npm create @mionjs/starter-vue my-app
 ```
 
 Each starter contains a `create.mjs` bin script that copies the starter files into a new project directory, cleans up the `package.json`, and runs `npm install`.
@@ -74,12 +77,21 @@ export const myRoutes = {
 } satisfies Routes;
 ```
 
-## Linking Mion Packages
-Packages are not published to npm yet. They must be linked from the local mion monorepo and then copied (some runtimes like Bun and Turbopack fail with symlinks).
-After any `npm install` or changes to mion packages, run from the repo root: `npm run mionlink`
-The mionlink scripts live only in the root `package.json` (not in individual starters, since they are dev-only). You can also run per-starter: `npm run mionlink:nextjs` or `npm run mionlink:nuxt`. Each script:
-1. `npm link` — creates symlinks to the local mion monorepo
-2. For Next.js: `scripts/copy-mion-packages.js` — replaces symlinks with real copies (removes TS sources to avoid bundler confusion)
+## Mion Packages
+All `@mionjs/*` packages are published to npm. During development, local tarballs from the mion repo can be used instead.
+
+### Using npm versions (default for CI / release)
+```bash
+npm run mion:npm -- 0.8.4-alpha.0   # set all @mionjs/* deps to a specific version
+```
+
+### Using local tarballs (for development)
+```bash
+npm run mion:tarballs               # packs mion packages, copies tarballs, and switches deps to file: references
+```
+This runs `scripts/copy-mion-tarballs.sh` (packs & copies tarballs from `../mion` into `mion-tarballs/`) then `scripts/update-mion-deps.mjs file` (rewrites all `@mionjs/*` deps to `file:../../mion-tarballs/mionjs-*.tgz`).
+
+After switching to tarballs, run `npm install` in each starter to install the local packages.
 
 
 ## Testing & Validation

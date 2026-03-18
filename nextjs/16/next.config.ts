@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
     // Transpile linked mion packages so Turbopack can resolve them
     transpilePackages: ['@mionjs/client', '@mionjs/core'],
     turbopack: {
+        root: import.meta.dirname,
         resolveAlias: {
             'virtual:mion-aot/caches': './mion-aot-caches-shim.js',
             'virtual:mion-server-pure-fns': './mion-aot-caches-shim.js',

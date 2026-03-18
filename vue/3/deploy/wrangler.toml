@@ -1,0 +1,7 @@
+# Cloudflare Pages configuration
+# Static files served from Pages, API from Pages Functions
+# Deploy with: wrangler pages deploy dist --config deploy/wrangler.toml
+
+name = "mion-vue-app"
+compatibility_date = "2025-03-01"
+pages_build_output_dir = "../dist"

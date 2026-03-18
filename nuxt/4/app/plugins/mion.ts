@@ -1,4 +1,3 @@
-import "virtual:mion-aot/caches";
 import { initClient } from "@mionjs/client";
 import type { MyApi } from "../../api/src/api.ts";
 

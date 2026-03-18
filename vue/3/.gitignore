@@ -1,0 +1,23 @@
+# Build outputs
+dist
+.dist
+
+# Node dependencies
+node_modules
+
+# API build outputs
+api/dist
+
+# Logs
+logs
+*.log
+
+# Misc
+.DS_Store
+.fleet
+.idea
+
+# Local env files
+.env
+.env.*
+!.env.example

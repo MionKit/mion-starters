@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/majerez/Projects/mion/packages/examples/src/codegen/**)",
+      "Read(//Users/majerez/Projects/mion/website/content/5.devtools/**)",
+      "Bash(npx playwright:*)",
+      "Bash(npm run:*)",
+      "Bash(timeout 15 npx nuxt dev --port 3099)"
+    ]
+  }
+}

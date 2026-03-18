@@ -2,17 +2,15 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { routesFlow, mapFrom } from "@mionjs/client";
-import { initAOTClient } from "@mionjs/client/aot";
+import { initClient, routesFlow, mapFrom } from "@mionjs/client";
 import type { MyApi } from "@mion-app/api";
 import type {
   Order,
   OrderEvent,
 } from "@/api/src/features/orders/orders-models";
 
-// Initialize mion client with precompiled AOT caches — fully typed RPC, automatic Date deserialization
-// this is required when vite is not used in the FE
-const { routes } = initAOTClient<MyApi>({
+// Initialize mion client — fully typed RPC, automatic Date deserialization
+const { routes } = initClient<MyApi>({
   baseURL: typeof window !== "undefined" ? window.location.origin : "",
   basePath: "api/mion",
 });
