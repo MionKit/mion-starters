@@ -16,6 +16,7 @@ import fs from "fs";
 import path from "path";
 import {fileURLToPath} from "url";
 import {glob} from "fs/promises";
+import {execSync} from "child_process";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -61,6 +62,14 @@ function fileRef(pkgJsonPath, mionPkg) {
   const tarballPath = path.join(ROOT, TARBALLS_DIR, toTarballName(mionPkg));
   const rel = path.relative(pkgDir, tarballPath);
   return `file:${rel}`;
+}
+
+function hasMionDeps(pkg) {
+  for (const deps of [pkg.dependencies, pkg.devDependencies, pkg.peerDependencies, pkg.optionalDependencies]) {
+    if (!deps) continue;
+    if (Object.keys(deps).some((d) => d.startsWith("@mionjs/"))) return true;
+  }
+  return false;
 }
 
 function updateDeps(deps, pkgJsonPath, label) {
@@ -113,8 +122,41 @@ for (const pkgPath of packageJsons) {
     // Preserve original formatting (detect indent)
     const indent = content.match(/^(\s+)"/m)?.[1] || "  ";
     fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, indent) + "\n");
+  } else if (hasMionDeps(pkg)) {
+    console.log(`  – ${relPath} (already up to date)\n`);
   } else {
     console.log(`  – ${relPath} (no @mionjs/* deps)\n`);
+  }
+
+  // In file mode, always clean cached @mionjs packages and stale lockfile integrity
+  // hashes so npm install picks up fresh tarballs (filenames no longer contain hashes).
+  if (useFile && hasMionDeps(pkg)) {
+    const pkgDir = path.dirname(pkgPath);
+    const mionNodeModules = path.join(pkgDir, "node_modules", "@mionjs");
+    if (fs.existsSync(mionNodeModules)) {
+      fs.rmSync(mionNodeModules, {recursive: true});
+      console.log(`  🗑 removed ${path.relative(ROOT, mionNodeModules)}`);
+    }
+    const viteCache = path.join(pkgDir, "node_modules", ".vite");
+    if (fs.existsSync(viteCache)) {
+      fs.rmSync(viteCache, {recursive: true});
+      console.log(`  🗑 removed ${path.relative(ROOT, viteCache)}`);
+    }
+    const lockPath = path.join(pkgDir, "package-lock.json");
+    if (fs.existsSync(lockPath)) {
+      const lockContent = fs.readFileSync(lockPath, "utf-8");
+      const lock = JSON.parse(lockContent);
+      let stripped = 0;
+      for (const [key, entry] of Object.entries(lock.packages || {})) {
+        if (!key.includes("@mionjs/")) continue;
+        if (entry.integrity) { delete entry.integrity; stripped++; }
+      }
+      if (stripped > 0) {
+        const lockIndent = lockContent.match(/^(\s+)"/m)?.[1] || "  ";
+        fs.writeFileSync(lockPath, JSON.stringify(lock, null, lockIndent) + "\n");
+        console.log(`  🗑 stripped ${stripped} integrity hashes from ${path.relative(ROOT, lockPath)}`);
+      }
+    }
   }
 }
 
@@ -140,4 +182,27 @@ if (useFile) {
   }
 }
 
-console.log(`Done: ${totalUpdated} dependencies updated.`);
+// Run npm install in each starter that has @mionjs/* deps
+if (useFile) {
+  const starterRoots = new Set();
+  for (const pkgPath of packageJsons) {
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"));
+    if (!hasMionDeps(pkg)) continue;
+    // Find the starter root (parent of api/ sub-packages)
+    const pkgDir = path.dirname(pkgPath);
+    const starterRoot = pkgDir.endsWith("/api") ? path.dirname(pkgDir) : pkgDir;
+    starterRoots.add(starterRoot);
+  }
+  for (const dir of starterRoots) {
+    const relDir = path.relative(ROOT, dir);
+    console.log(`\n📦 npm install in ${relDir}...`);
+    try {
+      execSync("npm install", {cwd: dir, stdio: "inherit"});
+    } catch {
+      console.error(`  ❌ npm install failed in ${relDir}`);
+      process.exit(1);
+    }
+  }
+}
+
+console.log(`\nDone: ${totalUpdated} dependencies updated.`);

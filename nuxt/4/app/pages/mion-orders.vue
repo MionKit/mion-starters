@@ -82,7 +82,7 @@ function getEventDetails(event: OrderEvent): string | null {
           is a lightweight TypeScript API framework with end-to-end type safety, automatic serialization, and built-in validation.
           This showcase demonstrates how
           <code>routesFlow</code>
-          resolves related data across multiple routes in a single HTTP request — a lightweight alternative to GraphQL, but fully typed and without a schema layer.
+          resolves related data across multiple routes in a single HTTP request. <strong class="hl">A fully typed lightweight alternative to GraphQL.</strong>
         </p>
       </div>
 
@@ -325,6 +325,11 @@ function getEventDetails(event: OrderEvent): string | null {
 .event-details {
   font-size: 13px;
   margin-top: 2px;
+}
+
+.hl {
+  color: #fafafa;
+  display: block;
 }
 
 @media (prefers-color-scheme: dark) {

@@ -4,13 +4,14 @@ import {resolve, join} from 'node:path';
 import {describe, it, beforeAll, afterAll} from 'vitest';
 
 const ROOT = resolve(import.meta.dirname, '..');
-const TMP_DIR = resolve(ROOT, '.tmp');
+const TMP_DIR = resolve(ROOT, '.tmp-vue');
 const PROJECT_DIR = join(TMP_DIR, 'e2e-vue');
 const STARTER_DIR = resolve(ROOT, 'vue/3');
 const CREATE_SCRIPT = resolve(STARTER_DIR, 'create.mjs');
 
+const env = {...process.env, NODE_ENV: 'development'};
 const run = (cmd: string, cwd = PROJECT_DIR) =>
-    execSync(cmd, {cwd, stdio: 'inherit', timeout: 180_000});
+    execSync(cmd, {cwd, stdio: 'inherit', timeout: 180_000, env});
 
 describe('create-starter-vue e2e', () => {
     beforeAll(() => {
