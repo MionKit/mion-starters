@@ -35,7 +35,7 @@ const {status, error: asyncError} = useAsyncData('orders', async () => {
       'mapFromOrdersToOrderEvents',
     ).type();
 
-    const [[ordersData, allEvents], [ordersError, eventsError]] = await routesFlow([ordersList, routes.orders.getOrdersEvents(orderIds)]);
+    const [[ordersData, allEvents], [ordersError, eventsError]] = await routesFlow([ordersList, routes.orders.getOrdersEvents(orderIds)]).call();
 
     if (ordersError) apiErrors.value.push(`listOrders: ${ordersError.publicMessage} (${ordersError.type})`);
     if (eventsError) apiErrors.value.push(`getOrdersEvents: ${eventsError.publicMessage} (${eventsError.type})`);

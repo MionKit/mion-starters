@@ -194,8 +194,9 @@ export default function OrdersPage() {
       "mapFromOrdersToOrderEvents",
     ).type();
 
-    routesFlow([ordersList, routes.orders.getOrdersEvents(orderIds)]).then(
-      ([[ordersData, allEvents]]) => {
+    routesFlow([ordersList, routes.orders.getOrdersEvents(orderIds)])
+      .call()
+      .then(([[ordersData, allEvents]]) => {
         if (ordersData) setOrders(ordersData);
         if (allEvents) {
           const eventsMap: Record<string, OrderEvent[]> = {};
@@ -205,8 +206,7 @@ export default function OrdersPage() {
           setEventsByOrder(eventsMap);
         }
         setLoading(false);
-      },
-    );
+      });
   }, []);
 
   if (loading)
