@@ -47,5 +47,20 @@
     "typescript": "^5",
     "vite": "^7.3.1",
     "vite-node": "^5.3.0"
+  },
+  "overrides": {
+    "@mionjs/client": "file:../../mion-tarballs/mionjs-client.tgz",
+    "@mionjs/core": "file:../../mion-tarballs/mionjs-core.tgz",
+    "@mionjs/devtools": "file:../../mion-tarballs/mionjs-devtools.tgz",
+    "@mionjs/drizzle": "file:../../mion-tarballs/mionjs-drizzle.tgz",
+    "@mionjs/platform-aws": "file:../../mion-tarballs/mionjs-platform-aws.tgz",
+    "@mionjs/platform-bun": "file:../../mion-tarballs/mionjs-platform-bun.tgz",
+    "@mionjs/platform-cloudflare": "file:../../mion-tarballs/mionjs-platform-cloudflare.tgz",
+    "@mionjs/platform-gcloud": "file:../../mion-tarballs/mionjs-platform-gcloud.tgz",
+    "@mionjs/platform-node": "file:../../mion-tarballs/mionjs-platform-node.tgz",
+    "@mionjs/platform-vercel": "file:../../mion-tarballs/mionjs-platform-vercel.tgz",
+    "@mionjs/router": "file:../../mion-tarballs/mionjs-router.tgz",
+    "@mionjs/run-types": "file:../../mion-tarballs/mionjs-run-types.tgz",
+    "@mionjs/type-formats": "file:../../mion-tarballs/mionjs-type-formats.tgz"
   }
 }

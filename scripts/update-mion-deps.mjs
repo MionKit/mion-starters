@@ -38,6 +38,21 @@ function toTarballName(pkg) {
   return pkg.replace("@mionjs/", "mionjs-") + ".tgz";
 }
 
+/** Converts mionjs-client.tgz → @mionjs/client */
+function fromTarballName(file) {
+  return "@mionjs/" + file.slice("mionjs-".length, -".tgz".length);
+}
+
+/** Lists every @mionjs/* package available as a local tarball */
+function listLocalMionPackages() {
+  const tarballsPath = path.join(ROOT, TARBALLS_DIR);
+  if (!fs.existsSync(tarballsPath)) return [];
+  return fs.readdirSync(tarballsPath)
+    .filter((f) => f.startsWith("mionjs-") && f.endsWith(".tgz"))
+    .map(fromTarballName)
+    .sort();
+}
+
 /** Finds all starter package.json files (skips node_modules, mion-tarballs, .tmp) */
 function findStarterPackageJsons() {
   const starters = [];
@@ -87,6 +102,36 @@ function updateDeps(deps, pkgJsonPath, label) {
   return count;
 }
 
+/**
+ * Manages the `overrides` block so transitive @mionjs/* deps (e.g. @mionjs/run-types
+ * pulled in by @mionjs/router) also resolve to local tarballs in file mode.
+ * In version mode, removes the @mionjs/* override entries again so the published
+ * starter packages stay clean.
+ */
+function updateOverrides(pkg, pkgJsonPath, allMionPkgs) {
+  let count = 0;
+  if (useFile) {
+    pkg.overrides = pkg.overrides || {};
+    for (const mionPkg of allMionPkgs) {
+      const newValue = fileRef(pkgJsonPath, mionPkg);
+      if (pkg.overrides[mionPkg] !== newValue) {
+        console.log(`  override ${mionPkg}: ${pkg.overrides[mionPkg] ?? "(none)"} → ${newValue}`);
+        pkg.overrides[mionPkg] = newValue;
+        count++;
+      }
+    }
+  } else if (pkg.overrides) {
+    for (const key of Object.keys(pkg.overrides)) {
+      if (!key.startsWith("@mionjs/")) continue;
+      console.log(`  override ${key}: ${pkg.overrides[key]} → (removed)`);
+      delete pkg.overrides[key];
+      count++;
+    }
+    if (Object.keys(pkg.overrides).length === 0) delete pkg.overrides;
+  }
+  return count;
+}
+
 // Validate tarballs exist when using file mode
 if (useFile) {
   const tarballsPath = path.join(ROOT, TARBALLS_DIR);
@@ -105,6 +150,8 @@ if (packageJsons.length === 0) {
 
 console.log(`Updating @mionjs/* deps to ${useFile ? "file: references" : version}\n`);
 
+const allMionPkgs = listLocalMionPackages();
+
 let totalUpdated = 0;
 for (const pkgPath of packageJsons) {
   const relPath = path.relative(ROOT, pkgPath);
@@ -116,6 +163,7 @@ for (const pkgPath of packageJsons) {
   totalUpdated += updateDeps(pkg.devDependencies, pkgPath, "dev");
   totalUpdated += updateDeps(pkg.peerDependencies, pkgPath, "peer");
   totalUpdated += updateDeps(pkg.optionalDependencies, pkgPath, "opt");
+  if (hasMionDeps(pkg)) totalUpdated += updateOverrides(pkg, pkgPath, allMionPkgs);
 
   if (totalUpdated > before) {
     console.log(`  ✓ ${relPath}\n`);
@@ -146,15 +194,18 @@ for (const pkgPath of packageJsons) {
     if (fs.existsSync(lockPath)) {
       const lockContent = fs.readFileSync(lockPath, "utf-8");
       const lock = JSON.parse(lockContent);
-      let stripped = 0;
-      for (const [key, entry] of Object.entries(lock.packages || {})) {
-        if (!key.includes("@mionjs/")) continue;
-        if (entry.integrity) { delete entry.integrity; stripped++; }
+      let removed = 0;
+      // Drop every @mionjs/* entry from the lock file so npm cannot reuse a stale
+      // `resolved` URL that points back at the npm registry for transitive deps.
+      for (const key of Object.keys(lock.packages || {})) {
+        if (!key.startsWith("node_modules/@mionjs/") && key !== "node_modules/@mionjs") continue;
+        delete lock.packages[key];
+        removed++;
       }
-      if (stripped > 0) {
+      if (removed > 0) {
         const lockIndent = lockContent.match(/^(\s+)"/m)?.[1] || "  ";
         fs.writeFileSync(lockPath, JSON.stringify(lock, null, lockIndent) + "\n");
-        console.log(`  🗑 stripped ${stripped} integrity hashes from ${path.relative(ROOT, lockPath)}`);
+        console.log(`  🗑 removed ${removed} @mionjs/* entries from ${path.relative(ROOT, lockPath)}`);
       }
     }
   }
