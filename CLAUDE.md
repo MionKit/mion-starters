@@ -82,16 +82,17 @@ All `@mionjs/*` packages are published to npm. During development, local tarball
 
 ### Using npm versions (default for CI / release)
 ```bash
-npm run mion:npm -- 0.8.4-alpha.0   # set all @mionjs/* deps to a specific version
+npm run mionupdate              # fetches latest @mionjs/core version from npm and updates all starters
+npm run mionupdate -- 0.8.4     # set all @mionjs/* deps to a specific version
 ```
 
 ### Using local tarballs (for development)
 ```bash
-npm run mion:tarballs               # packs mion packages, copies tarballs, and switches deps to file: references
+npm run mionlink                # packs mion packages, copies tarballs, and switches deps to file: references
 ```
-This runs `scripts/copy-mion-tarballs.sh` (packs & copies tarballs from `../mion` into `mion-tarballs/`) then `scripts/update-mion-deps.mjs file` (rewrites all `@mionjs/*` deps to `file:../../mion-tarballs/mionjs-*.tgz`).
+This runs `scripts/mionlink.mjs` which packs & copies tarballs from `../mion` into `mion-tarballs/`, rewrites all `@mionjs/*` deps to `file:` references, cleans caches, and runs `npm install` in each starter.
 
-After switching to tarballs, run `npm install` in each starter to install the local packages.
+Both scripts share utilities from `scripts/mion-utils.mjs` and handle cleanup + `npm install` automatically.
 
 
 ## Testing & Validation

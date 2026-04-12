@@ -23,39 +23,24 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@mionjs/client": "file:../../mion-tarballs/mionjs-client.tgz",
-    "@mionjs/core": "file:../../mion-tarballs/mionjs-core.tgz",
-    "@mionjs/router": "file:../../mion-tarballs/mionjs-router.tgz",
-    "@mionjs/platform-node": "file:../../mion-tarballs/mionjs-platform-node.tgz",
-    "@mionjs/platform-bun": "file:../../mion-tarballs/mionjs-platform-bun.tgz",
-    "@mionjs/platform-vercel": "file:../../mion-tarballs/mionjs-platform-vercel.tgz",
-    "@mionjs/platform-cloudflare": "file:../../mion-tarballs/mionjs-platform-cloudflare.tgz",
-    "@mionjs/type-formats": "file:../../mion-tarballs/mionjs-type-formats.tgz",
+    "@mionjs/client": "0.8.4",
+    "@mionjs/core": "0.8.4",
+    "@mionjs/router": "0.8.4",
+    "@mionjs/platform-node": "0.8.4",
+    "@mionjs/platform-bun": "0.8.4",
+    "@mionjs/platform-vercel": "0.8.4",
+    "@mionjs/platform-cloudflare": "0.8.4",
+    "@mionjs/type-formats": "0.8.4",
     "@nuxt/eslint": "^1.15.2",
     "nuxt": "^4.3.1",
     "vue": "^3.5.29",
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
-    "@mionjs/devtools": "file:../../mion-tarballs/mionjs-devtools.tgz",
+    "@mionjs/devtools": "0.8.4",
     "@playwright/test": "^1.58.2",
     "eslint": "^9",
     "vite-node": "^5.3.0",
     "typescript": "^5"
-  },
-  "overrides": {
-    "@mionjs/client": "file:../../mion-tarballs/mionjs-client.tgz",
-    "@mionjs/core": "file:../../mion-tarballs/mionjs-core.tgz",
-    "@mionjs/devtools": "file:../../mion-tarballs/mionjs-devtools.tgz",
-    "@mionjs/drizzle": "file:../../mion-tarballs/mionjs-drizzle.tgz",
-    "@mionjs/platform-aws": "file:../../mion-tarballs/mionjs-platform-aws.tgz",
-    "@mionjs/platform-bun": "file:../../mion-tarballs/mionjs-platform-bun.tgz",
-    "@mionjs/platform-cloudflare": "file:../../mion-tarballs/mionjs-platform-cloudflare.tgz",
-    "@mionjs/platform-gcloud": "file:../../mion-tarballs/mionjs-platform-gcloud.tgz",
-    "@mionjs/platform-node": "file:../../mion-tarballs/mionjs-platform-node.tgz",
-    "@mionjs/platform-vercel": "file:../../mion-tarballs/mionjs-platform-vercel.tgz",
-    "@mionjs/router": "file:../../mion-tarballs/mionjs-router.tgz",
-    "@mionjs/run-types": "file:../../mion-tarballs/mionjs-run-types.tgz",
-    "@mionjs/type-formats": "file:../../mion-tarballs/mionjs-type-formats.tgz"
   }
 }

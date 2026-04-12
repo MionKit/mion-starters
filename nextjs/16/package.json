@@ -21,20 +21,20 @@
     "test:install": "playwright install chromium"
   },
   "dependencies": {
-    "@mionjs/client": "file:../../mion-tarballs/mionjs-client.tgz",
-    "@mionjs/core": "file:../../mion-tarballs/mionjs-core.tgz",
-    "@mionjs/drizzle": "file:../../mion-tarballs/mionjs-drizzle.tgz",
-    "@mionjs/platform-bun": "file:../../mion-tarballs/mionjs-platform-bun.tgz",
-    "@mionjs/platform-node": "file:../../mion-tarballs/mionjs-platform-node.tgz",
-    "@mionjs/platform-vercel": "file:../../mion-tarballs/mionjs-platform-vercel.tgz",
-    "@mionjs/router": "file:../../mion-tarballs/mionjs-router.tgz",
-    "@mionjs/type-formats": "file:../../mion-tarballs/mionjs-type-formats.tgz",
+    "@mionjs/client": "0.8.4",
+    "@mionjs/core": "0.8.4",
+    "@mionjs/drizzle": "0.8.4",
+    "@mionjs/platform-bun": "0.8.4",
+    "@mionjs/platform-node": "0.8.4",
+    "@mionjs/platform-vercel": "0.8.4",
+    "@mionjs/router": "0.8.4",
+    "@mionjs/type-formats": "0.8.4",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
   "devDependencies": {
-    "@mionjs/devtools": "file:../../mion-tarballs/mionjs-devtools.tgz",
+    "@mionjs/devtools": "0.8.4",
     "@playwright/test": "^1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
@@ -47,20 +47,5 @@
     "typescript": "^5",
     "vite": "^7.3.1",
     "vite-node": "^5.3.0"
-  },
-  "overrides": {
-    "@mionjs/client": "file:../../mion-tarballs/mionjs-client.tgz",
-    "@mionjs/core": "file:../../mion-tarballs/mionjs-core.tgz",
-    "@mionjs/devtools": "file:../../mion-tarballs/mionjs-devtools.tgz",
-    "@mionjs/drizzle": "file:../../mion-tarballs/mionjs-drizzle.tgz",
-    "@mionjs/platform-aws": "file:../../mion-tarballs/mionjs-platform-aws.tgz",
-    "@mionjs/platform-bun": "file:../../mion-tarballs/mionjs-platform-bun.tgz",
-    "@mionjs/platform-cloudflare": "file:../../mion-tarballs/mionjs-platform-cloudflare.tgz",
-    "@mionjs/platform-gcloud": "file:../../mion-tarballs/mionjs-platform-gcloud.tgz",
-    "@mionjs/platform-node": "file:../../mion-tarballs/mionjs-platform-node.tgz",
-    "@mionjs/platform-vercel": "file:../../mion-tarballs/mionjs-platform-vercel.tgz",
-    "@mionjs/router": "file:../../mion-tarballs/mionjs-router.tgz",
-    "@mionjs/run-types": "file:../../mion-tarballs/mionjs-run-types.tgz",
-    "@mionjs/type-formats": "file:../../mion-tarballs/mionjs-type-formats.tgz"
   }
 }

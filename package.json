@@ -6,8 +6,8 @@
     "test:create:nextjs": "vitest run tests/create-nextjs.test.ts",
     "test:create:nuxt": "vitest run tests/create-nuxt.test.ts",
     "test:create:vue": "vitest run tests/create-vue.test.ts",
-    "mionlink": "bash scripts/copy-mion-tarballs.sh && node scripts/update-mion-deps.mjs file",
-    "mion:npm": "node scripts/update-mion-deps.mjs"
+    "mionlink": "node scripts/mionlink.mjs",
+    "mionupdate": "node scripts/mionupdate.mjs"
   },
   "devDependencies": {
     "vitest": "^3"
