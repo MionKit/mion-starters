@@ -1,5 +1,5 @@
 import {execSync} from 'node:child_process';
-import {rmSync, mkdirSync, cpSync} from 'node:fs';
+import {rmSync, mkdirSync} from 'node:fs';
 import {resolve, join} from 'node:path';
 import {describe, it, beforeAll, afterAll} from 'vitest';
 
@@ -21,11 +21,7 @@ describe('create-starter-vue e2e', () => {
         // 1. Create project (runs npm install)
         run(`node ${CREATE_SCRIPT} ${PROJECT_DIR}`, TMP_DIR);
 
-        // 2. Copy playwright config and e2e tests (excluded by create script)
-        cpSync(join(STARTER_DIR, 'playwright.config.ts'), join(PROJECT_DIR, 'playwright.config.ts'));
-        cpSync(join(STARTER_DIR, 'e2e'), join(PROJECT_DIR, 'e2e'), {recursive: true});
-
-        // 3. Install playwright browser
+        // 2. Install playwright browser
         run('npx playwright install chromium');
     }, 600_000);
 

@@ -23,19 +23,19 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@mionjs/client": "0.8.4",
-    "@mionjs/core": "0.8.4",
-    "@mionjs/router": "0.8.4",
-    "@mionjs/platform-node": "0.8.4",
-    "@mionjs/platform-bun": "0.8.4",
-    "@mionjs/platform-vercel": "0.8.4",
-    "@mionjs/platform-cloudflare": "0.8.4",
-    "@mionjs/type-formats": "0.8.4",
+    "@mionjs/client": "0.8.6",
+    "@mionjs/core": "0.8.6",
+    "@mionjs/router": "0.8.6",
+    "@mionjs/platform-node": "0.8.6",
+    "@mionjs/platform-bun": "0.8.6",
+    "@mionjs/platform-vercel": "0.8.6",
+    "@mionjs/platform-cloudflare": "0.8.6",
+    "@mionjs/type-formats": "0.8.6",
     "vue": "^3.5.29",
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
-    "@mionjs/devtools": "0.8.4",
+    "@mionjs/devtools": "0.8.6",
     "@playwright/test": "^1.58.2",
     "@vitejs/plugin-vue": "^6",
     "eslint": "^9",

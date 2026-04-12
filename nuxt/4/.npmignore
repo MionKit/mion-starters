@@ -8,8 +8,6 @@ build/
 coverage/
 .coverage/
 test-results/
-e2e/
-playwright.config.ts
 package-lock.json
 .DS_Store
 *.pem

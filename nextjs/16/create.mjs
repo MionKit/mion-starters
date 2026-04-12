@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import {existsSync, mkdirSync, cpSync, readFileSync, writeFileSync} from 'node:fs';
+import {existsSync, mkdirSync, cpSync, renameSync, readFileSync, writeFileSync} from 'node:fs';
 import {resolve, basename, dirname} from 'node:path';
 import {execSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
@@ -37,11 +37,9 @@ const EXCLUDE = new Set([
     '.dist',
     'build',
     'test-results',
-    'e2e',
     'coverage',
     '.coverage',
     'package-lock.json',
-    'playwright.config.ts',
     '.vercel',
     '.DS_Store',
 ]);
@@ -58,6 +56,9 @@ cpSync(__dirname, targetDir, {
         return true;
     },
 });
+
+// Rename gitignore to .gitignore (npm strips dotfiles from published packages)
+renameSync(resolve(targetDir, 'gitignore'), resolve(targetDir, '.gitignore'));
 
 // Clean up the copied package.json
 const pkgPath = resolve(targetDir, 'package.json');

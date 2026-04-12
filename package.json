@@ -7,7 +7,8 @@
     "test:create:nuxt": "vitest run tests/create-nuxt.test.ts",
     "test:create:vue": "vitest run tests/create-vue.test.ts",
     "mionlink": "node scripts/mionlink.mjs",
-    "mionupdate": "node scripts/mionupdate.mjs"
+    "mionupdate": "node scripts/mionupdate.mjs",
+    "pre-publish-test": "node scripts/pre-publish-test.mjs"
   },
   "devDependencies": {
     "vitest": "^3"

@@ -1,7 +1,4 @@
 node_modules/
-.next/
-.nuxt/
-.output/
 dist/
 .dist/
 build/
@@ -13,4 +10,3 @@ package-lock.json
 *.pem
 *.tsbuildinfo
 .env*
-.vercel
