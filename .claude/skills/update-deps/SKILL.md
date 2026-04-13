@@ -2,22 +2,25 @@
 name: update-deps
 description: Update a starter's framework dependencies by comparing with a fresh official scaffold. Use when you need to update nextjs, nuxt, or vue starter dependencies to the latest versions.
 user-invocable: true
-allowed-tools: Bash Read Grep Glob WebSearch WebFetch
+allowed-tools: Bash Read Grep Glob WebSearch WebFetch AskUserQuestion
 ---
 
 # Update Starter Dependencies
 
 Updates a single mion starter by scaffolding a fresh vanilla project with the official CLI, comparing it with the existing starter, and applying updates with verification.
+we should focus just on dependencies updates and logic, no cosmetic updates or anything that is not strictly necessary for the update.
 
 ## Step 0 — Ask Which Starter
 
-Ask the user which starter to update:
+use the AskUserQuestion to Ask the user which starter to update:
 
 - `nextjs` (nextjs/16)
 - `nuxt` (nuxt/4)
 - `vue` (vue/3)
 
 Do NOT proceed until the user has chosen one.
+
+---------- EnterPlanMode ----------
 
 ## Step 1 — Scaffold a Fresh Vanilla Project
 
@@ -87,7 +90,7 @@ Look for structural changes:
 
 ## Step 3 — Write Update Plan
 
-Write the plan to `tmp-update-plan.md` at the repo root. The plan must include the analysis from Step 2 AND the implementation/testing steps. Use this template:
+The plan must include the analysis from Step 2 AND the implementation/testing steps. Use this template:
 
 ```markdown
 # Update Plan: <starter name> (<starter path>)
@@ -145,17 +148,13 @@ The following changes require explicit user confirmation before applying:
 <!-- Any additional context or recommendations -->
 ```
 
-After writing the file, tell the user:
+**STOP HERE. Do NOT proceed to Step 4 until the user explicitly approves the plan.**
 
-- The plan has been written to `tmp-update-plan.md`
-- They can review and modify it (change actions, remove sections, adjust implementation steps, etc.)
-- Ask them to confirm when ready to proceed
-
-**STOP HERE. Do NOT proceed to Step 4 until the user explicitly approves.**
+---------- ExitPlanMode ----------
 
 ## Step 4 — Execute the Approved Plan
 
-Read `tmp-update-plan.md` and execute the implementation steps and verification exactly as written in the approved (possibly modified) plan.
+Execute the implementation steps and verification exactly as written in the approved (possibly modified) plan.
 
 If you encounter issues not covered by the plan, ask the user before proceeding.
 
