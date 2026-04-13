@@ -21,9 +21,10 @@ Do NOT proceed until the user has chosen one.
 
 ## Step 1 — Scaffold a Fresh Vanilla Project
 
-Get a fresh project into a temp directory at the repo root. We only need the generated files for comparison — do NOT run `npm install`.
+Create a fresh project using the official framework CLI into a temp directory at the repo root. Do NOT run `npm install` in the scaffolded project — we only need the generated files for comparison.
 
-**IMPORTANT:** Most framework CLIs (`npm create nuxt`, `npm create vue`, etc.) use interactive TUI prompts that cannot be automated with piped input or flags. Do NOT attempt to run these CLIs directly. Instead, clone the official starter/template repos:
+**IMPORTANT:** Most framework CLIs (`npm create nuxt`, `npm create vue`, etc.) use interactive TUI prompts please do not try to find workarounds for non interactive version specially do not use nuxi as is not used anymore, instead please try to find workarounds to use the interactive version of the CLI, like sleeping and send new command to terminal after a bit of time, or use the --no-install flag to avoid the install step. (basically try to work with the interactive version of the CLI)
+Use the appropriate command based on the chosen starter:
 
 ### nextjs
 
@@ -31,25 +32,21 @@ Get a fresh project into a temp directory at the repo root. We only need the gen
 npx create-next-app@latest tmp-update-nextjs --yes
 ```
 
-The `--yes` flag accepts all defaults (TypeScript, Tailwind, ESLint, App Router, Turbopack, `@/*` import alias). This is the one CLI that works non-interactively.
+The `--yes` flag accepts all defaults (TypeScript, Tailwind, ESLint, App Router, Turbopack, `@/*` import alias) which matches the current starter setup. This will also run `npm install` — that's fine since it's a temp directory.
 
 ### nuxt
 
 ```bash
-git clone --depth 1 --branch v4 https://github.com/nuxt/starter.git tmp-update-nuxt
+npm create nuxt@latest tmp-update-nuxt -- --no-install
 ```
 
 ### vue
 
 ```bash
-git clone --depth 1 https://github.com/vuejs/create-vue.git tmp-update-vue-repo
+npm create vue@latest tmp-update-vue -- --ts --router --vitest --playwright --eslint
 ```
 
-Then read the template files from `tmp-update-vue-repo/template/` — that's where `create-vue` stores the scaffold source.
-
-### Fallback
-
-If a clone fails or the repo structure has changed, try `npx giget@latest gh:<org>/<repo> tmp-update-<name>`. As a last resort, manually check the latest `package.json` from the starter repo on GitHub.
+**If the command fails** (e.g., unknown flags), check what flags are available (`--help`) and retry with sensible defaults. The goal is a TypeScript project with routing and the standard tooling for that framework.
 
 ## Step 2 — Compare with Existing Starter
 
