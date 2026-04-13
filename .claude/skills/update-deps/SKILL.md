@@ -21,9 +21,9 @@ Do NOT proceed until the user has chosen one.
 
 ## Step 1 — Scaffold a Fresh Vanilla Project
 
-Create a fresh project using the official framework CLI into a temp directory at the repo root. Do NOT run `npm install` in the scaffolded project — we only need the generated files for comparison.
+Get a fresh project into a temp directory at the repo root. We only need the generated files for comparison — do NOT run `npm install`.
 
-Use the appropriate command based on the chosen starter:
+**IMPORTANT:** Most framework CLIs (`npm create nuxt`, `npm create vue`, etc.) use interactive TUI prompts that cannot be automated with piped input or flags. Do NOT attempt to run these CLIs directly. Instead, clone the official starter/template repos:
 
 ### nextjs
 
@@ -31,21 +31,25 @@ Use the appropriate command based on the chosen starter:
 npx create-next-app@latest tmp-update-nextjs --yes
 ```
 
-The `--yes` flag accepts all defaults (TypeScript, Tailwind, ESLint, App Router, Turbopack, `@/*` import alias) which matches the current starter setup. This will also run `npm install` — that's fine since it's a temp directory.
+The `--yes` flag accepts all defaults (TypeScript, Tailwind, ESLint, App Router, Turbopack, `@/*` import alias). This is the one CLI that works non-interactively.
 
 ### nuxt
 
 ```bash
-npm create nuxt@latest tmp-update-nuxt -- --no-install
+git clone --depth 1 --branch v4 https://github.com/nuxt/starter.git tmp-update-nuxt
 ```
 
 ### vue
 
 ```bash
-npm create vue@latest tmp-update-vue -- --ts --router --vitest --playwright --eslint
+git clone --depth 1 https://github.com/vuejs/create-vue.git tmp-update-vue-repo
 ```
 
-**If the command fails** (e.g., unknown flags), check what flags are available (`--help`) and retry with sensible defaults. The goal is a TypeScript project with routing and the standard tooling for that framework.
+Then read the template files from `tmp-update-vue-repo/template/` — that's where `create-vue` stores the scaffold source.
+
+### Fallback
+
+If a clone fails or the repo structure has changed, try `npx giget@latest gh:<org>/<repo> tmp-update-<name>`. As a last resort, manually check the latest `package.json` from the starter repo on GitHub.
 
 ## Step 2 — Compare with Existing Starter
 
