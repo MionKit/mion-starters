@@ -86,7 +86,7 @@ function getEventDetails(event: OrderEvent): string | null {
         </p>
       </div>
 
-      <div v-if="status === 'pending'" class="loading">Loading orders...</div>
+      <div v-if="status === 'idle' || status === 'pending'" class="loading">Loading orders...</div>
 
       <div v-if="asyncError || apiErrors.length > 0" class="orders-list">
         <div v-if="asyncError" class="error-box">
@@ -97,7 +97,7 @@ function getEventDetails(event: OrderEvent): string | null {
         </div>
       </div>
 
-      <div v-if="status !== 'pending' && !asyncError && apiErrors.length === 0" class="orders-list">
+      <div v-if="status === 'success' && !asyncError && apiErrors.length === 0" class="orders-list">
         <div v-for="order in orders" :key="order.id" class="order-card">
           <!-- Order header -->
           <div class="order-header">
