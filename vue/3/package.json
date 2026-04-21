@@ -1,9 +1,34 @@
 {
   "name": "@mionjs/create-starter-vue",
   "version": "0.2.0",
+  "description": "Starter template for building full-stack apps with mion + Vue 3 (SPA). Run `npm create @mionjs/starter-vue <project-name>` to scaffold.",
   "type": "module",
+  "license": "MIT",
+  "author": "mion",
+  "homepage": "https://mion.io",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mionjs/mion-starters.git",
+    "directory": "vue/3"
+  },
+  "bugs": {
+    "url": "https://github.com/mionjs/mion-starters/issues"
+  },
+  "keywords": [
+    "mion",
+    "mionjs",
+    "vue",
+    "vue3",
+    "starter",
+    "template",
+    "create",
+    "rpc",
+    "api",
+    "typescript",
+    "spa"
+  ],
   "bin": {
-    "create-starter-vue": "./create.mjs"
+    "create-starter-vue": "create.mjs"
   },
   "publishConfig": {
     "access": "public"
@@ -23,19 +48,19 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@mionjs/client": "0.8.7",
-    "@mionjs/core": "0.8.7",
-    "@mionjs/router": "0.8.7",
-    "@mionjs/platform-node": "0.8.7",
-    "@mionjs/platform-bun": "0.8.7",
-    "@mionjs/platform-vercel": "0.8.7",
-    "@mionjs/platform-cloudflare": "0.8.7",
-    "@mionjs/type-formats": "0.8.7",
+    "@mionjs/client": "file:../../mion-tarballs/mionjs-client.tgz",
+    "@mionjs/core": "file:../../mion-tarballs/mionjs-core.tgz",
+    "@mionjs/router": "file:../../mion-tarballs/mionjs-router.tgz",
+    "@mionjs/platform-node": "file:../../mion-tarballs/mionjs-platform-node.tgz",
+    "@mionjs/platform-bun": "file:../../mion-tarballs/mionjs-platform-bun.tgz",
+    "@mionjs/platform-vercel": "file:../../mion-tarballs/mionjs-platform-vercel.tgz",
+    "@mionjs/platform-cloudflare": "file:../../mion-tarballs/mionjs-platform-cloudflare.tgz",
+    "@mionjs/type-formats": "file:../../mion-tarballs/mionjs-type-formats.tgz",
     "vue": "^3.5.31",
     "vue-router": "^5.0.4"
   },
   "devDependencies": {
-    "@mionjs/devtools": "0.8.7",
+    "@mionjs/devtools": "file:../../mion-tarballs/mionjs-devtools.tgz",
     "@playwright/test": "^1.58.2",
     "@vitejs/plugin-vue": "^6",
     "eslint": "^9",
@@ -45,5 +70,20 @@
     "vite": "^7.3.1",
     "vite-node": "^5.3.0",
     "vitest": "^4.1.2"
+  },
+  "overrides": {
+    "@mionjs/client": "file:../../mion-tarballs/mionjs-client.tgz",
+    "@mionjs/core": "file:../../mion-tarballs/mionjs-core.tgz",
+    "@mionjs/devtools": "file:../../mion-tarballs/mionjs-devtools.tgz",
+    "@mionjs/drizzle": "file:../../mion-tarballs/mionjs-drizzle.tgz",
+    "@mionjs/platform-aws": "file:../../mion-tarballs/mionjs-platform-aws.tgz",
+    "@mionjs/platform-bun": "file:../../mion-tarballs/mionjs-platform-bun.tgz",
+    "@mionjs/platform-cloudflare": "file:../../mion-tarballs/mionjs-platform-cloudflare.tgz",
+    "@mionjs/platform-gcloud": "file:../../mion-tarballs/mionjs-platform-gcloud.tgz",
+    "@mionjs/platform-node": "file:../../mion-tarballs/mionjs-platform-node.tgz",
+    "@mionjs/platform-vercel": "file:../../mion-tarballs/mionjs-platform-vercel.tgz",
+    "@mionjs/router": "file:../../mion-tarballs/mionjs-router.tgz",
+    "@mionjs/run-types": "file:../../mion-tarballs/mionjs-run-types.tgz",
+    "@mionjs/type-formats": "file:../../mion-tarballs/mionjs-type-formats.tgz"
   }
 }

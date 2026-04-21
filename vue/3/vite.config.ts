@@ -1,14 +1,14 @@
 import { defineConfig } from "vite";
 import { resolve } from "path";
 import vue from "@vitejs/plugin-vue";
-import { mionPlugin } from "@mionjs/devtools/vite-plugin";
+import { mionVitePlugin } from "@mionjs/devtools/vite-plugin";
 
 const apiDir = resolve(import.meta.dirname, "api");
 
 export default defineConfig({
   plugins: [
     vue(),
-    mionPlugin({
+    mionVitePlugin({
       runTypes: { tsConfig: resolve(apiDir, "tsconfig.json") },
       serverPureFunctions: { clientSrcPath: resolve(apiDir, "../app") },
       aotCaches: true,

@@ -5,6 +5,7 @@ build/
 coverage/
 .coverage/
 test-results/
+updatelogs/
 package-lock.json
 .DS_Store
 *.pem

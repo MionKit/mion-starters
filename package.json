@@ -8,7 +8,8 @@
     "test:create:vue": "vitest run tests/create-vue.test.ts",
     "mionlink": "node scripts/mionlink.mjs",
     "mionupdate": "node scripts/mionupdate.mjs",
-    "pre-publish-test": "node scripts/pre-publish-test.mjs"
+    "pre-publish-test": "node scripts/pre-publish-test.mjs",
+    "publish-all": "node scripts/publish-all.mjs"
   },
   "devDependencies": {
     "vitest": "^3"

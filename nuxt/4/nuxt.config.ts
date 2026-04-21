@@ -1,24 +1,22 @@
-import {createMionPlugin} from './api/mion-plugin';
+import { createMionVitePlugin } from "./api/mion-plugin";
 
 export default defineNuxtConfig({
-  compatibilityDate: '2025-07-15',
+  compatibilityDate: "2025-07-15",
   ssr: true,
-  devtools: {enabled: true},
-  modules: ['@nuxt/eslint'],
-  css: ['~/assets/css/main.css'],
+  devtools: { enabled: true },
+  modules: ["@nuxt/eslint"],
+  css: ["~/assets/css/main.css"],
 
   runtimeConfig: {
     public: {
-      mionApiUrl: '',
+      mionApiUrl: "",
     },
   },
 
   vite: {
-    plugins: [
-      createMionPlugin(),
-    ],
+    plugins: [createMionVitePlugin()],
     ssr: {
       noExternal: [/@mionjs\//],
     },
   },
-})
+});
