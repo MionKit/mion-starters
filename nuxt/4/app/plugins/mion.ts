@@ -1,10 +1,12 @@
 import { initClient } from "@mionjs/client";
+import { aotCaches } from "virtual:mion-aot/caches";
 import type { MyApi } from "../../api/src/api.ts";
 
 export default defineNuxtPlugin(() => {
   const config = useRuntimeConfig();
 
   const client = initClient<MyApi>({
+    aotCaches,
     baseURL:
       config.public.mionApiUrl ||
       (import.meta.server ? "http://localhost:3000" : window.location.origin),

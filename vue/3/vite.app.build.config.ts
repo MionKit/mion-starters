@@ -20,9 +20,6 @@ export default defineConfig({
       },
     }),
   ],
-  ssr: {
-    noExternal: [/@mionjs\//],
-  },
   server: {
     proxy: {
       "/api/mion": "http://localhost:3001",

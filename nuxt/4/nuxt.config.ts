@@ -15,8 +15,5 @@ export default defineNuxtConfig({
 
   vite: {
     plugins: [createMionVitePlugin()],
-    ssr: {
-      noExternal: [/@mionjs\//],
-    },
   },
 });

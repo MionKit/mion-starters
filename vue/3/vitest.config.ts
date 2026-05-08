@@ -16,9 +16,6 @@ export default defineConfig({
       },
     }),
   ],
-  ssr: {
-    noExternal: [/@mionjs\//],
-  },
   test: {
     globals: true,
     globalSetup: "./vitest.globalSetup.ts",

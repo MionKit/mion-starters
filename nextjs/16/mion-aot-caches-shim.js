@@ -2,4 +2,5 @@
 export const jitFnsCache = {};
 export const pureFnsCache = {};
 export const routerCache = {};
+export const aotCaches = { jitFnsCache, pureFnsCache, routerCache };
 export const serverPureFnsCache = {};

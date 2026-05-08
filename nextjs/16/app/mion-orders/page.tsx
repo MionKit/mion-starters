@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { initClient, routesFlow, mapFrom } from "@mionjs/client";
+import { aotCaches } from "virtual:mion-aot/caches";
 import type { MyApi } from "@mion-app/api";
 import type {
   Order,
@@ -11,6 +12,7 @@ import type {
 
 // Initialize mion client — fully typed RPC, automatic Date deserialization
 const { routes } = initClient<MyApi>({
+  aotCaches,
   baseURL: typeof window !== "undefined" ? window.location.origin : "",
   basePath: "api/mion",
 });

@@ -13,9 +13,6 @@ export default defineConfig({
       aotCaches: true,
     }),
   ],
-  ssr: {
-    noExternal: [/@mionjs\//],
-  },
   build: {
     ssr: true,
     outDir: resolve(apiDir, "../dist/api"),
