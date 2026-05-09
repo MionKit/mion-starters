@@ -14,6 +14,10 @@ export function createMionVitePlugin(): any {
     aotCaches: true,
     server: {
       startScript: resolve(apiDir, "src/server.node.ts"),
+      // Point the buildStart pre-pass child at api/vite.config.ts so it loads this very
+      // mion plugin (otherwise vite-node uses an empty default config and can't resolve
+      // virtual:mion-aot/caches).
+      viteConfig: resolve(apiDir, "vite.config.ts"),
       runMode: "middleware",
     },
   });

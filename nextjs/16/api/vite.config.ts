@@ -12,6 +12,18 @@ export default defineConfig({
         noViteClient: true,
       },
       aotCaches: true,
+      // Pre-pass at buildStart populates AOT caches so virtual:mion-aot/caches returns
+      // populated data at import time. runMode: 'buildOnly' spawns a short-lived child
+      // that runs dev-server.ts with MION_COMPILE=buildOnly (platform adapters skip
+      // server.listen()), captures the caches, and exits. The actual API server is still
+      // launched separately by `npm run dev:api` via vite-node --watch.
+      server: {
+        startScript: resolve(__dirname, "src/dev-server.ts"),
+        // Point the pre-pass child at this same vite config so the mion plugin loads
+        // there too (and resolves virtual:mion-aot/caches).
+        viteConfig: resolve(__dirname, "vite.config.ts"),
+        runMode: "buildOnly",
+      },
     }),
   ],
   build: {
