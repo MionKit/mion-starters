@@ -15,5 +15,13 @@ export default defineNuxtConfig({
 
   vite: {
     plugins: [createMionVitePlugin()],
+    optimizeDeps: {
+      include: [
+        "@mionjs/client",
+        "@mionjs/core",
+        "@mionjs/run-types",
+        "@mionjs/type-formats",
+      ],
+    },
   },
 });
