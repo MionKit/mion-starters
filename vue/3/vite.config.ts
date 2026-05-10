@@ -19,8 +19,5 @@ export default defineConfig({
       },
     }),
   ],
-  ssr: {
-    noExternal: [/@mionjs\//],
-  },
   build: { outDir: "dist/app" },
 });

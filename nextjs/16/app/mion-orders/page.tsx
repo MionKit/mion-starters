@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { initClient, routesFlow, mapFrom } from "@mionjs/client";
+import { initClient, routesFlow, serverMapFrom } from "@mionjs/client";
 import type { MyApi } from "@mion-app/api";
 import type {
   Order,
@@ -186,13 +186,13 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Single HTTP request: listOrders -> mapFrom extracts IDs server-side -> getOrdersEvents
+    // Single HTTP request: listOrders -> serverMapFrom extracts IDs server-side -> getOrdersEvents
     const ordersList = routes.orders.listOrders();
-    const orderIds = mapFrom(
+    const orderIds = serverMapFrom(
       ordersList,
       (orders) => orders!.map((o) => o.id),
-      "mapFromOrdersToOrderEvents",
-    ).type();
+      "serverMapFromOrdersToOrderEvents",
+    ).asArg();
 
     routesFlow([ordersList, routes.orders.getOrdersEvents(orderIds)])
       .call()

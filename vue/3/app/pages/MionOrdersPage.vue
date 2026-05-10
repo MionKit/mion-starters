@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ref, onMounted} from 'vue';
-import {routesFlow, mapFrom} from '@mionjs/client';
+import {routesFlow, serverMapFrom} from '@mionjs/client';
 import type {Order, OrderEvent} from '../../api/src/features/orders/orders-models';
 import {useMionClient} from '../composables/useMionClient';
 
@@ -31,11 +31,11 @@ onMounted(async () => {
   apiErrors.value = [];
   try {
     const ordersList = routes.orders.listOrders();
-    const orderIds = mapFrom(
+    const orderIds = serverMapFrom(
       ordersList,
       (orders) => orders!.map((o) => o.id),
-      'mapFromOrdersToOrderEvents',
-    ).type();
+      'serverMapFromOrdersToOrderEvents',
+    ).asArg();
 
     const [[ordersData, allEvents], [ordersError, eventsError]] = await routesFlow([ordersList, routes.orders.getOrdersEvents(orderIds)]).call();
 

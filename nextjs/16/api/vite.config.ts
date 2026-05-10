@@ -14,9 +14,6 @@ export default defineConfig({
       aotCaches: true,
     }),
   ],
-  ssr: {
-    noExternal: [/@mionjs\//],
-  },
   build: {
     ssr: resolve(__dirname, "src/vercel-serverless.ts"),
     outDir: "dist",
