@@ -40,6 +40,7 @@ const EXCLUDE = new Set([
     'coverage',
     '.coverage',
     'package-lock.json',
+    '.pnpm-store',
     '.vercel',
     '.DS_Store',
 ]);
@@ -76,15 +77,31 @@ delete pkg.bugs;
 writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
 
 if (!skipInstall) {
-    console.log('\nInstalling dependencies...\n');
-    execSync('npm install', {cwd: targetDir, stdio: 'inherit'});
+    console.log('\nInstalling dependencies with pnpm...\n');
+    try {
+        execSync('pnpm install', {cwd: targetDir, stdio: 'inherit'});
+        // `ignoreScripts: true` blocks the project's postinstall too, so
+        // run `nuxt prepare` explicitly. The `dev`/`build` scripts also
+        // chain it, so this is belt-and-suspenders for first-time setup.
+        execSync('pnpm exec nuxt prepare', {cwd: targetDir, stdio: 'inherit'});
+    } catch (err) {
+        console.error(`
+pnpm install failed. This starter requires pnpm 11+ for its
+supply-chain hardening (minimumReleaseAge, allowBuilds, etc.).
+
+  • Enable corepack:    corepack enable
+  • Or install pnpm:    npm install -g pnpm@11
+  • Then re-run:        cd ${projectName} && pnpm install && pnpm exec nuxt prepare
+`);
+        process.exit(err.status ?? 1);
+    }
 }
 
 console.log(`
 Done! Your mion + Nuxt project is ready.
 
   cd ${projectName}
-  npm run dev
+  pnpm run dev
 
 Happy coding!
 `);

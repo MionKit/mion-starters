@@ -31,7 +31,7 @@ function validateNoDeps() {
     const packageJsons = findStarterPackageJsons();
     if (isCurrentlyFileMode(packageJsons)) {
         console.error('Error: Starters are using file: references for @mionjs/* deps.');
-        console.error("Run 'npm run mionupdate' first to switch to npm versions.");
+        console.error("Run 'pnpm run mionupdate' first to switch to npm versions.");
         process.exit(1);
     }
     console.log('All starters using npm versions (no file: references).\n');
@@ -46,10 +46,13 @@ function testStarter({name, dir}) {
     const tmpDir = path.join(TMP_ROOT, name);
     const projectDir = path.join(tmpDir, `test-${name}`);
 
-    // 1. npm pack
-    console.log('--- npm pack ---');
-    const tarballName = execSync('npm pack', {cwd: starterDir, env, encoding: 'utf-8'}).trim();
-    const tarballPath = path.join(starterDir, tarballName);
+    // 1. pnpm pack
+    console.log('--- pnpm pack ---');
+    const tarballName = execSync('pnpm pack', {cwd: starterDir, env, encoding: 'utf-8'})
+        .trim()
+        .split('\n')
+        .pop();
+    const tarballPath = path.isAbsolute(tarballName) ? tarballName : path.join(starterDir, tarballName);
 
     try {
         // 2. Extract tarball
@@ -65,10 +68,10 @@ function testStarter({name, dir}) {
 
         // 4. Install playwright and run e2e tests
         console.log('--- install playwright ---');
-        run('npx playwright install chromium', projectDir);
+        run('pnpm exec playwright install chromium', projectDir);
 
         console.log('--- run e2e tests ---');
-        run('npx playwright test', projectDir);
+        run('pnpm exec playwright test', projectDir);
 
         console.log(`\n  ${name} starter: PASSED\n`);
     } finally {

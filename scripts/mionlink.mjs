@@ -4,10 +4,16 @@
  * Switches all starters to use local mion tarballs (file: references).
  *
  * Packs mion packages from ../mion, copies tarballs to ./mion-tarballs/,
- * updates all @mionjs/* deps to file: references, cleans caches, and runs npm install.
+ * updates all @mionjs/* deps to file: references, cleans caches, and
+ * runs pnpm install.
+ *
+ * During install, each starter's `allowNonRegistryProtocols` setting is
+ * temporarily flipped from `false` to `true` so pnpm will accept file:
+ * specifiers, then restored. This keeps the published starter posture
+ * locked down for end-users while letting local dev resolve tarballs.
  *
  * Usage:
- *   npm run mionlink
+ *   pnpm run mionlink
  *   node scripts/mionlink.mjs
  */
 
@@ -46,5 +52,6 @@ for (const f of tarballs) {
 }
 console.log(`Copied ${tarballs.length} tarballs.`);
 
-// 3. Switch deps to file: references, clean caches, and npm install
+// 3. Switch deps to file: references, clean caches, and pnpm install
+//    (allowNonRegistryProtocols is toggled per-starter inside runPnpmInstall)
 updateAllStarters(true, null);

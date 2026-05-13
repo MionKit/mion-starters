@@ -9,6 +9,10 @@ dist
 # Node dependencies
 node_modules
 
+# pnpm
+.pnpm-store
+.pnpm-debug.log*
+
 # API build outputs
 api/dist
 

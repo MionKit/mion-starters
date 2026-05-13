@@ -18,11 +18,11 @@ describe('create-starter-nextjs e2e', () => {
         rmSync(TMP_DIR, {recursive: true, force: true});
         mkdirSync(TMP_DIR, {recursive: true});
 
-        // 1. Create project (runs npm install)
+        // 1. Create project (runs pnpm install)
         run(`node ${CREATE_SCRIPT} ${PROJECT_DIR}`, TMP_DIR);
 
         // 2. Install playwright browser
-        run('npx playwright install chromium');
+        run('pnpm exec playwright install chromium');
     }, 600_000);
 
     afterAll(() => {
@@ -30,6 +30,6 @@ describe('create-starter-nextjs e2e', () => {
     });
 
     it('passes playwright e2e tests', () => {
-        run('npx playwright test');
+        run('pnpm exec playwright test');
     }, 120_000);
 });

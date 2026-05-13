@@ -103,35 +103,39 @@ export function updateDeps(deps, pkgJsonPath, label, useFile, version) {
 }
 
 /**
- * Manages the `overrides` block so transitive @mionjs/* deps also resolve correctly.
+ * Manages the `pnpm.overrides` block so transitive @mionjs/* deps also resolve correctly.
  * In file mode: adds overrides for all known mion packages.
  * In version mode: removes @mionjs/* override entries.
+ *
+ * Note: pnpm reads `pnpm.overrides` (not the top-level `overrides` used by npm).
  */
 export function updateOverrides(pkg, pkgJsonPath, allMionPkgs, useFile, version) {
   let count = 0;
+  pkg.pnpm = pkg.pnpm || {};
   if (useFile) {
-    pkg.overrides = pkg.overrides || {};
+    pkg.pnpm.overrides = pkg.pnpm.overrides || {};
     for (const mionPkg of allMionPkgs) {
       const newValue = fileRef(pkgJsonPath, mionPkg);
-      if (pkg.overrides[mionPkg] !== newValue) {
-        console.log(`  override ${mionPkg}: ${pkg.overrides[mionPkg] ?? "(none)"} → ${newValue}`);
-        pkg.overrides[mionPkg] = newValue;
+      if (pkg.pnpm.overrides[mionPkg] !== newValue) {
+        console.log(`  override ${mionPkg}: ${pkg.pnpm.overrides[mionPkg] ?? "(none)"} → ${newValue}`);
+        pkg.pnpm.overrides[mionPkg] = newValue;
         count++;
       }
     }
-  } else if (pkg.overrides) {
-    for (const key of Object.keys(pkg.overrides)) {
+  } else if (pkg.pnpm.overrides) {
+    for (const key of Object.keys(pkg.pnpm.overrides)) {
       if (!key.startsWith("@mionjs/")) continue;
-      console.log(`  override ${key}: ${pkg.overrides[key]} → (removed)`);
-      delete pkg.overrides[key];
+      console.log(`  override ${key}: ${pkg.pnpm.overrides[key]} → (removed)`);
+      delete pkg.pnpm.overrides[key];
       count++;
     }
-    if (Object.keys(pkg.overrides).length === 0) delete pkg.overrides;
+    if (Object.keys(pkg.pnpm.overrides).length === 0) delete pkg.pnpm.overrides;
+    if (Object.keys(pkg.pnpm).length === 0) delete pkg.pnpm;
   }
   return count;
 }
 
-/** Removes cached @mionjs packages, .vite cache, and stale lock file entries for a starter */
+/** Removes cached @mionjs packages, .vite cache, and the pnpm lockfile for a starter */
 export function cleanMionCaches(pkgPath) {
   const pkgDir = path.dirname(pkgPath);
 
@@ -147,21 +151,15 @@ export function cleanMionCaches(pkgPath) {
     console.log(`  🗑 removed ${path.relative(ROOT, viteCache)}`);
   }
 
-  const lockPath = path.join(pkgDir, "package-lock.json");
+  // Surgically pruning @mionjs entries from pnpm-lock.yaml is brittle; the
+  // file references resolve in milliseconds, so we just delete the lockfile
+  // and let `pnpm install` rebuild it. The starter's hardened pnpm config
+  // (minimumReleaseAge, allowBuilds, etc.) still gates which packages can
+  // resolve, so this is no looser than a normal install.
+  const lockPath = path.join(pkgDir, "pnpm-lock.yaml");
   if (fs.existsSync(lockPath)) {
-    const lockContent = fs.readFileSync(lockPath, "utf-8");
-    const lock = JSON.parse(lockContent);
-    let removed = 0;
-    for (const key of Object.keys(lock.packages || {})) {
-      if (!key.startsWith("node_modules/@mionjs/") && key !== "node_modules/@mionjs") continue;
-      delete lock.packages[key];
-      removed++;
-    }
-    if (removed > 0) {
-      const lockIndent = lockContent.match(/^(\s+)"/m)?.[1] || "  ";
-      fs.writeFileSync(lockPath, JSON.stringify(lock, null, lockIndent) + "\n");
-      console.log(`  🗑 removed ${removed} @mionjs/* entries from ${path.relative(ROOT, lockPath)}`);
-    }
+    fs.rmSync(lockPath);
+    console.log(`  🗑 removed ${path.relative(ROOT, lockPath)}`);
   }
 }
 
@@ -187,8 +185,34 @@ export function validateTarballs(packageJsons) {
   }
 }
 
-/** Runs npm install in each starter root that has @mionjs/* deps */
-export function runNpmInstall(packageJsons) {
+/**
+ * Toggles `allowNonRegistryProtocols` in a starter's pnpm-workspace.yaml.
+ *
+ * The starter's default posture is `allowNonRegistryProtocols: false` so
+ * end-users can never accidentally pull a `file:` / `git:` / `http:` dep.
+ * During local-tarball development (mionlink) we need file: refs to
+ * resolve, so we flip it to `true` for the install, then restore. The
+ * restore is unconditional (try/finally semantics from the caller).
+ *
+ * Returns the previous value so the caller can restore it.
+ */
+export function setAllowNonRegistry(pkgDir, allow) {
+  const yamlPath = path.join(pkgDir, "pnpm-workspace.yaml");
+  if (!fs.existsSync(yamlPath)) return null;
+  const content = fs.readFileSync(yamlPath, "utf-8");
+  const target = `allowNonRegistryProtocols: ${allow}`;
+  if (/^allowNonRegistryProtocols:\s*(true|false)\s*$/m.test(content)) {
+    const updated = content.replace(/^allowNonRegistryProtocols:\s*(true|false)\s*$/m, target);
+    fs.writeFileSync(yamlPath, updated);
+  } else {
+    // No line present — append. (Should not happen given our template, but is safe.)
+    fs.writeFileSync(yamlPath, content.replace(/\n*$/, `\n${target}\n`));
+  }
+  return yamlPath;
+}
+
+/** Runs `pnpm install` in each starter root that has @mionjs/* deps */
+export function runPnpmInstall(packageJsons, {allowFileRefs = false} = {}) {
   const starterRoots = new Set();
   for (const pkgPath of packageJsons) {
     const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"));
@@ -199,18 +223,24 @@ export function runNpmInstall(packageJsons) {
   }
   for (const dir of starterRoots) {
     const relDir = path.relative(ROOT, dir);
-    console.log(`\n📦 npm install in ${relDir}...`);
+    console.log(`\n📦 pnpm install in ${relDir}...`);
+    const toggled = allowFileRefs ? setAllowNonRegistry(dir, true) : null;
     try {
-      execSync("npm install", {cwd: dir, stdio: "inherit"});
+      // Force regen rather than --frozen-lockfile because mionlink/mionupdate
+      // rewrites deps and we want pnpm to resolve fresh.
+      execSync("pnpm install --no-frozen-lockfile", {cwd: dir, stdio: "inherit"});
     } catch {
-      console.error(`  ❌ npm install failed in ${relDir}`);
+      console.error(`  ❌ pnpm install failed in ${relDir}`);
+      if (toggled) setAllowNonRegistry(dir, false);
       process.exit(1);
+    } finally {
+      if (toggled) setAllowNonRegistry(dir, false);
     }
   }
 }
 
 /**
- * Main orchestrator: rewrites deps + overrides → cleans caches → validates (file mode) → npm install.
+ * Main orchestrator: rewrites deps + overrides → cleans caches → validates (file mode) → pnpm install.
  * @param {boolean} useFile - true for file: references, false for npm version
  * @param {string|null} version - npm version string (ignored when useFile is true)
  */
@@ -219,7 +249,7 @@ export function updateAllStarters(useFile, version) {
     const tarballsPath = path.join(ROOT, TARBALLS_DIR);
     if (!fs.existsSync(tarballsPath)) {
       console.error(`Error: ${TARBALLS_DIR}/ directory not found.`);
-      console.error("Run npm run mionlink to create the tarballs first.");
+      console.error("Run pnpm run mionlink to create the tarballs first.");
       process.exit(1);
     }
   }
@@ -257,13 +287,13 @@ export function updateAllStarters(useFile, version) {
       console.log(`  – ${relPath} (no @mionjs/* deps)\n`);
     }
 
-    // Clean cached @mionjs packages and stale lockfile entries
+    // Clean cached @mionjs packages and the lockfile
     if (hasMionDeps(pkg)) cleanMionCaches(pkgPath);
   }
 
   if (useFile) validateTarballs(packageJsons);
 
-  runNpmInstall(packageJsons);
+  runPnpmInstall(packageJsons, {allowFileRefs: useFile});
 
   console.log(`\nDone: ${totalUpdated} dependencies updated.`);
 }
