@@ -7,10 +7,12 @@
  * updates all @mionjs/* deps to file: references, cleans caches, and
  * runs pnpm install.
  *
- * During install, each starter's `allowNonRegistryProtocols` setting is
- * temporarily flipped from `false` to `true` so pnpm will accept file:
- * specifiers, then restored. This keeps the published starter posture
- * locked down for end-users while letting local dev resolve tarballs.
+ * During install, the `pnpm install` command is run with
+ * `--config.allowNonRegistryProtocols=true` so pnpm accepts the
+ * `file:` specifiers. The on-disk `pnpm-workspace.yaml` is never
+ * modified, so the locked-down posture (file: refs forbidden) is
+ * preserved for every other install (including the one users run
+ * after scaffolding via `npm create`).
  *
  * Usage:
  *   pnpm run mionlink
@@ -53,5 +55,6 @@ for (const f of tarballs) {
 console.log(`Copied ${tarballs.length} tarballs.`);
 
 // 3. Switch deps to file: references, clean caches, and pnpm install
-//    (allowNonRegistryProtocols is toggled per-starter inside runPnpmInstall)
+//    (runPnpmInstall passes --config.allowNonRegistryProtocols=true for
+//    this command only so the file: refs we just wrote can resolve)
 updateAllStarters(true, null);

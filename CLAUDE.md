@@ -106,7 +106,14 @@ pnpm run mionlink                # packs mion packages, copies tarballs, and swi
 ```
 This runs `scripts/mionlink.mjs` which packs & copies tarballs from `../mion` into `mion-tarballs/`, rewrites all `@mionjs/*` deps to `file:` references, cleans caches, and runs `pnpm install` in each starter.
 
-`mionlink` temporarily flips each starter's `allowNonRegistryProtocols` from `false` to `true` for the duration of the install (so pnpm will accept `file:` specifiers) and restores it immediately after. `mionupdate` does not need this — it puts the deps back on npm-registry versions.
+### How `@mionjs/*` from local tarballs coexists with `allowNonRegistryProtocols: false`
+pnpm 11 doesn't expose a per-package allowlist for `allowNonRegistryProtocols`, so we enforce the "`file:` is OK only for `@mionjs/*`" rule by **workflow**:
+- The starter's `pnpm-workspace.yaml` keeps `allowNonRegistryProtocols: false` on disk at all times.
+- `mionlink` runs its `pnpm install` with `--config.allowNonRegistryProtocols=true` so the freshly-written `file:../../mion-tarballs/mionjs-*.tgz` refs can resolve. The on-disk config is **not** mutated, so a crashed install can never leave a starter in a relaxed posture.
+- At that moment, the only file: refs in any starter's `package.json` are the `@mionjs/*` ones (because mionlink just wrote them in the previous step) — so the exception is effectively scoped to mion's own packages.
+- Every other install (including the one end-users run after `npm create`) sees `allowNonRegistryProtocols: false` and rejects file/git/http specifiers wholesale.
+
+`mionupdate` doesn't need this — it puts deps back on npm-registry versions, so the hardened default works as-is.
 
 Both scripts share utilities from `scripts/mion-utils.mjs` and handle cleanup + `pnpm install` automatically.
 

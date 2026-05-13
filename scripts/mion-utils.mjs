@@ -186,32 +186,25 @@ export function validateTarballs(packageJsons) {
 }
 
 /**
- * Toggles `allowNonRegistryProtocols` in a starter's pnpm-workspace.yaml.
+ * Runs `pnpm install` in each starter root that has @mionjs/* deps.
  *
- * The starter's default posture is `allowNonRegistryProtocols: false` so
- * end-users can never accidentally pull a `file:` / `git:` / `http:` dep.
- * During local-tarball development (mionlink) we need file: refs to
- * resolve, so we flip it to `true` for the install, then restore. The
- * restore is unconditional (try/finally semantics from the caller).
+ * Security model around `allowNonRegistryProtocols`:
+ *   Starters ship with `allowNonRegistryProtocols: false` in their
+ *   `pnpm-workspace.yaml`, so file:/git:/http: specifiers in any
+ *   dependency are rejected. pnpm doesn't expose a per-package
+ *   allowlist for this setting, so the "@mionjs/* may come from a
+ *   tarball" exception is enforced by workflow instead: the
+ *   `mionlink` script — the only flow that intentionally introduces
+ *   file: refs — runs this function with `allowFileRefs: true`,
+ *   which passes the flag for this command only. The
+ *   pnpm-workspace.yaml on disk is never modified, so an interrupted
+ *   install can't leave the starter in a relaxed posture.
  *
- * Returns the previous value so the caller can restore it.
+ *   At the moment `mionlink` runs, the only file: refs that exist in
+ *   any starter's package.json are the @mionjs/* ones that mionlink
+ *   itself just wrote — so in practice the exception applies only to
+ *   @mionjs/* tarballs.
  */
-export function setAllowNonRegistry(pkgDir, allow) {
-  const yamlPath = path.join(pkgDir, "pnpm-workspace.yaml");
-  if (!fs.existsSync(yamlPath)) return null;
-  const content = fs.readFileSync(yamlPath, "utf-8");
-  const target = `allowNonRegistryProtocols: ${allow}`;
-  if (/^allowNonRegistryProtocols:\s*(true|false)\s*$/m.test(content)) {
-    const updated = content.replace(/^allowNonRegistryProtocols:\s*(true|false)\s*$/m, target);
-    fs.writeFileSync(yamlPath, updated);
-  } else {
-    // No line present — append. (Should not happen given our template, but is safe.)
-    fs.writeFileSync(yamlPath, content.replace(/\n*$/, `\n${target}\n`));
-  }
-  return yamlPath;
-}
-
-/** Runs `pnpm install` in each starter root that has @mionjs/* deps */
 export function runPnpmInstall(packageJsons, {allowFileRefs = false} = {}) {
   const starterRoots = new Set();
   for (const pkgPath of packageJsons) {
@@ -221,20 +214,19 @@ export function runPnpmInstall(packageJsons, {allowFileRefs = false} = {}) {
     const starterRoot = pkgDir.endsWith("/api") ? path.dirname(pkgDir) : pkgDir;
     starterRoots.add(starterRoot);
   }
+  // Force regen rather than --frozen-lockfile because mionlink/mionupdate
+  // rewrites deps and we want pnpm to resolve fresh.
+  const flags = ["--no-frozen-lockfile"];
+  if (allowFileRefs) flags.push("--config.allowNonRegistryProtocols=true");
+  const cmd = ["pnpm install", ...flags].join(" ");
   for (const dir of starterRoots) {
     const relDir = path.relative(ROOT, dir);
-    console.log(`\n📦 pnpm install in ${relDir}...`);
-    const toggled = allowFileRefs ? setAllowNonRegistry(dir, true) : null;
+    console.log(`\n📦 ${cmd} in ${relDir}...`);
     try {
-      // Force regen rather than --frozen-lockfile because mionlink/mionupdate
-      // rewrites deps and we want pnpm to resolve fresh.
-      execSync("pnpm install --no-frozen-lockfile", {cwd: dir, stdio: "inherit"});
+      execSync(cmd, {cwd: dir, stdio: "inherit"});
     } catch {
       console.error(`  ❌ pnpm install failed in ${relDir}`);
-      if (toggled) setAllowNonRegistry(dir, false);
       process.exit(1);
-    } finally {
-      if (toggled) setAllowNonRegistry(dir, false);
     }
   }
 }
