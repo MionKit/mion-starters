@@ -28,16 +28,32 @@ resolutionMode: highest
 
 # ── Supply-chain protection: minimum release age ─────────
 # Refuse to install package versions younger than 30 days (43200 minutes).
+# @mionjs/* are exempt — first-party packages, integrity controlled
+# elsewhere, and a stale gate would defeat the whole point of running
+# mionupdate to test the freshest release.
 minimumReleaseAge: 43200
-minimumReleaseAgeExclude: []
+minimumReleaseAgeExclude:
+  - '@mionjs/client'
+  - '@mionjs/core'
+  - '@mionjs/devtools'
+  - '@mionjs/drizzle'
+  - '@mionjs/platform-aws'
+  - '@mionjs/platform-bun'
+  - '@mionjs/platform-cloudflare'
+  - '@mionjs/platform-gcloud'
+  - '@mionjs/platform-node'
+  - '@mionjs/platform-vercel'
+  - '@mionjs/router'
+  - '@mionjs/run-types'
+  - '@mionjs/type-formats'
 
 # ── Block lifecycle scripts ──────────────────────────────
 ignoreScripts: true
 sideEffectsCache: false
 
 # ── Block non-registry sources ───────────────────────────
-# mionlink temporarily flips this to `true` while installing local
-# tarballs, then restores it. mionupdate ensures it stays `false`.
+# Stays `false` on disk. mionlink passes
+# `--config.allowNonRegistryProtocols=true` to its install only.
 allowNonRegistryProtocols: false
 
 # ── Strict peer / hoisting ───────────────────────────────

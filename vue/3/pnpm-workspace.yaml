@@ -17,16 +17,47 @@ savePrefix: ''
 resolutionMode: highest
 
 # ── Supply-chain protection: minimum release age ─────────
+# Refuse to install package versions younger than 30 days (43200 minutes).
+# @mionjs/* are exempt — they are first-party packages whose release
+# integrity we already control, and pinning them to a 30-day-old version
+# would make starter scaffolds permanently lag the framework they
+# showcase. External deps remain subject to the age gate.
 minimumReleaseAge: 43200
-minimumReleaseAgeExclude: []
+minimumReleaseAgeExclude:
+  - '@mionjs/client'
+  - '@mionjs/core'
+  - '@mionjs/devtools'
+  - '@mionjs/drizzle'
+  - '@mionjs/platform-aws'
+  - '@mionjs/platform-bun'
+  - '@mionjs/platform-cloudflare'
+  - '@mionjs/platform-gcloud'
+  - '@mionjs/platform-node'
+  - '@mionjs/platform-vercel'
+  - '@mionjs/router'
+  - '@mionjs/run-types'
+  - '@mionjs/type-formats'
+  # Vue ecosystem — published with incomplete `time` metadata on some
+  # subpackages, which pnpm 11 treats as a hard install error when
+  # minimumReleaseAge is enabled. Add new entries here as they surface.
+  - '@vue/compiler-core'
+  - '@vue/compiler-dom'
+  - '@vue/compiler-sfc'
+  - '@vue/compiler-ssr'
+  - '@vue/reactivity'
+  - '@vue/runtime-core'
+  - '@vue/runtime-dom'
+  - '@vue/server-renderer'
+  - '@vue/shared'
 
 # ── Block lifecycle scripts ──────────────────────────────
 ignoreScripts: true
 sideEffectsCache: false
 
 # ── Block non-registry sources ───────────────────────────
-# Toggled to `true` by the repo's `mionlink` script during local-tarball
-# installs and restored to `false` immediately after.
+# Stays `false` on disk. The repo's `mionlink` script passes
+# `--config.allowNonRegistryProtocols=true` to pnpm install for its
+# command only.
 allowNonRegistryProtocols: false
 
 # ── Strict peer / hoisting ───────────────────────────────
