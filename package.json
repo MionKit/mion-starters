@@ -1,6 +1,11 @@
 {
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@11.1.1",
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=11"
+  },
   "scripts": {
     "test": "vitest run --no-file-parallelism",
     "test:create:nextjs": "vitest run tests/create-nextjs.test.ts",
@@ -12,6 +17,6 @@
     "publish-all": "node scripts/publish-all.mjs"
   },
   "devDependencies": {
-    "vitest": "^3"
+    "vitest": "3"
   }
 }

@@ -1,0 +1,46 @@
+# mion-starters root config.
+#
+# NOTE: Each starter (nextjs/16, nuxt/4, vue/3) is published as an
+# independent `npm create` package and ships its own pnpm-lock.yaml.
+# They are intentionally NOT workspace members — including them would
+# hoist their dependencies and break the standalone install/publish
+# flow expected by end-users.
+#
+# This file therefore configures only the root package (root tooling:
+# vitest, mionlink/mionupdate/pre-publish-test/publish-all scripts).
+# Each starter carries its own pnpm-workspace.yaml with the same
+# hardening so the supply-chain protections survive `npm create`.
+
+# ── Build-script allowlist ───────────────────────────────
+# pnpm 11 blocks every dependency install/postinstall script by default.
+# Only the packages listed here may run them. Entries are added as
+# validation surfaces blocked scripts that we explicitly trust.
+allowBuilds:
+  esbuild: true
+
+# ── Lockfile / install integrity ─────────────────────────
+preferFrozenLockfile: true
+verifyStoreIntegrity: true
+
+# ── Version pinning (no auto-bumps) ──────────────────────
+savePrefix: ''
+resolutionMode: highest
+
+# ── Supply-chain protection: minimum release age ─────────
+# Refuse to install package versions younger than 30 days (43200 minutes).
+minimumReleaseAge: 43200
+minimumReleaseAgeExclude: []
+
+# ── Block lifecycle scripts ──────────────────────────────
+ignoreScripts: true
+sideEffectsCache: false
+
+# ── Block non-registry sources ───────────────────────────
+# mionlink temporarily flips this to `true` while installing local
+# tarballs, then restores it. mionupdate ensures it stays `false`.
+allowNonRegistryProtocols: false
+
+# ── Strict peer / hoisting ───────────────────────────────
+strictPeerDependencies: true
+autoInstallPeers: false
+nodeLinker: hoisted

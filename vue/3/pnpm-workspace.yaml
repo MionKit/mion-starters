@@ -1,0 +1,35 @@
+# mion starter (Vue 3) — pnpm 11 hardening.
+# Shipped with the published create-starter-vue package so end-users
+# inherit the same supply-chain protections used in the mion repo.
+
+# ── Build-script allowlist ───────────────────────────────
+# pnpm 11 blocks all dependency install/postinstall scripts by default.
+# Only entries listed here (set to `true`) are allowed to run.
+allowBuilds:
+  esbuild: true
+
+# ── Lockfile / install integrity ─────────────────────────
+preferFrozenLockfile: true
+verifyStoreIntegrity: true
+
+# ── Version pinning (no auto-bumps) ──────────────────────
+savePrefix: ''
+resolutionMode: highest
+
+# ── Supply-chain protection: minimum release age ─────────
+minimumReleaseAge: 43200
+minimumReleaseAgeExclude: []
+
+# ── Block lifecycle scripts ──────────────────────────────
+ignoreScripts: true
+sideEffectsCache: false
+
+# ── Block non-registry sources ───────────────────────────
+# Toggled to `true` by the repo's `mionlink` script during local-tarball
+# installs and restored to `false` immediately after.
+allowNonRegistryProtocols: false
+
+# ── Strict peer / hoisting ───────────────────────────────
+strictPeerDependencies: true
+autoInstallPeers: false
+nodeLinker: hoisted

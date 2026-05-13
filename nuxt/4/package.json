@@ -6,6 +6,11 @@
   "license": "MIT",
   "author": "mion",
   "homepage": "https://mion.io",
+  "packageManager": "pnpm@11.1.1",
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=11"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mionjs/mion-starters.git",
@@ -33,18 +38,18 @@
     "access": "public"
   },
   "scripts": {
-    "dev": "nuxt dev",
-    "generate": "nuxt generate",
+    "prepare:nuxt": "nuxt prepare",
+    "dev": "nuxt prepare && nuxt dev",
+    "generate": "nuxt prepare && nuxt generate",
     "build:api": "vite build --config api/vite.config.ts",
     "build:api:node": "vite build --config api/vite.config.ts --ssr api/src/server.node.ts",
     "build:api:bun": "vite build --config api/vite.config.ts --ssr api/src/server.bun.ts",
     "build:api:vercel": "vite build --config api/vite.config.ts --ssr api/src/vercel-serverless.ts",
     "build:api:cloudflare": "vite build --config api/vite.config.ts --ssr api/src/cloudflare-worker.ts",
-    "preview": "nuxt preview",
+    "preview": "nuxt prepare && nuxt preview",
     "test": "playwright test",
     "test:install": "playwright install chromium",
-    "lint": "eslint",
-    "postinstall": "nuxt prepare"
+    "lint": "eslint"
   },
   "dependencies": {
     "@mionjs/client": "file:../../mion-tarballs/mionjs-client.tgz",
@@ -55,31 +60,33 @@
     "@mionjs/platform-vercel": "file:../../mion-tarballs/mionjs-platform-vercel.tgz",
     "@mionjs/platform-cloudflare": "file:../../mion-tarballs/mionjs-platform-cloudflare.tgz",
     "@mionjs/type-formats": "file:../../mion-tarballs/mionjs-type-formats.tgz",
-    "@nuxt/eslint": "^1.15.2",
-    "nuxt": "^4.4.2",
-    "vue": "^3.5.32",
-    "vue-router": "^5.0.4"
+    "@nuxt/eslint": "1.15.2",
+    "nuxt": "4.4.2",
+    "vue": "3.5.32",
+    "vue-router": "5.0.4"
   },
   "devDependencies": {
     "@mionjs/devtools": "file:../../mion-tarballs/mionjs-devtools.tgz",
-    "@playwright/test": "^1.59.1",
-    "eslint": "^10",
-    "vite-node": "^6.0.0",
-    "typescript": "^6"
+    "@playwright/test": "1.59.1",
+    "eslint": "10",
+    "vite-node": "6.0.0",
+    "typescript": "6"
   },
-  "overrides": {
-    "@mionjs/client": "file:../../mion-tarballs/mionjs-client.tgz",
-    "@mionjs/core": "file:../../mion-tarballs/mionjs-core.tgz",
-    "@mionjs/devtools": "file:../../mion-tarballs/mionjs-devtools.tgz",
-    "@mionjs/drizzle": "file:../../mion-tarballs/mionjs-drizzle.tgz",
-    "@mionjs/platform-aws": "file:../../mion-tarballs/mionjs-platform-aws.tgz",
-    "@mionjs/platform-bun": "file:../../mion-tarballs/mionjs-platform-bun.tgz",
-    "@mionjs/platform-cloudflare": "file:../../mion-tarballs/mionjs-platform-cloudflare.tgz",
-    "@mionjs/platform-gcloud": "file:../../mion-tarballs/mionjs-platform-gcloud.tgz",
-    "@mionjs/platform-node": "file:../../mion-tarballs/mionjs-platform-node.tgz",
-    "@mionjs/platform-vercel": "file:../../mion-tarballs/mionjs-platform-vercel.tgz",
-    "@mionjs/router": "file:../../mion-tarballs/mionjs-router.tgz",
-    "@mionjs/run-types": "file:../../mion-tarballs/mionjs-run-types.tgz",
-    "@mionjs/type-formats": "file:../../mion-tarballs/mionjs-type-formats.tgz"
+  "pnpm": {
+    "overrides": {
+      "@mionjs/client": "file:../../mion-tarballs/mionjs-client.tgz",
+      "@mionjs/core": "file:../../mion-tarballs/mionjs-core.tgz",
+      "@mionjs/devtools": "file:../../mion-tarballs/mionjs-devtools.tgz",
+      "@mionjs/drizzle": "file:../../mion-tarballs/mionjs-drizzle.tgz",
+      "@mionjs/platform-aws": "file:../../mion-tarballs/mionjs-platform-aws.tgz",
+      "@mionjs/platform-bun": "file:../../mion-tarballs/mionjs-platform-bun.tgz",
+      "@mionjs/platform-cloudflare": "file:../../mion-tarballs/mionjs-platform-cloudflare.tgz",
+      "@mionjs/platform-gcloud": "file:../../mion-tarballs/mionjs-platform-gcloud.tgz",
+      "@mionjs/platform-node": "file:../../mion-tarballs/mionjs-platform-node.tgz",
+      "@mionjs/platform-vercel": "file:../../mion-tarballs/mionjs-platform-vercel.tgz",
+      "@mionjs/router": "file:../../mion-tarballs/mionjs-router.tgz",
+      "@mionjs/run-types": "file:../../mion-tarballs/mionjs-run-types.tgz",
+      "@mionjs/type-formats": "file:../../mion-tarballs/mionjs-type-formats.tgz"
+    }
   }
 }

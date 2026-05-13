@@ -1,0 +1,37 @@
+# mion starter (Nuxt) — pnpm 11 hardening.
+# Shipped with the published create-starter-nuxt package so end-users
+# inherit the same supply-chain protections used in the mion repo.
+
+# ── Build-script allowlist ───────────────────────────────
+# Nuxt's `postinstall: nuxt prepare` runs at the project level (declared
+# in package.json scripts) and is not a dependency install hook — it is
+# not blocked by `ignoreScripts`. Entries below cover transitive deps.
+allowBuilds:
+  esbuild: true
+  '@parcel/watcher': true
+  unrs-resolver: true
+  better-sqlite3: true
+
+# ── Lockfile / install integrity ─────────────────────────
+preferFrozenLockfile: true
+verifyStoreIntegrity: true
+
+# ── Version pinning (no auto-bumps) ──────────────────────
+savePrefix: ''
+resolutionMode: highest
+
+# ── Supply-chain protection: minimum release age ─────────
+minimumReleaseAge: 43200
+minimumReleaseAgeExclude: []
+
+# ── Block lifecycle scripts ──────────────────────────────
+ignoreScripts: true
+sideEffectsCache: false
+
+# ── Block non-registry sources ───────────────────────────
+allowNonRegistryProtocols: false
+
+# ── Strict peer / hoisting ───────────────────────────────
+strictPeerDependencies: true
+autoInstallPeers: false
+nodeLinker: hoisted
