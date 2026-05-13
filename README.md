@@ -2,6 +2,18 @@
 
 Starter templates and CLI for scaffolding [mion](https://mion.io) into new or existing projects.
 
+## Requirements
+
+- **Node** ≥ 20
+- **pnpm** ≥ 11 — every starter ships with pnpm 11 supply-chain
+  hardening (`minimumReleaseAge`, `ignoreScripts`, `allowBuilds`
+  allowlist, `allowNonRegistryProtocols: false`, exact version
+  pinning). Enable corepack to get the pinned version automatically:
+  ```bash
+  corepack enable
+  ```
+  Or install pnpm globally: `npm i -g pnpm@11`.
+
 ## Structure
 
 ```

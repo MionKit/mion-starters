@@ -1,7 +1,21 @@
 # Mion Starters
 
+## Package manager: pnpm 11
+The repo and every starter use **pnpm 11** with supply-chain hardening
+mirroring the mion repo (`minimumReleaseAge`, `ignoreScripts: true`,
+`allowBuilds` allowlist, `allowNonRegistryProtocols: false`, exact
+version pinning). Settings live in `pnpm-workspace.yaml` files — one
+at the repo root and one inside each starter (so end-users who run
+`npm create @mionjs/starter-*` inherit the same protections).
+
+Enable corepack to get the pinned pnpm version automatically:
+```bash
+corepack enable
+```
+Or install pnpm globally: `npm i -g pnpm@11`.
+
 ## Repo Structure
-- **Not a monorepo** — each starter is an independent `npm create` package with own `package.json`, `tsconfig.json`, etc.
+- **Not a monorepo** — each starter is an independent `npm create` package with its own `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `tsconfig.json`, etc.
 - Starters are versioned by framework major version: `nextjs/16`, `nuxt/4`, `vue/3`, `standalone/1`
 - Each starter is published as a `create-*` package and can be used via `npm create`
 
@@ -24,7 +38,7 @@ npm create @mionjs/starter-nuxt my-app
 npm create @mionjs/starter-vue my-app
 ```
 
-Each starter contains a `create.mjs` bin script that copies the starter files into a new project directory, cleans up the `package.json`, and runs `npm install`.
+Each starter contains a `create.mjs` bin script that copies the starter files into a new project directory, cleans up the `package.json`, and runs `pnpm install` (Nuxt also runs `pnpm exec nuxt prepare`).
 
 ## Mion API Structure (shared across all starters)
 Each starter contains an `api/` sub-package with the same folder structure:
@@ -82,23 +96,28 @@ All `@mionjs/*` packages are published to npm. During development, local tarball
 
 ### Using npm versions (default for CI / release)
 ```bash
-npm run mionupdate              # fetches latest @mionjs/core version from npm and updates all starters
-npm run mionupdate -- 0.8.4     # set all @mionjs/* deps to a specific version
+pnpm run mionupdate              # fetches latest @mionjs/core version from npm and updates all starters
+pnpm run mionupdate -- 0.8.4     # set all @mionjs/* deps to a specific version
 ```
 
 ### Using local tarballs (for development)
 ```bash
-npm run mionlink                # packs mion packages, copies tarballs, and switches deps to file: references
+pnpm run mionlink                # packs mion packages, copies tarballs, and switches deps to file: references
 ```
-This runs `scripts/mionlink.mjs` which packs & copies tarballs from `../mion` into `mion-tarballs/`, rewrites all `@mionjs/*` deps to `file:` references, cleans caches, and runs `npm install` in each starter.
+This runs `scripts/mionlink.mjs` which packs & copies tarballs from `../mion` into `mion-tarballs/`, rewrites all `@mionjs/*` deps to `file:` references, cleans caches, and runs `pnpm install` in each starter.
 
-Both scripts share utilities from `scripts/mion-utils.mjs` and handle cleanup + `npm install` automatically.
+`mionlink` temporarily flips each starter's `allowNonRegistryProtocols` from `false` to `true` for the duration of the install (so pnpm will accept `file:` specifiers) and restores it immediately after. `mionupdate` does not need this — it puts the deps back on npm-registry versions.
+
+Both scripts share utilities from `scripts/mion-utils.mjs` and handle cleanup + `pnpm install` automatically.
 
 
 ## Testing & Validation
-- Each starter has e2e tests (`npm test` / Playwright). **All e2e tests must pass** before a starter is considered working.
+- Each starter has e2e tests (`pnpm test` / Playwright). **All e2e tests must pass** before a starter is considered working.
 - If any test fails, **stop and investigate the failure** before making further changes. Do not assume failures are unrelated or pre-existing.
 - Starters serve as integration/e2e tests for mion itself. If a failure originates in a mion package (build error, missing export, runtime bug), **fix it in the mion repo first** rather than working around it in the starter.
 
 ## Root Tests
-Root-level e2e tests (`tests/create-starter.test.ts`) verify that each `create.mjs` script correctly copies files and modifies `package.json`. Run with `npm test` from root. Uses vitest.
+Root-level e2e tests (`tests/create-starter.test.ts`) verify that each `create.mjs` script correctly copies files and modifies `package.json`. Run with `pnpm test` from root. Uses vitest.
+
+## Adding entries to `allowBuilds`
+pnpm 11 blocks every dependency install/postinstall script by default. When `pnpm install` reports a blocked build, add the package name to the `allowBuilds:` map in the appropriate `pnpm-workspace.yaml` (root for root-level tooling, or the affected starter's file). Only allow what you've vetted — that's the whole point.

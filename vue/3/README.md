@@ -2,10 +2,12 @@
 
 A full-stack starter that pairs a Vue 3 SPA with a [mion](https://mion.io) API. The same `api/` package builds for Node, Bun, Vercel, and Cloudflare Workers.
 
+This starter is configured for **pnpm 11** with supply-chain hardening. Make sure pnpm is available (`corepack enable`).
+
 ## Setup
 
 ```bash
-npm install
+pnpm install
 ```
 
 ## Development
@@ -13,7 +15,7 @@ npm install
 Runs the Vue dev server with the mion API mounted as Vite middleware:
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 Open [http://localhost:5173](http://localhost:5173).
@@ -21,22 +23,22 @@ Open [http://localhost:5173](http://localhost:5173).
 ## Build
 
 ```bash
-npm run build       # builds both the SPA and the API
-npm run build:app   # SPA only
-npm run build:api   # API only
+pnpm run build       # builds both the SPA and the API
+pnpm run build:app   # SPA only
+pnpm run build:api   # API only
 ```
 
 ## Preview
 
 ```bash
-npm run preview
+pnpm run preview
 ```
 
 ## Test
 
 ```bash
-npm run test:unit   # vitest
-npm run test:e2e    # playwright
+pnpm run test:unit   # vitest
+pnpm run test:e2e    # playwright
 ```
 
 ## Project layout
