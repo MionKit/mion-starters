@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ref, onMounted} from 'vue';
-import {routesFlow, serverMapFrom} from '@mionjs/client';
+import {routesFlow, mapFrom} from '@mionjs/client';
 import type {Order, OrderEvent} from '../../api/src/features/orders/orders-models';
 import {useMionClient} from '../composables/useMionClient';
 
@@ -10,8 +10,8 @@ const eventStyles: Record<string, {color: string; icon: string; label: string}> 
   placed: {color: '#3b82f6', icon: '\u{1F4E6}', label: 'Order Placed'},
   paid: {color: '#10b981', icon: '\u{1F4B3}', label: 'Payment Received'},
   shipped: {color: '#f59e0b', icon: '\u{1F69A}', label: 'Shipped'},
-  delivered: {color: '#22c55e', icon: '\u2705', label: 'Delivered'},
-  cancelled: {color: '#ef4444', icon: '\u274C', label: 'Cancelled'},
+  delivered: {color: '#22c55e', icon: '✅', label: 'Delivered'},
+  cancelled: {color: '#ef4444', icon: '❌', label: 'Cancelled'},
 };
 
 const statusColors: Record<string, string> = {
@@ -31,10 +31,10 @@ onMounted(async () => {
   apiErrors.value = [];
   try {
     const ordersList = routes.orders.listOrders();
-    const orderIds = serverMapFrom(
+    const orderIds = mapFrom(
       ordersList,
       (orders) => orders!.map((o) => o.id),
-      'serverMapFromOrdersToOrderEvents',
+      'mapFromOrdersToOrderEvents',
     ).asArg();
 
     const [[ordersData, allEvents], [ordersError, eventsError]] = await routesFlow([ordersList, routes.orders.getOrdersEvents(orderIds)]).call();
@@ -62,7 +62,7 @@ function getEventDetails(event: OrderEvent): string | null {
     case 'paid':
       return `via ${event.method}`;
     case 'shipped':
-      return `${event.carrier} \u00B7 ${event.tracking}`;
+      return `${event.carrier} · ${event.tracking}`;
     case 'cancelled':
       return event.reason;
     default:

@@ -4,6 +4,10 @@ import { builtinModules } from "module";
 import { mionVitePlugin } from "@mionjs/devtools/vite-plugin";
 
 export default defineConfig({
+  // Anchor vite's root to api/ so `outDir: "dist"` resolves to
+  // api/dist/, which matches the `../../../api/dist/...` import path
+  // used by the Next.js route handler.
+  root: __dirname,
   plugins: [
     mionVitePlugin({
       runTypes: { tsConfig: resolve(__dirname, "tsconfig.json") },

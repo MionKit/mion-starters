@@ -21,12 +21,13 @@ savePrefix: ''
 resolutionMode: highest
 
 # ── Supply-chain protection: minimum release age ─────────
-# Refuse to install package versions younger than 30 days (43200 minutes).
-# @mionjs/* are exempt — they are first-party packages whose release
-# integrity we already control, and pinning them to a 30-day-old version
-# would make starter scaffolds permanently lag the framework they
-# showcase. External deps remain subject to the age gate.
-minimumReleaseAge: 43200
+# Refuse to install package versions younger than 7 days (10080 minutes).
+# Applied to future bumps only — lockfile-frozen entries skip the
+# check, so the value chiefly governs what NEW deps may resolve to.
+# @mionjs/* are exempt — first-party packages whose release integrity
+# is controlled at the source repo; gating them would defeat
+# `mionupdate` against the freshest release.
+minimumReleaseAge: 10080
 minimumReleaseAgeExclude:
   - '@mionjs/client'
   - '@mionjs/core'
@@ -52,7 +53,11 @@ sideEffectsCache: false
 # command only.
 allowNonRegistryProtocols: false
 
-# ── Strict peer / hoisting ───────────────────────────────
-strictPeerDependencies: true
+# ── Peer / hoisting ─────────────────────────────────────
+# strictPeerDependencies relaxed for application starters: framework
+# transitives (nuxt, vite plugins) routinely declare narrow peer
+# ranges that conflict with each other. Supply-chain hardening
+# (minimumReleaseAge, ignoreScripts, allowBuilds) is unaffected.
+strictPeerDependencies: false
 autoInstallPeers: false
 nodeLinker: hoisted

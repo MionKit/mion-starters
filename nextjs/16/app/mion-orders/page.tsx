@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { initClient, routesFlow, serverMapFrom } from "@mionjs/client";
+import { initClient, routesFlow, mapFrom } from "@mionjs/client";
 import type { MyApi } from "@mion-app/api";
 import type {
   Order,
@@ -24,8 +24,8 @@ const eventStyles: Record<
   placed: { color: "#3b82f6", icon: "\u{1F4E6}", label: "Order Placed" },
   paid: { color: "#10b981", icon: "\u{1F4B3}", label: "Payment Received" },
   shipped: { color: "#f59e0b", icon: "\u{1F69A}", label: "Shipped" },
-  delivered: { color: "#22c55e", icon: "\u2705", label: "Delivered" },
-  cancelled: { color: "#ef4444", icon: "\u274C", label: "Cancelled" },
+  delivered: { color: "#22c55e", icon: "✅", label: "Delivered" },
+  cancelled: { color: "#ef4444", icon: "❌", label: "Cancelled" },
 };
 
 function EventDetails({ event }: { event: OrderEvent }) {
@@ -186,12 +186,12 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Single HTTP request: listOrders -> serverMapFrom extracts IDs server-side -> getOrdersEvents
+    // Single HTTP request: listOrders -> mapFrom extracts IDs server-side -> getOrdersEvents
     const ordersList = routes.orders.listOrders();
-    const orderIds = serverMapFrom(
+    const orderIds = mapFrom(
       ordersList,
       (orders) => orders!.map((o) => o.id),
-      "serverMapFromOrdersToOrderEvents",
+      "mapFromOrdersToOrderEvents",
     ).asArg();
 
     routesFlow([ordersList, routes.orders.getOrdersEvents(orderIds)])

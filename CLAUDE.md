@@ -128,3 +128,14 @@ Root-level e2e tests (`tests/create-starter.test.ts`) verify that each `create.m
 
 ## Adding entries to `allowBuilds`
 pnpm 11 blocks every dependency install/postinstall script by default. When `pnpm install` reports a blocked build, add the package name to the `allowBuilds:` map in the appropriate `pnpm-workspace.yaml` (root for root-level tooling, or the affected starter's file). Only allow what you've vetted — that's the whole point.
+
+## How `minimumReleaseAge` interacts with the lockfile
+`minimumReleaseAge` (7 days / 10080 minutes) applies to **resolution**, not to lockfile-bound installs. Once a `pnpm-lock.yaml` exists, `pnpm install` reuses the pinned versions and skips the age check entirely — so the gate exists primarily to govern **future bumps**.
+
+This makes the bootstrap pattern important: the very first install in a fresh tree has nothing to compare against, so pnpm checks every package. If brand-new ecosystem packages (or those with incomplete `time` metadata on npm) make that initial resolution fail, seed the lockfile once with the gate bypassed:
+
+```bash
+pnpm install --config.minimumReleaseAge=0
+```
+
+Commit the resulting `pnpm-lock.yaml`. All subsequent installs run with the 7-day gate active, but resolution is skipped, so the gate only triggers when a real dep bump introduces a fresh version. At that point either wait for it to age out or add a targeted `minimumReleaseAgeExclude` entry.

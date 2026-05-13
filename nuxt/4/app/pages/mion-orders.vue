@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {routesFlow, serverMapFrom} from '@mionjs/client';
+import {routesFlow, mapFrom} from '@mionjs/client';
 import type {Order, OrderEvent} from '../../api/src/features/orders/orders-models';
 
 const {$mionClient} = useNuxtApp();
@@ -29,10 +29,10 @@ const {status, error: asyncError} = useAsyncData('orders', async () => {
   apiErrors.value = [];
   try {
     const ordersList = routes.orders.listOrders();
-    const orderIds = serverMapFrom(
+    const orderIds = mapFrom(
       ordersList,
       (orders) => orders!.map((o) => o.id),
-      'serverMapFromOrdersToOrderEvents',
+      'mapFromOrdersToOrderEvents',
     ).asArg();
 
     const [[ordersData, allEvents], [ordersError, eventsError]] = await routesFlow([ordersList, routes.orders.getOrdersEvents(orderIds)]).call();
