@@ -95,7 +95,8 @@ this change touched, review its report against the code, and commit it as its ow
   version the local registry serves, drops `@mionjs/*` overrides, cleans caches and installs with
   `--cache .mion-local-cache`. `--no-build` reuses the last tarballs; starter folders can be passed as arguments.
   `npm run mionstop` stops the registry.
-- `npm run mionupdate`: per-package `npm view <pkg> version`, removes the local `.npmrc`, cleans, installs.
+- `npm run mionupdate`: per-package `npm view <pkg> version`, removes the local `.npmrc`, cleans, installs. Takes
+  starter folders as arguments too.
 - `create.mjs` (all three, same exclude list): skips `.mion` except `.mion/enriched/`, `dist-server`, `.wrangler`,
   `.data`, `next-env.d.ts`, `api/drizzle`, `.npmrc`; package name from the folder name; drops `description`,
   `homepage`, `author`, `version`, `license`. `gitignore` + `.npmignore` get `.mion` and host outputs.
@@ -103,3 +104,21 @@ this change touched, review its report against the code, and commit it as its ow
   `typecheck` and `test:unit` when present. In local mode they install from the local registry.
 - `pre-publish-test`: refuses local mode, also runs the build. `publish-all`: no change needed.
 - Docs: `CLAUDE.md`, `README.md`, `.claude/skills/update-deps/SKILL.md`.
+
+## What shipped
+
+Built as planned, plus:
+
+- `api/drizzle` (migrations output) is skipped by `create.mjs` and `.npmignore` but not gitignored: a real project
+  commits its migrations.
+- The root `.gitignore` also ignores `.npmrc`, `.mion-registry` and `.mion-local-cache`, so a starter in local mode
+  cannot be committed with its local `.npmrc`.
+- The stale root `README.md` (a `cli/` folder and an `npm link` flow that no longer exist) was rewritten, and a stray
+  extracted `@mionjs/router` 0.8 `package/package.json` was removed.
+- Proved end to end on a throwaway copy of `vue/3` with the 0.13 package set: `mionlink` built `../mion`, published 20
+  packages and installed `@mionjs/*@0.13.2`, `@mionjs/drizzle-orm@0.45.1` and `@mionjs/native-compiler-linux-x64` from
+  the local registry; `mionupdate` switched it back to npmjs; `mionstop` stopped the registry. The npm cache folder
+  alone was enough: no prerelease version needed in mion.
+- The per-starter root tests (`tests/create-*.test.ts`) stay red until each port lands: the starters on `main` still
+  point at `file:` tarballs that no longer exist. `tests/create-output.test.ts` passes.
+- Unrelated finding filed as `docs/todos/starters-repository-urls.md`.
