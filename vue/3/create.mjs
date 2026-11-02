@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import {existsSync, mkdirSync, cpSync, renameSync, readFileSync, writeFileSync} from 'node:fs';
-import {resolve, basename, dirname} from 'node:path';
+import {resolve, basename, dirname, relative, sep} from 'node:path';
 import {execSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 
@@ -27,24 +27,40 @@ if (existsSync(targetDir)) {
 
 mkdirSync(targetDir, {recursive: true});
 
+/** Starter-only files and generated state (build output, caches, mion's generated folder) */
 const EXCLUDE = new Set([
     'create.mjs',
     'node_modules',
     'dist',
     '.dist',
+    'dist-server',
     'build',
+    '.next',
+    '.nuxt',
+    '.output',
+    '.data',
+    '.wrangler',
+    '.vercel',
+    'next-env.d.ts',
     'test-results',
     'coverage',
     '.coverage',
     'package-lock.json',
+    '.npmrc',
     '.DS_Store',
 ]);
+/** Generated paths, relative to the starter root (drizzle migrations output) */
+const EXCLUDE_PATHS = ['api/drizzle'];
 
 cpSync(__dirname, targetDir, {
     recursive: true,
     filter: (src) => {
         const name = basename(src);
-        if (EXCLUDE.has(name)) return false;
+        const rel = relative(__dirname, src).split(sep).join('/');
+        if (EXCLUDE.has(name) || EXCLUDE_PATHS.includes(rel)) return false;
+        // .mion/ is generated, except .mion/enriched/ which holds hand-written texts
+        if (rel === '.mion') return existsSync(resolve(src, 'enriched'));
+        if (rel.startsWith('.mion/') && rel !== '.mion/enriched' && !rel.startsWith('.mion/enriched/')) return false;
         if (name.startsWith('debug-')) return false;
         if (name.endsWith('.tsbuildinfo')) return false;
         if (name.startsWith('.env')) return false;
@@ -60,7 +76,8 @@ renameSync(resolve(targetDir, 'gitignore'), resolve(targetDir, '.gitignore'));
 const pkgPath = resolve(targetDir, 'package.json');
 const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
 
-pkg.name = projectName;
+// The folder name, never the raw argument: mion uses the package name as a path segment in generated files
+pkg.name = basename(targetDir);
 pkg.private = true;
 delete pkg.bin;
 delete pkg.files;
@@ -68,6 +85,11 @@ delete pkg.publishConfig;
 delete pkg.repository;
 delete pkg.keywords;
 delete pkg.bugs;
+delete pkg.description;
+delete pkg.homepage;
+delete pkg.author;
+delete pkg.version;
+delete pkg.license;
 
 writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
 
