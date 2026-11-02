@@ -8,6 +8,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {execFileSync, spawn} from 'node:child_process';
+import {setTimeout as sleep} from 'node:timers/promises';
 import {LOCAL_REGISTRY, MION_REPO, ROOT} from './mion-utils.mjs';
 
 const VERDACCIO = 'verdaccio@6.7.2';
@@ -21,26 +22,31 @@ const PUBLISH_NPMRC = path.join(STATE_DIR, 'publish.npmrc');
 
 /** Starts a fresh, empty registry, stopping any previous one first */
 export async function startRegistry() {
-    stopRegistry();
+    if (stopRegistry()) for (let i = 0; i < 40 && (await ping()); i++) await sleep(250);
     fs.rmSync(STORAGE, {recursive: true, force: true});
     fs.mkdirSync(STORAGE, {recursive: true});
     const mionConfig = fs.readFileSync(path.join(MION_REPO, '.github', 'verdaccio.yaml'), 'utf-8');
     if (!/^storage: .*$/m.test(mionConfig)) throw new Error('mion .github/verdaccio.yaml has no `storage:` line');
     fs.writeFileSync(CONFIG, mionConfig.replace(/^storage: .*$/m, `storage: ${JSON.stringify(STORAGE)}`));
 
+    if (await ping()) throw new Error(`something already answers on ${LOCAL_REGISTRY}: stop it first`);
     console.log(`Starting ${VERDACCIO} on ${LOCAL_REGISTRY} (log: ${path.relative(ROOT, LOG_FILE)})`);
     const log = fs.openSync(LOG_FILE, 'w');
-    const {host, port} = new URL(LOCAL_REGISTRY);
-    const child = spawn('npx', ['--yes', VERDACCIO, '--config', CONFIG, '--listen', host], {
+    const child = spawn('npx', ['--yes', VERDACCIO, '--config', CONFIG, '--listen', new URL(LOCAL_REGISTRY).host], {
         cwd: STATE_DIR,
         stdio: ['ignore', log, log],
         detached: true,
     });
     child.unref();
     fs.writeFileSync(PID_FILE, String(child.pid));
-    if (!(await waitPing(180))) {
-        stopRegistry();
-        throw new Error(`registry did not answer on port ${port}:\n${fs.readFileSync(LOG_FILE, 'utf-8')}`);
+    // generous: a cold `npx` first downloads verdaccio
+    const deadline = Date.now() + 180_000;
+    while (!(await ping())) {
+        if (child.exitCode !== null || Date.now() > deadline) {
+            stopRegistry();
+            throw new Error(`registry did not start:\n${fs.readFileSync(LOG_FILE, 'utf-8')}`);
+        }
+        await sleep(500);
     }
 }
 
@@ -60,6 +66,8 @@ export function stopRegistry() {
     if (!fs.existsSync(PID_FILE)) return false;
     const pid = Number(fs.readFileSync(PID_FILE, 'utf-8'));
     fs.rmSync(PID_FILE);
+    // 0 or garbage would signal our own process group
+    if (!Number.isInteger(pid) || pid <= 0) return false;
     try {
         process.kill(-pid);
         return true;
@@ -68,15 +76,10 @@ export function stopRegistry() {
     }
 }
 
-async function waitPing(timeoutS) {
-    const deadline = Date.now() + timeoutS * 1000;
-    while (Date.now() < deadline) {
-        try {
-            if ((await fetch(new URL('-/ping', LOCAL_REGISTRY))).ok) return true;
-        } catch {
-            // not listening yet
-        }
-        await new Promise((r) => setTimeout(r, 500));
+async function ping() {
+    try {
+        return (await fetch(new URL('-/ping', LOCAL_REGISTRY))).ok;
+    } catch {
+        return false;
     }
-    return false;
 }
