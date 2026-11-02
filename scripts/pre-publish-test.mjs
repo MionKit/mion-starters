@@ -8,9 +8,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {execSync} from 'node:child_process';
-import {findStarterDirs, isLocalMode} from './mion-utils.mjs';
+import {ROOT, findStarterDirs, isLocalMode} from './mion-utils.mjs';
 
-const ROOT = path.resolve(import.meta.dirname, '..');
 const TMP_ROOT = path.join(ROOT, '.tmp-pre-publish');
 
 const STARTERS = [
@@ -27,10 +26,17 @@ function run(cmd, cwd) {
     execSync(cmd, {cwd, stdio: 'inherit', timeout: 300_000, env});
 }
 
+/** True when a starter still points an @mionjs/* dep or override at a `file:` tarball */
+function hasFileDeps(dir) {
+    const pkg = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf-8'));
+    const blocks = [pkg.dependencies, pkg.devDependencies, pkg.overrides];
+    return blocks.some((deps) => Object.entries(deps ?? {}).some(([n, v]) => n.startsWith('@mionjs/') && String(v).startsWith('file:')));
+}
+
 function validateNpmMode() {
-    const local = findStarterDirs().filter(isLocalMode);
+    const local = findStarterDirs().filter((dir) => isLocalMode(dir) || hasFileDeps(dir));
     if (local.length) {
-        console.error('Error: these starters install @mionjs/* from the local registry:');
+        console.error('Error: these starters do not install @mionjs/* from npm:');
         for (const dir of local) console.error(`  ${path.relative(ROOT, dir)}`);
         console.error("Run 'npm run mionupdate' first to switch to npm versions.");
         process.exit(1);
