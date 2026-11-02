@@ -8,7 +8,7 @@ npm create @mionjs/starter-nuxt my-app
 npm create @mionjs/starter-vue my-app
 ```
 
-## Structure
+## Repo Structure
 
 ```
 mion-starters/
@@ -22,7 +22,7 @@ mion-starters/
 Each starter is a self-contained project (own `package.json`, `tsconfig.json`), not a monorepo. Starters are versioned
 by their framework's major version. All of them ship the same Orders showcase API.
 
-## Developing against a local mion
+## Developing Against a Local mion
 
 With the [mion repo](https://github.com/MionKit/mion) cloned and set up next to this one (`../mion`):
 
@@ -34,7 +34,7 @@ npm run mionupdate    # back to the npm-published packages
 
 Details are in [CLAUDE.md](CLAUDE.md#mion-packages).
 
-## Tests
+## Root Tests
 
 ```bash
 npm test              # every root test: create each starter, build it, run its tests

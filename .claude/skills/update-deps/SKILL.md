@@ -137,7 +137,7 @@ The following changes require explicit user confirmation before applying:
 
 ## Verification
 
-1. Build, then run the tests: `cd <starter-dir> && npm run build && npm test`
+1. Build and test: `cd <starter-dir> && npm run build && npm test`
 2. If tests fail:
    - If the error is trivial (renamed import, type mismatch, minor API change): fix and re-test
    - If non-trivial: search for `<package> <version> breaking changes` and report findings

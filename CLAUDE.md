@@ -1,7 +1,7 @@
 # Mion Starters
 
 ## Repo Structure
-- **Not a monorepo** — each starter is an independent `npm create` package with own `package.json`, `tsconfig.json`, etc.
+- **Not a monorepo**: each starter is an independent `npm create` package with own `package.json`, `tsconfig.json`, etc.
 - Starters are versioned by framework major version: `nextjs/16`, `nuxt/4`, `vue/3`, `standalone/1`
 - Each starter is published as a `create-*` package and can be used via `npm create`
 
@@ -18,8 +18,8 @@ mion-starters/
 └── tests/                        # Root-level e2e tests for create scripts
 ```
 
-## Guidelines
-- **SPA first.** mion's main target is the SPA (the browser to server bridge), so starters prefer SPA over SSR.
+## Starter Guidelines
+- **SPA first.** mion mainly serves a browser app calling its own server (an SPA), so starters prefer SPA over SSR.
   Example: the Nuxt starter runs with `ssr: false` and loads data on the client.
 
 ## Creating a New Project
@@ -33,10 +33,10 @@ Each starter contains a `create.mjs` bin script that copies the starter files in
 - The package name is the new folder's name (`basename(targetDir)`), never the raw argument: mion uses it as a path segment in generated files.
 - Generated state is never copied: `.mion` (except `.mion/enriched/`), build output (`dist`, `dist-server`, `.next`, `.nuxt`, `.output`), `.wrangler`, `.data`, `next-env.d.ts`, `api/drizzle`, `.npmrc`.
 - Keep the `EXCLUDE` list the same in all three `create.mjs`. A new generated folder goes into `EXCLUDE`, `gitignore`, `.gitignore` and `.npmignore`.
-  Exception: `api/drizzle` is left out of `gitignore`, since a real project commits its migrations; the root `.gitignore` keeps it out of this repo.
+  Exception: `api/drizzle` stays out of `gitignore` (a real project commits its migrations). The root `.gitignore` keeps it out of this repo.
 
 ## Mion API Structure (shared across all starters)
-`api/` is a source folder, not a package. Client and server code share one tsconfig program (one `tsconfig.json` at the starter root), so mion sees every route and every client call.
+`api/` is a source folder, not a package. Client and server code share one `tsconfig.json` at the starter root, so mion sees every route and every client call.
 
 ```
 api/
@@ -125,7 +125,7 @@ npm run mionlink -- vue/3       # only these starter folders
 npm run mionstop                # stop the local registry
 ```
 
-`mionlink` runs mion's own release scripts (`build-binaries.mjs --host-only`, `pnpm run build`, `pack.mjs`), starts `verdaccio` (a local npm registry) on `http://127.0.0.1:4873/` with mion's `.github/verdaccio.yaml`, and publishes with `publish-tarballs.mjs --registry`. Each starter then gets a `.npmrc` with `@mionjs:registry=http://127.0.0.1:4873/` and installs with its own npm cache (`.mion-local-cache`), because a local build has the same version as the npm one. Registry state lives in `.mion-registry/`.
+`mionlink` runs mion's own release scripts (`build-binaries.mjs --host-only`, `pnpm run build`, `pack.mjs`). It starts `verdaccio` (a local npm registry) on `http://127.0.0.1:4873/` with mion's `.github/verdaccio.yaml`, then publishes with `publish-tarballs.mjs --registry`. Each starter then gets a `.npmrc` with `@mionjs:registry=http://127.0.0.1:4873/` and installs with its own npm cache (`.mion-local-cache`), because a local build has the same version as the npm one. Registry state lives in `.mion-registry/`.
 
 The registry keeps running after `mionlink`, so later installs and the root tests still work. `mionupdate` removes the `.npmrc` line and switches back to npm. Never commit a starter in local mode.
 
