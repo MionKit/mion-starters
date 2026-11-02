@@ -1,50 +1,45 @@
 #!/usr/bin/env node
 
 /**
- * Switches all starters to use local mion tarballs (file: references).
+ * Switches starters to a locally built mion served from a local registry.
  *
- * Packs mion packages from ../mion, copies tarballs to ./mion-tarballs/,
- * updates all @mionjs/* deps to file: references, cleans caches, and runs npm install.
+ * Builds ../mion with its own release scripts, starts the local registry, publishes mion there, then points
+ * each starter's @mionjs/* deps at it (`.npmrc` scope line) and installs with a dedicated npm cache.
+ * The registry keeps running for later installs: stop it with `npm run mionstop`.
  *
  * Usage:
- *   npm run mionlink
- *   node scripts/mionlink.mjs
+ *   npm run mionlink                          # build mion, every starter
+ *   npm run mionlink -- --no-build            # reuse mion's last packed tarballs
+ *   npm run mionlink -- vue/3 path/to/copy    # only these starter folders
  */
 
-import fs from "fs";
-import path from "path";
-import {execSync} from "child_process";
-import {ROOT, TARBALLS_DIR, updateAllStarters} from "./mion-utils.mjs";
+import fs from 'node:fs';
+import path from 'node:path';
+import {execFileSync} from 'node:child_process';
+import {LOCAL_REGISTRY, MION_REPO, findStarterDirs, latestVersion, resolveVersions, switchStarters} from './mion-utils.mjs';
+import {publishMion, startRegistry} from './local-registry.mjs';
 
-const MION_REPO = path.join(ROOT, "..", "mion");
-const MION_TARBALLS_SRC = path.join(MION_REPO, "test-publish", "tarballs");
-const TARBALLS_DEST = path.join(ROOT, TARBALLS_DIR);
+const args = process.argv.slice(2);
+const build = !args.includes('--no-build');
+const dirs = args.filter((a) => !a.startsWith('--')).map((d) => path.resolve(d));
+const starters = dirs.length ? dirs : findStarterDirs();
 
-// Verify mion repo exists
-if (!fs.existsSync(path.join(MION_REPO, "scripts", "pack-packages.sh"))) {
-  console.error("Error: ../mion repo not found (expected ../mion/scripts/pack-packages.sh).");
-  console.error("Make sure the mion repo is cloned as a sibling directory.");
-  process.exit(1);
+if (!fs.existsSync(path.join(MION_REPO, 'scripts', 'release', 'pack.mjs'))) {
+    console.error(`Error: no mion checkout at ${MION_REPO} (clone mion as a sibling of mion-starters).`);
+    process.exit(1);
 }
 
-// 1. Pack mion packages
-console.log("Packing mion packages...");
-execSync("bash scripts/pack-packages.sh", {cwd: MION_REPO, stdio: "inherit"});
-
-// 2. Copy tarballs
-console.log("\nCopying tarballs to ./mion-tarballs/...");
-fs.mkdirSync(TARBALLS_DEST, {recursive: true});
-// Clear existing tarballs
-for (const f of fs.readdirSync(TARBALLS_DEST)) {
-  if (f.endsWith(".tgz")) fs.rmSync(path.join(TARBALLS_DEST, f));
+if (build) {
+    const run = (cmd, cmdArgs) => execFileSync(cmd, cmdArgs, {cwd: MION_REPO, stdio: 'inherit'});
+    console.log('Building mion (resolver binary for this machine, JS packages, tarballs)...');
+    run('node', ['scripts/release/build-binaries.mjs', '--host-only']);
+    run('pnpm', ['run', 'build']);
+    run('node', ['scripts/release/pack.mjs']);
 }
-// Copy new ones
-const tarballs = fs.readdirSync(MION_TARBALLS_SRC).filter((f) => f.endsWith(".tgz"));
-for (const f of tarballs) {
-  fs.copyFileSync(path.join(MION_TARBALLS_SRC, f), path.join(TARBALLS_DEST, f));
-  console.log(`  copied ${f}`);
-}
-console.log(`Copied ${tarballs.length} tarballs.`);
 
-// 3. Switch deps to file: references, clean caches, and npm install
-updateAllStarters(true, null);
+await startRegistry();
+publishMion();
+
+const versions = resolveVersions(starters, (name) => latestVersion(name, LOCAL_REGISTRY));
+switchStarters(starters, versions, true);
+console.log(`\nDone: starters install @mionjs/* from ${LOCAL_REGISTRY}. Stop it with: npm run mionstop`);

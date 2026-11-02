@@ -33,4 +33,13 @@ yarn-error.log*
 
 # test temp dirs
 .tmp*
-mion-tarballs
+
+# local mion registry (npm run mionlink)
+.mion-registry
+.mion-local-cache
+# starters in local mode point @mionjs/* at the local registry here
+.npmrc
+
+# mion generated state (.mion/enriched/ holds hand-written texts and is committed)
+.mion/*
+!.mion/enriched/

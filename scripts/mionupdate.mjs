@@ -1,34 +1,21 @@
 #!/usr/bin/env node
 
 /**
- * Switches all starters to use npm-published mion packages.
+ * Switches starters to npm-published mion packages, each on its own version line.
  *
- * Fetches the latest @mionjs/core version (or uses an explicit version argument),
- * updates all @mionjs/* deps, cleans caches, and runs npm install.
+ * Every @mionjs/* dep gets its own latest npm version (`@mionjs/drizzle-orm*` follow drizzle's line), the local
+ * registry `.npmrc` line is removed, caches are cleaned and `npm install` runs.
  *
  * Usage:
- *   npm run mionupdate              # uses latest published version
- *   npm run mionupdate -- 0.8.4     # uses explicit version
- *   node scripts/mionupdate.mjs 0.8.4
+ *   npm run mionupdate                # latest version of each package
+ *   npm run mionupdate -- 0.13.2      # this version for every package except @mionjs/drizzle-orm*
  */
 
-import {execSync} from "child_process";
-import {updateAllStarters} from "./mion-utils.mjs";
+import {findStarterDirs, latestVersion, resolveVersions, switchStarters} from './mion-utils.mjs';
 
-let version = process.argv[2];
-
-if (!version) {
-  console.log("No version specified, fetching latest from npm...");
-  try {
-    version = execSync("npm view @mionjs/core version", {encoding: "utf-8"}).trim();
-  } catch {
-    console.error("Error: failed to fetch latest @mionjs/core version from npm.");
-    console.error("Check your network connection or specify a version explicitly:");
-    console.error("  npm run mionupdate -- 0.8.4");
-    process.exit(1);
-  }
-  console.log(`Latest @mionjs/core version: ${version}`);
-}
-
-// Switch deps to npm version, clean caches, and npm install
-updateAllStarters(false, version);
+const pinned = process.argv[2];
+const onOwnLine = (name) => name.startsWith('@mionjs/drizzle-orm');
+const starters = findStarterDirs();
+const versions = resolveVersions(starters, (name) => (pinned && !onOwnLine(name) ? pinned : latestVersion(name)));
+switchStarters(starters, versions, false);
+console.log('\nDone: starters use npm-published @mionjs/* packages.');
