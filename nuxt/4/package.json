@@ -35,6 +35,7 @@
   "scripts": {
     "dev": "nuxt dev",
     "generate": "nuxt generate",
+    "build": "nuxt generate && npm run build:api",
     "build:api": "vite build --config api/vite.config.ts",
     "build:api:node": "vite build --config api/vite.config.ts --ssr api/src/server.node.ts",
     "build:api:bun": "vite build --config api/vite.config.ts --ssr api/src/server.bun.ts",
