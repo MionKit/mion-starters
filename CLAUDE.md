@@ -111,6 +111,7 @@ TypeScript stays on `^6`: TypeScript 7 breaks vue-tsc and typescript-eslint.
 ```bash
 npm run mionupdate              # each @mionjs/* dep to its own latest npm version
 npm run mionupdate -- 0.13.2    # this version for every @mionjs/* dep except @mionjs/drizzle-orm*
+npm run mionupdate -- vue/3     # only these starter folders
 ```
 
 ### Using a local mion build (for development)
