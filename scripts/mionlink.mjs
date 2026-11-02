@@ -1,16 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * Switches starters to a locally built mion served from a local registry.
- *
- * Builds ../mion with its own release scripts, starts the local registry, publishes mion there, then points
- * each starter's @mionjs/* deps at it (`.npmrc` scope line) and installs with a dedicated npm cache.
- * The registry keeps running for later installs: stop it with `npm run mionstop`.
- *
- * Usage:
- *   npm run mionlink                          # build mion, every starter
- *   npm run mionlink -- --no-build            # reuse mion's last packed tarballs
- *   npm run mionlink -- vue/3 path/to/copy    # only these starter folders
+ * Switches starters to a locally built ../mion on a local registry that keeps running: `npm run mionstop` stops it.
+ * Usage: `npm run mionlink [-- --no-build] [starter folders]`; `--no-build` reuses mion's last packed tarballs.
  */
 
 import fs from 'node:fs';

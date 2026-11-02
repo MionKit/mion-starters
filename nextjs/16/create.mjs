@@ -27,7 +27,7 @@ if (existsSync(targetDir)) {
 
 mkdirSync(targetDir, {recursive: true});
 
-/** Starter-only files and generated state (build output, caches, mion's generated folder) */
+/** Starter-only files and generated state; .mion/ is filtered below */
 const EXCLUDE = new Set([
     'create.mjs',
     'node_modules',

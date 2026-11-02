@@ -4,7 +4,7 @@ import {resolve, join} from 'node:path';
 import {describe, it, beforeAll, afterAll} from 'vitest';
 import {ROOT, isLocalMode, localModeEnv} from '../scripts/mion-utils.mjs';
 
-/** Creates a project from each starter, installs it (from the local registry in local mode), builds and tests it */
+/** create.mjs installs too: from the local registry when the starter is in local mode */
 describe.each([
     ['nextjs', 'nextjs/16'],
     ['nuxt', 'nuxt/4'],

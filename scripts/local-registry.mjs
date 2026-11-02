@@ -1,9 +1,6 @@
 #!/usr/bin/env node
 
-/**
- * The throwaway local registry (verdaccio) that serves a locally built mion to the starters.
- * Runs mion's own `.github/verdaccio.yaml`, with storage moved into `.mion-registry/`.
- */
+/** Throwaway verdaccio registry serving a locally built mion to the starters. */
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -17,10 +14,9 @@ const STORAGE = path.join(STATE_DIR, 'storage');
 const CONFIG = path.join(STATE_DIR, 'verdaccio.yaml');
 const PID_FILE = path.join(STATE_DIR, 'verdaccio.pid');
 const LOG_FILE = path.join(STATE_DIR, 'verdaccio.log');
-/** npm user config used only for publishing: holds the token verdaccio wants, keeps ~/.npmrc untouched */
+/** Holds the publish token verdaccio wants, so ~/.npmrc stays untouched */
 const PUBLISH_NPMRC = path.join(STATE_DIR, 'publish.npmrc');
 
-/** Starts a fresh, empty registry, stopping any previous one first */
 export async function startRegistry() {
     if (stopRegistry()) for (let i = 0; i < 40 && (await ping()); i++) await sleep(250);
     fs.rmSync(STORAGE, {recursive: true, force: true});
@@ -61,7 +57,6 @@ export function publishMion() {
     });
 }
 
-/** Stops the registry started by `startRegistry`; a no-op when none is running */
 export function stopRegistry() {
     if (!fs.existsSync(PID_FILE)) return false;
     const pid = Number(fs.readFileSync(PID_FILE, 'utf-8'));

@@ -1,9 +1,6 @@
 #!/usr/bin/env node
 
-/**
- * Simulates the full `npm create @mionjs/starter-*` flow before publishing.
- * Packs each starter, extracts the tarball, runs create.mjs, builds the project and verifies e2e tests pass.
- */
+/** Simulates the full `npm create @mionjs/starter-*` flow before publishing. */
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -26,7 +23,6 @@ function run(cmd, cwd) {
     execSync(cmd, {cwd, stdio: 'inherit', timeout: 300_000, env});
 }
 
-/** True when a starter still points an @mionjs/* dep or override at a `file:` tarball */
 function hasFileDeps(dir) {
     const pkg = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf-8'));
     const blocks = [pkg.dependencies, pkg.devDependencies, pkg.overrides];
@@ -53,24 +49,20 @@ function testStarter({name, dir}) {
     const tmpDir = path.join(TMP_ROOT, name);
     const projectDir = path.join(tmpDir, `test-${name}`);
 
-    // 1. npm pack
     console.log('--- npm pack ---');
     const tarballName = execSync('npm pack', {cwd: starterDir, env, encoding: 'utf-8'}).trim();
     const tarballPath = path.join(starterDir, tarballName);
 
     try {
-        // 2. Extract tarball
         console.log('--- extract tarball ---');
         fs.mkdirSync(tmpDir, {recursive: true});
         run(`tar xzf ${tarballPath} -C ${tmpDir}`, ROOT);
 
-        // 3. Run create.mjs from the extracted package (simulates npm create)
         const extractedDir = path.join(tmpDir, 'package');
         const createScript = path.join(extractedDir, 'create.mjs');
         console.log('--- run create.mjs ---');
         run(`node ${createScript} ${projectDir}`, tmpDir);
 
-        // 4. Build, then install playwright and run e2e tests
         console.log('--- build ---');
         run('npm run build', projectDir);
 
@@ -82,7 +74,6 @@ function testStarter({name, dir}) {
 
         console.log(`\n  ${name} starter: PASSED\n`);
     } finally {
-        // Clean up tarball from starter directory
         if (fs.existsSync(tarballPath)) fs.rmSync(tarballPath);
     }
 }

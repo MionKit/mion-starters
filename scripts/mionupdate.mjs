@@ -1,15 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * Switches starters to npm-published mion packages, each on its own version line.
- *
- * Every @mionjs/* dep gets its own latest npm version (`@mionjs/drizzle-orm*` follow drizzle's line), the local
- * registry `.npmrc` line is removed, caches are cleaned and `npm install` runs.
- *
- * Usage:
- *   npm run mionupdate                # latest version of each package
- *   npm run mionupdate -- 0.13.2      # this version for every package except @mionjs/drizzle-orm*
- *   npm run mionupdate -- vue/3       # only these starter folders
+ * Switches starters to npm-published mion, each @mionjs/* dep on its own latest version.
+ * Usage: `npm run mionupdate [-- 0.13.2] [starter folders]`; a pin skips `@mionjs/drizzle-orm*` (drizzle's line).
  */
 
 import {parseArgs} from 'node:util';
