@@ -1,7 +1,7 @@
 ---
 type: chore
 spec: guidelines
-status: ready
+status: done
 created: 2026-11-02
 ---
 
@@ -14,7 +14,7 @@ run against a locally built mion while mion bugs found during the migration are 
 and repo docs match how 0.13 works.
 
 Full investigation: `docs/investigations/mion-0.13-migration/` (start with `README.md`; decisions in
-`DECISIONS.md`).
+`DECISIONS.md`) on the branch `claude/focused-feynman-3p5dap`, commit `03259315`. It is not on `main`.
 
 ## Direction
 
@@ -119,6 +119,16 @@ Built as planned, plus:
   packages and installed `@mionjs/*@0.13.2`, `@mionjs/drizzle-orm@0.45.1` and `@mionjs/native-compiler-linux-x64` from
   the local registry; `mionupdate` switched it back to npmjs; `mionstop` stopped the registry. The npm cache folder
   alone was enough: no prerelease version needed in mion.
-- The per-starter root tests (`tests/create-*.test.ts`) stay red until each port lands: the starters on `main` still
-  point at `file:` tarballs that no longer exist. `tests/create-output.test.ts` passes.
-- Unrelated finding filed as `docs/todos/starters-repository-urls.md`.
+- The per-starter root tests (`tests/create-e2e.test.ts`) stay red until each port lands: the starters on `main` still
+  point at `file:` tarballs that no longer exist. `tests/create-output.test.ts` and `tests/mion-utils.test.ts` pass.
+- An unrelated finding (the starters' repository links) was filed as its own todo.
+- Review fixes: `nuxt/4` got a `build` script (`nuxt generate` plus `build:api`) so the root tests and
+  `pre-publish-test` can build it; local mode is also detected from local registry URLs in the lockfile; and
+  `pre-publish-test` also refuses `file:` @mionjs/* deps. The root `.gitignore` keeps `*/*/api/drizzle/` out of
+  this repo.
+- Not shipped here:
+  - The Next.js Node floor (`"engines": {"node": ">=22.18"}`) ships with the Next.js port, together with the
+    `next.config.mts` that needs it.
+  - Done when lines 1 and 2 hold for the real starters only once each port gives them the 0.13 package set. Today
+    they still name `@mionjs/type-formats` and `@mionjs/drizzle`, which mion 0.13 does not publish, so `mionlink`
+    stops and names them.

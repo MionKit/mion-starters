@@ -33,6 +33,7 @@ Each starter contains a `create.mjs` bin script that copies the starter files in
 - The package name is the new folder's name (`basename(targetDir)`), never the raw argument: mion uses it as a path segment in generated files.
 - Generated state is never copied: `.mion` (except `.mion/enriched/`), build output (`dist`, `dist-server`, `.next`, `.nuxt`, `.output`), `.wrangler`, `.data`, `next-env.d.ts`, `api/drizzle`, `.npmrc`.
 - Keep the `EXCLUDE` list the same in all three `create.mjs`. A new generated folder goes into `EXCLUDE`, `gitignore`, `.gitignore` and `.npmignore`.
+  Exception: `api/drizzle` is left out of `gitignore`, since a real project commits its migrations; the root `.gitignore` keeps it out of this repo.
 
 ## Mion API Structure (shared across all starters)
 `api/` is a source folder, not a package. Client and server code share one tsconfig program (one `tsconfig.json` at the starter root), so mion sees every route and every client call.
@@ -136,4 +137,5 @@ The registry keeps running after `mionlink`, so later installs and the root test
 ## Root Tests
 Run with `npm test` from root (vitest).
 - `tests/create-output.test.ts` (fast, no install): each `create.mjs` names the package after the folder, drops starter-only fields and copies no generated state.
-- `tests/create-*.test.ts` (one per starter): create a project, install, then `npm run build`, `typecheck` and `test:unit` when the starter has them, and Playwright. A starter in local mode installs from the local registry.
+- `tests/mion-utils.test.ts` (fast): the dependency switching helpers.
+- `tests/create-e2e.test.ts` (one block per starter): create a project, install, then `npm run build`, `typecheck` and `test:unit` when the starter has them, and Playwright. A starter in local mode installs from the local registry.
