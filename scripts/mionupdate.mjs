@@ -12,14 +12,14 @@
  *   npm run mionupdate -- vue/3       # only these starter folders
  */
 
-import path from 'node:path';
-import {findStarterDirs, latestVersion, resolveVersions, switchStarters} from './mion-utils.mjs';
+import {parseArgs} from 'node:util';
+import {latestVersion, resolveVersions, starterDirs, switchStarters} from './mion-utils.mjs';
 
-const args = process.argv.slice(2);
-const pinned = args.find((a) => /^\d+\.\d+\.\d+/.test(a));
-const dirs = args.filter((a) => a !== pinned).map((d) => path.resolve(d));
-const starters = dirs.length ? dirs : findStarterDirs();
+const {positionals} = parseArgs({allowPositionals: true});
+const pinned = positionals.find((a) => /^\d+\.\d+\.\d+/.test(a));
+const starters = starterDirs(positionals.filter((a) => a !== pinned));
 const onOwnLine = (name) => name.startsWith('@mionjs/drizzle-orm');
-const versions = resolveVersions(starters, (name) => (pinned && !onOwnLine(name) ? pinned : latestVersion(name)));
+// a pin resolves through npm too, so a version that does not exist fails before anything is written
+const versions = resolveVersions(starters, (name) => latestVersion(pinned && !onOwnLine(name) ? `${name}@${pinned}` : name));
 switchStarters(starters, versions, false);
 console.log('\nDone: starters use npm-published @mionjs/* packages.');

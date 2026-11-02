@@ -10,11 +10,22 @@ export const ROOT = path.resolve(import.meta.dirname, '..');
 export const MION_REPO = path.join(ROOT, '..', 'mion');
 export const LOCAL_REGISTRY = 'http://127.0.0.1:4873/';
 /** Dedicated npm cache for local mode: a local build shares its version with the npmjs one */
-export const LOCAL_CACHE = path.join(ROOT, '.mion-local-cache');
+const LOCAL_CACHE = path.join(ROOT, '.mion-local-cache');
 
 const STARTER_DIRS = ['nextjs', 'nuxt', 'vue', 'standalone'];
 const DEP_BLOCKS = ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies'];
 const SCOPE_LINE = `@mionjs:registry=${LOCAL_REGISTRY}`;
+
+/** The starter folders named on the command line, or every starter; exits on a folder without package.json */
+export function starterDirs(args) {
+    const dirs = args.length ? args.map((d) => path.resolve(d)) : findStarterDirs();
+    const bad = dirs.filter((d) => !fs.existsSync(path.join(d, 'package.json')));
+    if (bad.length) {
+        console.error(`Error: no package.json in:\n  ${bad.join('\n  ')}`);
+        process.exit(1);
+    }
+    return dirs;
+}
 
 /** Every starter folder (`<framework>/<major>`) that has a package.json */
 export function findStarterDirs() {
@@ -31,8 +42,8 @@ export function findStarterDirs() {
 }
 
 /** The @mionjs/* package names a starter depends on, sorted */
-export function mionDeps(starterDir) {
-    const pkg = readPkg(starterDir);
+function mionDeps(starterDir) {
+    const pkg = JSON.parse(fs.readFileSync(path.join(starterDir, 'package.json'), 'utf-8'));
     const names = new Set();
     for (const block of DEP_BLOCKS) {
         for (const name of Object.keys(pkg[block] ?? {})) if (name.startsWith('@mionjs/')) names.add(name);
@@ -40,21 +51,24 @@ export function mionDeps(starterDir) {
     return [...names].sort();
 }
 
-/** Latest version of `pkg` on `registry` (npm's default when omitted), or null when it is not there */
+/** Latest version of `pkg` (or of a `pkg@range` spec) on `registry`, npm's default when omitted; null when missing */
 export function latestVersion(pkg, registry) {
     const args = ['view', pkg, 'version', '--prefer-online'];
     if (registry) args.push('--registry', registry, '--cache', LOCAL_CACHE);
     try {
-        return execFileSync('npm', args, {encoding: 'utf-8', stdio: ['ignore', 'pipe', 'ignore']}).trim() || null;
+        return execFileSync('npm', args, {encoding: 'utf-8', stdio: ['ignore', 'pipe', 'inherit']}).trim() || null;
     } catch {
         return null;
     }
 }
 
-/** True when a starter installs @mionjs/* from the local registry */
+/** True when a starter installs @mionjs/* from the local registry (`.npmrc` line or lockfile URLs) */
 export function isLocalMode(starterDir) {
-    const npmrc = path.join(starterDir, '.npmrc');
-    return fs.existsSync(npmrc) && fs.readFileSync(npmrc, 'utf-8').split('\n').includes(SCOPE_LINE);
+    const read = (file) => {
+        const filePath = path.join(starterDir, file);
+        return fs.existsSync(filePath) ? fs.readFileSync(filePath, 'utf-8') : '';
+    };
+    return read('.npmrc').split('\n').includes(SCOPE_LINE) || read('package-lock.json').includes(LOCAL_REGISTRY);
 }
 
 /** npm env that makes a copy of a local-mode starter install from the local registry too */
@@ -63,10 +77,10 @@ export function localModeEnv() {
 }
 
 /** Resolves every @mionjs/* dep of the starters with `resolve`; exits naming any package it lacks */
-export function resolveVersions(starterDirs, resolve) {
+export function resolveVersions(dirs, resolve) {
     const versions = {};
     const missing = [];
-    for (const dir of starterDirs) {
+    for (const dir of dirs) {
         for (const name of mionDeps(dir)) {
             if (!(name in versions)) versions[name] = resolve(name);
             if (!versions[name]) missing.push(`${name} (${path.relative(ROOT, dir)})`);
@@ -83,8 +97,8 @@ export function resolveVersions(starterDirs, resolve) {
  * Writes `versions` (package name → version) into the starters, cleans caches and installs.
  * `local` adds or removes the `.npmrc` line that points @mionjs/* at the local registry.
  */
-export function switchStarters(starterDirs, versions, local) {
-    for (const dir of starterDirs) {
+export function switchStarters(dirs, versions, local) {
+    for (const dir of dirs) {
         console.log(`\n${path.relative(ROOT, dir)}`);
         writeVersions(dir, versions);
         setScopeLine(dir, local);
@@ -96,12 +110,8 @@ export function switchStarters(starterDirs, versions, local) {
     }
 }
 
-function readPkg(starterDir) {
-    return JSON.parse(fs.readFileSync(path.join(starterDir, 'package.json'), 'utf-8'));
-}
-
 /** Writes exact versions to every @mionjs/* dep and drops @mionjs/* overrides */
-function writeVersions(starterDir, versions) {
+export function writeVersions(starterDir, versions) {
     const pkgPath = path.join(starterDir, 'package.json');
     const content = fs.readFileSync(pkgPath, 'utf-8');
     const pkg = JSON.parse(content);
@@ -121,7 +131,7 @@ function writeVersions(starterDir, versions) {
 }
 
 /** Adds or removes the local scope line, deleting `.npmrc` once nothing else is left in it */
-function setScopeLine(starterDir, local) {
+export function setScopeLine(starterDir, local) {
     const npmrc = path.join(starterDir, '.npmrc');
     const old = fs.existsSync(npmrc) ? fs.readFileSync(npmrc, 'utf-8').split('\n') : [];
     const lines = old.filter((line) => line !== SCOPE_LINE);
@@ -132,7 +142,7 @@ function setScopeLine(starterDir, local) {
 }
 
 /** Removes installed @mionjs packages, the .vite cache and the lockfile's @mionjs/* entries */
-function cleanMionCaches(starterDir) {
+export function cleanMionCaches(starterDir) {
     for (const sub of ['node_modules/@mionjs', 'node_modules/.vite']) {
         fs.rmSync(path.join(starterDir, sub), {recursive: true, force: true});
     }
