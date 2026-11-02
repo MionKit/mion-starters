@@ -1,0 +1,755 @@
+diff -ruN a/nuxt/4/.npmignore b/nuxt/4/.npmignore
+--- a/nuxt/4/.npmignore
++++ b/nuxt/4/.npmignore
+@@ -15,3 +15,6 @@
+ *.tsbuildinfo
+ .env*
+ .vercel
++.mion/
++.data/
++.wrangler/
+diff -ruN a/nuxt/4/api/mion-plugin.ts b/nuxt/4/api/mion-plugin.ts
+--- a/nuxt/4/api/mion-plugin.ts
++++ b/nuxt/4/api/mion-plugin.ts
+@@ -1,20 +0,0 @@
+-/* eslint-disable @typescript-eslint/no-explicit-any */
+-import { resolve } from "path";
+-import { mionVitePlugin } from "@mionjs/devtools/vite-plugin";
+-
+-const apiDir = import.meta.dirname;
+-
+-/** Shared mion Vite plugin config — used by both nuxt.config.ts and api/vite.config.ts */
+-export function createMionVitePlugin(): any {
+-  return mionVitePlugin({
+-    runTypes: { tsConfig: resolve(apiDir, "tsconfig.json") },
+-    serverPureFunctions: {
+-      clientSrcPath: resolve(apiDir, "../app"),
+-    },
+-    aotCaches: true,
+-    server: {
+-      startScript: resolve(apiDir, "src/server.node.ts"),
+-      runMode: "middleware",
+-    },
+-  });
+-}
+diff -ruN a/nuxt/4/api/src/api.ts b/nuxt/4/api/src/api.ts
+--- a/nuxt/4/api/src/api.ts
++++ b/nuxt/4/api/src/api.ts
+@@ -1,14 +1,12 @@
+-import { initMionRouter, PublicApi, query, Routes } from "@mionjs/router";
+-import { ordersRoutes } from "./features/orders/orders-handlers.ts";
++import type {Routes} from '@mionjs/router';
++import {mion} from './mion.ts';
++import {ordersRoutes} from './features/orders/orders-handlers.ts';
+ 
+ const routes = {
+-  hello: query((ctx, name: string): string => `Hello ${name}!`),
+-  getTime: query((ctx): Date => new Date()),
++  hello: mion.query((ctx, name: string): string => `Hello ${name}!`),
++  getTime: mion.query((): Date => new Date()),
+   orders: ordersRoutes,
+ } satisfies Routes;
+ 
+-export type MyApi = PublicApi<typeof routes>;
+-
+-export async function initApi() {
+-  return initMionRouter(routes, { basePath: "api/mion" });
+-}
++export const myApi = mion.initRoutes(routes);
++export type MyApi = typeof myApi;
+diff -ruN a/nuxt/4/api/src/cloudflare-worker.ts b/nuxt/4/api/src/cloudflare-worker.ts
+--- a/nuxt/4/api/src/cloudflare-worker.ts
++++ b/nuxt/4/api/src/cloudflare-worker.ts
+@@ -1,5 +1,4 @@
+-import {initApi} from './api.ts';
++import './api.ts';
+ import {createCloudflareHandler} from '@mionjs/platform-cloudflare';
+ 
+-await initApi();
+ export default createCloudflareHandler();
+diff -ruN a/nuxt/4/api/src/dev-server.ts b/nuxt/4/api/src/dev-server.ts
+--- a/nuxt/4/api/src/dev-server.ts
++++ b/nuxt/4/api/src/dev-server.ts
+@@ -1,5 +0,0 @@
+-import {initApi} from './api.ts';
+-import {startVercelDevServer} from '@mionjs/platform-vercel/dev-server';
+-
+-await initApi();
+-await startVercelDevServer({port: 3001});
+diff -ruN a/nuxt/4/api/src/features/orders/orders-handlers.ts b/nuxt/4/api/src/features/orders/orders-handlers.ts
+--- a/nuxt/4/api/src/features/orders/orders-handlers.ts
++++ b/nuxt/4/api/src/features/orders/orders-handlers.ts
+@@ -1,23 +1,24 @@
+-import {query, mutation, Routes} from '@mionjs/router';
+-import {FormatUUIDv7} from '@mionjs/type-formats/StringFormats';
+-import {Order, OrderEvent} from './orders-models.ts';
++import type {Routes} from '@mionjs/router';
++import type {UUIDv7} from '@mionjs/run-types/formats';
++import {mion} from '../../mion.ts';
++import type {Order, OrderEvent} from './orders-models.ts';
+ import {findAllOrders, findOrderById, insertOrder, findEventsByOrderId, findEventsByOrderIds} from './orders-repository.ts';
+ 
+ export const ordersRoutes = {
+-    listOrders: query((): Order[] => {
++    listOrders: mion.query((): Order[] => {
+         return findAllOrders();
+     }),
+-    getOrder: query((ctx, id: FormatUUIDv7): Order | undefined => {
++    getOrder: mion.query((ctx, id: UUIDv7): Order | undefined => {
+         return findOrderById(id);
+     }),
+-    createOrder: mutation((ctx, customer: string, total: number, id?: FormatUUIDv7): Order => {
++    createOrder: mion.mutation((ctx, customer: string, total: number, id?: UUIDv7): Order => {
+         return insertOrder(customer, total, id);
+     }),
+ 
+-    getOrderEvents: query((ctx, orderId: FormatUUIDv7): OrderEvent[] => {
++    getOrderEvents: mion.query((ctx, orderId: UUIDv7): OrderEvent[] => {
+         return findEventsByOrderId(orderId);
+     }),
+-    getOrdersEvents: query((ctx, orderIds: FormatUUIDv7[]): OrderEvent[] => {
++    getOrdersEvents: mion.query((ctx, orderIds: UUIDv7[]): OrderEvent[] => {
+         return findEventsByOrderIds(orderIds);
+     }),
+ } satisfies Routes;
+diff -ruN a/nuxt/4/api/src/features/orders/orders-models.ts b/nuxt/4/api/src/features/orders/orders-models.ts
+--- a/nuxt/4/api/src/features/orders/orders-models.ts
++++ b/nuxt/4/api/src/features/orders/orders-models.ts
+@@ -1,7 +1,7 @@
+-import {FormatUUIDv7} from '@mionjs/type-formats/StringFormats';
++import type {UUIDv7} from '@mionjs/run-types/formats';
+ 
+ export interface Order {
+-    id: FormatUUIDv7;
++    id: UUIDv7;
+     customer: string;
+     total: number;
+     status: 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
+@@ -9,8 +9,8 @@
+ }
+ 
+ export type OrderEvent =
+-    | {type: 'placed'; orderId: FormatUUIDv7; at: Date}
+-    | {type: 'paid'; orderId: FormatUUIDv7; at: Date; method: string}
+-    | {type: 'shipped'; orderId: FormatUUIDv7; at: Date; carrier: string; tracking: string}
+-    | {type: 'delivered'; orderId: FormatUUIDv7; at: Date}
+-    | {type: 'cancelled'; orderId: FormatUUIDv7; at: Date; reason: string};
++    | {type: 'placed'; orderId: UUIDv7; at: Date}
++    | {type: 'paid'; orderId: UUIDv7; at: Date; method: string}
++    | {type: 'shipped'; orderId: UUIDv7; at: Date; carrier: string; tracking: string}
++    | {type: 'delivered'; orderId: UUIDv7; at: Date}
++    | {type: 'cancelled'; orderId: UUIDv7; at: Date; reason: string};
+diff -ruN a/nuxt/4/api/src/features/orders/orders-repository.ts b/nuxt/4/api/src/features/orders/orders-repository.ts
+--- a/nuxt/4/api/src/features/orders/orders-repository.ts
++++ b/nuxt/4/api/src/features/orders/orders-repository.ts
+@@ -1,12 +1,13 @@
+ import {randomUUID_V7} from '@mionjs/core';
+-import {FormatUUIDv7} from '@mionjs/type-formats/StringFormats';
+-import {Order, OrderEvent} from './orders-models.ts';
++import type {UUIDv7} from '@mionjs/run-types/formats';
++import type {Order, OrderEvent} from './orders-models.ts';
+ 
+ // ---- In-memory store with seed data ----
+ 
+-const id1 = randomUUID_V7() as FormatUUIDv7;
+-const id2 = randomUUID_V7() as FormatUUIDv7;
+-const id3 = randomUUID_V7() as FormatUUIDv7;
++// fixed seed ids: edge runtimes (Cloudflare Workers) refuse random values at module scope
++const id1 = '0195515c-6c00-7000-8000-000000000001' as UUIDv7;
++const id2 = '0195515c-6c00-7000-8000-000000000002' as UUIDv7;
++const id3 = '0195515c-6c00-7000-8000-000000000003' as UUIDv7;
+ 
+ const orders: Order[] = [
+     {
+@@ -48,13 +49,13 @@
+     return orders;
+ }
+ 
+-export function findOrderById(id: FormatUUIDv7): Order | undefined {
++export function findOrderById(id: UUIDv7): Order | undefined {
+     return orders.find((o) => o.id === id);
+ }
+ 
+-export function insertOrder(customer: string, total: number, id?: FormatUUIDv7): Order {
++export function insertOrder(customer: string, total: number, id?: UUIDv7): Order {
+     const order: Order = {
+-        id: id ?? (randomUUID_V7() as FormatUUIDv7),
++        id: id ?? (randomUUID_V7() as UUIDv7),
+         customer,
+         total: Math.round(total * 100) / 100,
+         status: 'pending',
+@@ -65,11 +66,11 @@
+     return order;
+ }
+ 
+-export function findEventsByOrderId(orderId: FormatUUIDv7): OrderEvent[] {
++export function findEventsByOrderId(orderId: UUIDv7): OrderEvent[] {
+     return events.filter((e) => e.orderId === orderId);
+ }
+ 
+-export function findEventsByOrderIds(orderIds: FormatUUIDv7[]): OrderEvent[] {
++export function findEventsByOrderIds(orderIds: UUIDv7[]): OrderEvent[] {
+     const idSet = new Set(orderIds);
+     return events.filter((e) => idSet.has(e.orderId));
+ }
+diff -ruN a/nuxt/4/api/src/mion.ts b/nuxt/4/api/src/mion.ts
+--- a/nuxt/4/api/src/mion.ts
++++ b/nuxt/4/api/src/mion.ts
+@@ -0,0 +1,4 @@
++import {createMionRouter} from '@mionjs/router';
++
++/** The one router instance; every feature declares its routes with these helpers */
++export const mion = createMionRouter({basePath: 'api/mion'});
+diff -ruN a/nuxt/4/api/src/server.bun.ts b/nuxt/4/api/src/server.bun.ts
+--- a/nuxt/4/api/src/server.bun.ts
++++ b/nuxt/4/api/src/server.bun.ts
+@@ -1,5 +1,4 @@
+-import {initApi} from './api.ts';
++import './api.ts';
+ import {startBunServer} from '@mionjs/platform-bun';
+ 
+-await initApi();
+-startBunServer({port: 3001});
++await startBunServer({port: Number(process.env.PORT ?? 3001)});
+diff -ruN a/nuxt/4/api/src/server.node.ts b/nuxt/4/api/src/server.node.ts
+--- a/nuxt/4/api/src/server.node.ts
++++ b/nuxt/4/api/src/server.node.ts
+@@ -1,5 +1,4 @@
+-import {initApi} from './api.ts';
++import './api.ts';
+ import {startNodeServer} from '@mionjs/platform-node';
+ 
+-await initApi();
+-startNodeServer({port: 3001});
++await startNodeServer({port: Number(process.env.PORT ?? 3001)});
+diff -ruN a/nuxt/4/api/src/vercel-serverless.ts b/nuxt/4/api/src/vercel-serverless.ts
+--- a/nuxt/4/api/src/vercel-serverless.ts
++++ b/nuxt/4/api/src/vercel-serverless.ts
+@@ -1,5 +1,4 @@
+-import {initApi} from './api.ts';
++import './api.ts';
+ import {createVercelHandler} from '@mionjs/platform-vercel';
+ 
+-await initApi();
+ export const {GET, POST, PUT, DELETE, PATCH} = createVercelHandler();
+diff -ruN a/nuxt/4/api/tsconfig.json b/nuxt/4/api/tsconfig.json
+--- a/nuxt/4/api/tsconfig.json
++++ b/nuxt/4/api/tsconfig.json
+@@ -1,18 +1,16 @@
+ {
++  // Editor + `tsc -p api` for the API and its platform entries (the build itself uses ../tsconfig.mion.json)
+   "compilerOptions": {
+     "target": "ES2023",
+-    "module": "NodeNext",
+-    "moduleResolution": "NodeNext",
+-    "esModuleInterop": true,
++    "module": "preserve",
++    "moduleResolution": "bundler",
+     "strict": true,
+-    "outDir": "dist",
+-    "declaration": true,
+-    "sourceMap": true,
+-    "isolatedModules": true,
++    "noEmit": true,
++    "skipLibCheck": true,
++    "verbatimModuleSyntax": true,
+     "allowImportingTsExtensions": true,
+-    "rewriteRelativeImportExtensions": true
++    "lib": ["ES2023", "DOM"],
++    "types": ["node"]
+   },
+-  "include": ["src"],
+-  "exclude": ["node_modules", "dist"],
+-  "reflection": true
++  "include": ["src", "vite.config.ts"]
+ }
+diff -ruN a/nuxt/4/api/vite.config.ts b/nuxt/4/api/vite.config.ts
+--- a/nuxt/4/api/vite.config.ts
++++ b/nuxt/4/api/vite.config.ts
+@@ -1,19 +1,38 @@
+-import { defineConfig } from "vite";
+-import { resolve } from "path";
+-import { builtinModules } from "module";
+-import { createMionVitePlugin } from "./mion-plugin";
++import {defineConfig} from 'vite';
++import {resolve} from 'node:path';
++import {builtinModules} from 'node:module';
++import {mionVitePlugin} from '@mionjs/devtools/vite';
+ 
+-export default defineConfig({
+-  plugins: [createMionVitePlugin()],
+-  build: {
+-    ssr: resolve(__dirname, "src/vercel-serverless.ts"),
+-    outDir: "dist",
+-    emptyOutDir: true,
+-    sourcemap: true,
+-    minify: false,
+-    rollupOptions: {
+-      external: [...builtinModules, ...builtinModules.map((m) => `node:${m}`)],
+-      output: { format: "es", entryFileNames: "[name].js" },
++const root = resolve(import.meta.dirname, '..');
++const entries = ['server.node', 'server.bun', 'vercel-serverless', 'cloudflare-worker'];
++
++/** Production API bundle, one platform entry per run: `vite build --config api/vite.config.ts --mode <entry>` */
++export default defineConfig(({mode}) => {
++  const entry = entries.includes(mode) ? mode : 'server.node';
++  // Workers forbid `new Function`, so compiled fns must ship as live code ('both'), in one file
++  const isEdge = entry === 'cloudflare-worker';
++  return {
++    root,
++    publicDir: false,
++    plugins: [
++      mionVitePlugin({
++        // the SAME one-program tsconfig as nuxt.config.ts: the API build must see the client's batches
++        tsConfig: resolve(root, 'tsconfig.mion.json'),
++        runTypes: isEdge ? {emitMode: 'both'} : undefined,
++      }),
++    ],
++    ssr: isEdge ? {noExternal: true, target: 'webworker'} : {noExternal: [/@mionjs\//]},
++    build: {
++      ssr: resolve(root, `api/src/${entry}.ts`),
++      outDir: resolve(root, 'api/dist'),
++      emptyOutDir: false,
++      sourcemap: true,
++      minify: false,
++      target: 'es2023',
++      rollupOptions: {
++        external: isEdge ? [] : [...builtinModules, ...builtinModules.map((m) => `node:${m}`), 'bun'],
++        output: {format: 'es', entryFileNames: '[name].js', ...(isEdge ? {codeSplitting: false} : {})},
++      },
+     },
+-  },
++  };
+ });
+diff -ruN a/nuxt/4/app/lib/mion-client.ts b/nuxt/4/app/lib/mion-client.ts
+--- a/nuxt/4/app/lib/mion-client.ts
++++ b/nuxt/4/app/lib/mion-client.ts
+@@ -0,0 +1,13 @@
++import {initClient} from '@mionjs/client';
++import type {MyApi} from '../../api/src/api.ts';
++
++/** Absolute API origin. Browser: public runtime config, else same origin (proxy mode).
++ *  SSR / prerender: MION_API_URL (server-only, never shipped), else this Nuxt server's own port (dev middleware). */
++function apiBaseURL(): string {
++  if (import.meta.client) return useRuntimeConfig().public.mionApiUrl || window.location.origin;
++  const env = (globalThis as {process?: {env: Record<string, string | undefined>}}).process?.env ?? {};
++  return env.MION_API_URL || `http://localhost:${env.PORT || env.NITRO_PORT || 3000}`;
++}
++
++/** Module-level on purpose: batch() and inputFrom() compile only when `routes` traces back to initClient() */
++export const {client, routes} = initClient<MyApi>({baseURL: apiBaseURL(), basePath: 'api/mion'});
+diff -ruN a/nuxt/4/app/lib/orders.ts b/nuxt/4/app/lib/orders.ts
+--- a/nuxt/4/app/lib/orders.ts
++++ b/nuxt/4/app/lib/orders.ts
+@@ -0,0 +1,21 @@
++import {batch, inputFrom} from '@mionjs/client';
++import type {Order, OrderEvent} from '../../api/src/models.ts';
++import {routes} from './mion-client.ts';
++
++/** One HTTP request: listOrders, then its ids are mapped ON THE SERVER into getOrdersEvents.
++ *  Lives in a .ts file (not the .vue page) so a server-only API build sees the batch too. */
++export async function loadOrdersWithEvents() {
++  const ordersReq = routes.orders.listOrders();
++  const orderIds = inputFrom(ordersReq, (orders) => orders!.map((o) => o.id));
++  const eventsReq = routes.orders.getOrdersEvents(orderIds.asArg());
++  const [[orders, ordersError, response], [events, eventsError]] = await batch([ordersReq, eventsReq]).call();
++
++  const apiErrors: string[] = [];
++  if (ordersError) apiErrors.push(`listOrders: ${ordersError.publicMessage} (${ordersError.type})`);
++  if (eventsError) apiErrors.push(`getOrdersEvents: ${eventsError.publicMessage} (${eventsError.type})`);
++  for (const thrown of response['@thrownErrors'] ?? []) apiErrors.push(`${thrown.type}: ${thrown.publicMessage}`);
++
++  const eventsByOrder: Record<string, OrderEvent[]> = {};
++  for (const event of events ?? []) (eventsByOrder[event.orderId] ??= []).push(event);
++  return {orders: orders ?? ([] as Order[]), eventsByOrder, apiErrors};
++}
+diff -ruN a/nuxt/4/app/pages/mion-orders.vue b/nuxt/4/app/pages/mion-orders.vue
+--- a/nuxt/4/app/pages/mion-orders.vue
++++ b/nuxt/4/app/pages/mion-orders.vue
+@@ -1,9 +1,6 @@
+ <script setup lang="ts">
+-import {routesFlow, serverMapFrom} from '@mionjs/client';
+-import type {Order, OrderEvent} from '../../api/src/features/orders/orders-models';
+-
+-const {$mionClient} = useNuxtApp();
+-const {routes} = $mionClient;
++import type {OrderEvent} from '../../api/src/models';
++import {loadOrdersWithEvents} from '../lib/orders';
+ 
+ const eventStyles: Record<string, {color: string; icon: string; label: string}> = {
+   placed: {color: '#3b82f6', icon: '📦', label: 'Order Placed'},
+@@ -21,40 +18,11 @@
+   cancelled: '#ef4444',
+ };
+ 
+-const orders = ref<Order[]>([]);
+-const eventsByOrder = ref<Record<string, OrderEvent[]>>({});
+-const apiErrors = ref<string[]>([]);
+-
+-const {status, error: asyncError} = useAsyncData('orders', async () => {
+-  apiErrors.value = [];
+-  try {
+-    const ordersList = routes.orders.listOrders();
+-    const orderIds = serverMapFrom(
+-      ordersList,
+-      (orders) => orders!.map((o) => o.id),
+-      'serverMapFromOrdersToOrderEvents',
+-    ).asArg();
+-
+-    const [[ordersData, allEvents], [ordersError, eventsError]] = await routesFlow([ordersList, routes.orders.getOrdersEvents(orderIds)]).call();
+-
+-    if (ordersError) apiErrors.value.push(`listOrders: ${ordersError.publicMessage} (${ordersError.type})`);
+-    if (eventsError) apiErrors.value.push(`getOrdersEvents: ${eventsError.publicMessage} (${eventsError.type})`);
+-
+-    if (ordersData) orders.value = ordersData;
+-    if (allEvents) {
+-      const eventsMap: Record<string, OrderEvent[]> = {};
+-      for (const event of allEvents) {
+-        (eventsMap[event.orderId] ??= []).push(event);
+-      }
+-      eventsByOrder.value = eventsMap;
+-    }
+-
+-    return {orders: ordersData, events: allEvents};
+-  } catch (e: unknown) {
+-    apiErrors.value.push(`Unexpected error: ${e instanceof Error ? e.message : e}`);
+-    throw e;
+-  }
+-}, {server: false});
++// runs during SSR / prerender and hydrates on the client (Dates survive Nuxt's payload)
++const {data, status, error: asyncError} = await useAsyncData('orders', loadOrdersWithEvents);
++const orders = computed(() => data.value?.orders ?? []);
++const eventsByOrder = computed(() => data.value?.eventsByOrder ?? {});
++const apiErrors = computed(() => data.value?.apiErrors ?? []);
+ 
+ function getEventDetails(event: OrderEvent): string | null {
+   switch (event.type) {
+@@ -81,8 +49,8 @@
+           <a href="https://mion.io" target="_blank" rel="noopener noreferrer">Mion</a>
+           is a lightweight TypeScript API framework with end-to-end type safety, automatic serialization, and built-in validation.
+           This showcase demonstrates how
+-          <code>routesFlow</code>
+-          resolves related data across multiple routes in a single HTTP request. <strong class="hl">A fully typed lightweight alternative to GraphQL.</strong>
++          <code>batch</code> + <code>inputFrom</code>
++          resolve related data across multiple routes in a single HTTP request. <strong class="hl">A fully typed lightweight alternative to GraphQL.</strong>
+         </p>
+       </div>
+ 
+diff -ruN a/nuxt/4/app/plugins/mion.ts b/nuxt/4/app/plugins/mion.ts
+--- a/nuxt/4/app/plugins/mion.ts
++++ b/nuxt/4/app/plugins/mion.ts
+@@ -1,15 +0,0 @@
+-import { initClient } from "@mionjs/client";
+-import type { MyApi } from "../../api/src/api.ts";
+-
+-export default defineNuxtPlugin(() => {
+-  const config = useRuntimeConfig();
+-
+-  const client = initClient<MyApi>({
+-    baseURL:
+-      config.public.mionApiUrl ||
+-      (import.meta.server ? "http://localhost:3000" : window.location.origin),
+-    basePath: "api/mion",
+-  });
+-
+-  return { provide: { mionClient: client } };
+-});
+diff -ruN a/nuxt/4/create.mjs b/nuxt/4/create.mjs
+--- a/nuxt/4/create.mjs
++++ b/nuxt/4/create.mjs
+@@ -42,6 +42,9 @@
+     'package-lock.json',
+     '.vercel',
+     '.DS_Store',
++    '.mion',
++    '.data',
++    '.wrangler',
+ ]);
+ 
+ cpSync(__dirname, targetDir, {
+diff -ruN a/nuxt/4/e2e/smoke.test.ts b/nuxt/4/e2e/smoke.test.ts
+--- a/nuxt/4/e2e/smoke.test.ts
++++ b/nuxt/4/e2e/smoke.test.ts
+@@ -5,47 +5,47 @@
+     await expect(page.getByText('To get started')).toBeVisible();
+ });
+ 
+-test('mion API responds through dev server middleware', async ({request}) => {
+-    const res = await request.post('/api/mion/hello', {
+-        headers: {'Content-Type': 'application/json'},
+-        data: {hello: ['Playwright']},
+-    });
++test('mion API responds through the Nuxt dev server middleware', async ({request}) => {
++    const res = await request.post('/api/mion/hello', {data: {hello: ['Playwright']}});
+     expect(res.ok()).toBe(true);
+-    const json = await res.json();
+-    expect(json.hello).toBe('Hello Playwright!');
++    expect((await res.json()).hello).toBe('Hello Playwright!');
+ });
+ 
+ test('mion API getTime returns valid date', async ({request}) => {
+-    const res = await request.post('/api/mion/getTime', {
+-        headers: {'Content-Type': 'application/json'},
+-        data: {getTime: []},
+-    });
++    const res = await request.post('/api/mion/getTime', {data: {getTime: []}});
+     expect(res.ok()).toBe(true);
+-    const json = await res.json();
+-    expect(new Date(json.getTime).getTime()).not.toBeNaN();
++    expect(new Date((await res.json()).getTime).getTime()).not.toBeNaN();
+ });
+ 
+-test('orders showcase page loads and displays orders', async ({page}) => {
++test('UUIDv7 format is validated by the API', async ({request}) => {
++    const res = await request.post('/api/mion/orders/getOrder', {data: {'orders/getOrder': ['550e8400-e29b-41d4-a716-446655440000']}});
++    expect(res.status()).toBe(422);
++    expect(JSON.stringify(await res.json())).toContain('validation-error');
++});
++
++test('orders page is server rendered (SSR batch through the dev middleware)', async ({request}) => {
++    const html = await (await request.get('/mion-orders')).text();
++    expect(html).toContain('Alice Johnson');
++    expect(html).not.toContain('API Error');
++});
++
++test('client navigation loads orders with ONE batch request', async ({page}) => {
+     const errors: string[] = [];
+-    const requests: string[] = [];
+-    page.on('console', (msg) => { if (msg.type() === 'error') errors.push(msg.text()); });
++    const batchCalls: string[] = [];
+     page.on('pageerror', (err) => errors.push(err.message));
+-    page.on('response', (res) => { if (res.status() >= 400) requests.push(`${res.status()} ${res.url()}`); });
+-    await page.goto('/mion-orders');
+-    // Wait for orders to load (loading state disappears)
+-    await expect(page.getByText('Loading orders...')).toBeHidden({timeout: 15_000});
+-    // Log any errors for debugging
+-    if (errors.length > 0) console.log('Browser errors:', errors);
+-    if (requests.length > 0) console.log('Failed requests:', requests);
+-    // Verify orders are rendered
+-    await expect(page.getByText('Alice Johnson')).toBeVisible();
++    page.on('console', (msg) => { if (msg.type() === 'error') errors.push(msg.text()); });
++    page.on('request', (req) => { if (req.url().includes('/api/mion/')) batchCalls.push(req.url()); });
++    await page.goto('/', {waitUntil: 'networkidle'});
++    await page.waitForFunction(() => !(window as {useNuxtApp?: () => {isHydrating?: boolean}}).useNuxtApp?.().isHydrating);
++    await page.getByText('Mion Showcase').click();
++    await expect(page.getByText('Alice Johnson')).toBeVisible({timeout: 15_000});
+     await expect(page.getByText('Bob Smith')).toBeVisible();
+     await expect(page.getByText('Carol Davis')).toBeVisible();
+-});
+-
+-test('orders showcase displays event timeline', async ({page}) => {
+-    await page.goto('/mion-orders');
+-    await expect(page.getByText('Loading orders...')).toBeHidden({timeout: 15_000});
+-    // Verify event timeline is rendered for at least one order
++    // the discriminated union events and their Dates (rendered with toLocaleString) round-tripped
+     await expect(page.getByText('Event Timeline').first()).toBeVisible();
++    await expect(page.getByText('FedEx · FX-123456')).toBeVisible();
++    await expect(page.getByText('Customer changed their mind')).toBeVisible();
++    expect(batchCalls).toHaveLength(1);
++    expect(batchCalls[0]).toContain('/api/mion/mion-batch?id=');
++    expect(errors).toEqual([]);
+ });
+diff -ruN a/nuxt/4/eslint.config.mjs b/nuxt/4/eslint.config.mjs
+--- a/nuxt/4/eslint.config.mjs
++++ b/nuxt/4/eslint.config.mjs
+@@ -1,33 +1,16 @@
+ // @ts-check
+-import { ESLint } from "eslint";
+ import withNuxt from "./.nuxt/eslint.config.mjs";
+-import mionPlugin from "@mionjs/devtools/eslint";
++import mion from "@mionjs/devtools/eslint";
+ 
+ export default withNuxt(
+   {
+-    ignores: ["api/dist/**"],
++    ignores: ["api/dist/**", ".mion/**"],
+   },
+   {
+-    // mion rules for backend API code
+-    files: ["api/**/*.ts"],
+-    ...mionPlugin.configs.recommended,
+-  },
+-  {
+-    // Disable consistent-type-imports for API code as it conflicts with mion's runtime reflection
+-    files: ["api/**/*.ts"],
+-    rules: {
+-      "@typescript-eslint/consistent-type-imports": "off",
+-    },
+-  },
+-  {
+-    // Enforce type-only imports from backend in frontend code
+-    files: ["app/**/*.ts", "app/**/*.vue"],
+-    plugins: { "@mionjs": /** @type {any} */ (mionPlugin) },
+-    rules: {
+-      "@mionjs/enforce-type-imports": [
+-        "error",
+-        { backendSources: ["api/src/"] },
+-      ],
+-    },
++    // mion's compiler-backed rules, on the same one-program tsconfig the build uses.
++    // .ts only: the mion lint worker cannot read .vue files (keep typed mion code in .ts modules)
++    files: ["api/**/*.ts", "app/**/*.ts"],
++    ...mion.configs.recommended,
++    settings: { mion: { tsconfig: "tsconfig.mion.json" } },
+   },
+ );
+diff -ruN a/nuxt/4/gitignore b/nuxt/4/gitignore
+--- a/nuxt/4/gitignore
++++ b/nuxt/4/gitignore
+@@ -9,6 +9,9 @@
+ # Node dependencies
+ node_modules
+ 
++# mion generated code (rebuilt by the Vite plugin)
++.mion
++
+ # API build outputs
+ api/dist
+ 
+diff -ruN a/nuxt/4/nuxt.config.ts b/nuxt/4/nuxt.config.ts
+--- a/nuxt/4/nuxt.config.ts
++++ b/nuxt/4/nuxt.config.ts
+@@ -1,4 +1,7 @@
+-import { createMionVitePlugin } from "./api/mion-plugin";
++import { fileURLToPath } from "node:url";
++import { mionVitePlugin } from "@mionjs/devtools/vite";
++
++const apiEntry = fileURLToPath(new URL("./api/src/server.node.ts", import.meta.url));
+ 
+ export default defineNuxtConfig({
+   compatibilityDate: "2025-07-15",
+@@ -14,14 +17,10 @@
+   },
+ 
+   vite: {
+-    plugins: [createMionVitePlugin()],
+-    optimizeDeps: {
+-      include: [
+-        "@mionjs/client",
+-        "@mionjs/core",
+-        "@mionjs/run-types",
+-        "@mionjs/type-formats",
+-      ],
+-    },
++    // mion hot reload only tracks files under the Vite root; Nuxt's default root is srcDir (app/)
++    root: fileURLToPath(new URL(".", import.meta.url)),
++    plugins: [mionVitePlugin({ tsConfig: fileURLToPath(new URL("./tsconfig.mion.json", import.meta.url)), server: { entry: apiEntry } })],
++    // pre-bundled up front, so the first page load is not interrupted by a dep-discovery reload
++    optimizeDeps: { include: ["@mionjs/client", "@mionjs/core", "@mionjs/run-types", "@vue/devtools-core"] },
+   },
+ });
+diff -ruN a/nuxt/4/package.json b/nuxt/4/package.json
+--- a/nuxt/4/package.json
++++ b/nuxt/4/package.json
+@@ -34,52 +34,42 @@
+   },
+   "scripts": {
+     "dev": "nuxt dev",
++    "build": "nuxt build",
+     "generate": "nuxt generate",
+-    "build:api": "vite build --config api/vite.config.ts",
+-    "build:api:node": "vite build --config api/vite.config.ts --ssr api/src/server.node.ts",
+-    "build:api:bun": "vite build --config api/vite.config.ts --ssr api/src/server.bun.ts",
+-    "build:api:vercel": "vite build --config api/vite.config.ts --ssr api/src/vercel-serverless.ts",
+-    "build:api:cloudflare": "vite build --config api/vite.config.ts --ssr api/src/cloudflare-worker.ts",
+     "preview": "nuxt preview",
++    "build:api": "vite build --config api/vite.config.ts --mode server.node",
++    "build:api:node": "vite build --config api/vite.config.ts --mode server.node",
++    "build:api:bun": "vite build --config api/vite.config.ts --mode server.bun",
++    "build:api:vercel": "vite build --config api/vite.config.ts --mode vercel-serverless",
++    "build:api:cloudflare": "vite build --config api/vite.config.ts --mode cloudflare-worker",
++    "typecheck": "nuxi typecheck && tsc -p api",
+     "test": "playwright test",
+     "test:install": "playwright install chromium",
+     "lint": "eslint",
+     "postinstall": "nuxt prepare"
+   },
+   "dependencies": {
+-    "@mionjs/client": "file:../../mion-tarballs/mionjs-client.tgz",
+-    "@mionjs/core": "file:../../mion-tarballs/mionjs-core.tgz",
+-    "@mionjs/router": "file:../../mion-tarballs/mionjs-router.tgz",
+-    "@mionjs/platform-node": "file:../../mion-tarballs/mionjs-platform-node.tgz",
+-    "@mionjs/platform-bun": "file:../../mion-tarballs/mionjs-platform-bun.tgz",
+-    "@mionjs/platform-vercel": "file:../../mion-tarballs/mionjs-platform-vercel.tgz",
+-    "@mionjs/platform-cloudflare": "file:../../mion-tarballs/mionjs-platform-cloudflare.tgz",
+-    "@mionjs/type-formats": "file:../../mion-tarballs/mionjs-type-formats.tgz",
++    "@mionjs/client": "0.13.2",
++    "@mionjs/core": "0.13.2",
++    "@mionjs/platform-bun": "0.13.2",
++    "@mionjs/platform-cloudflare": "0.13.2",
++    "@mionjs/platform-node": "0.13.2",
++    "@mionjs/platform-vercel": "0.13.2",
++    "@mionjs/router": "0.13.2",
++    "@mionjs/run-types": "0.13.2",
+     "@nuxt/eslint": "^1.15.2",
+     "nuxt": "^4.4.2",
+     "vue": "^3.5.32",
+     "vue-router": "^5.0.4"
+   },
+   "devDependencies": {
+-    "@mionjs/devtools": "file:../../mion-tarballs/mionjs-devtools.tgz",
++    "@mionjs/bin-compiler": "0.13.2",
++    "@mionjs/devtools": "0.13.2",
+     "@playwright/test": "^1.59.1",
++    "@types/node": "^24.19.2",
+     "eslint": "^10",
+-    "vite-node": "^6.0.0",
+-    "typescript": "^6"
+-  },
+-  "overrides": {
+-    "@mionjs/client": "file:../../mion-tarballs/mionjs-client.tgz",
+-    "@mionjs/core": "file:../../mion-tarballs/mionjs-core.tgz",
+-    "@mionjs/devtools": "file:../../mion-tarballs/mionjs-devtools.tgz",
+-    "@mionjs/drizzle": "file:../../mion-tarballs/mionjs-drizzle.tgz",
+-    "@mionjs/platform-aws": "file:../../mion-tarballs/mionjs-platform-aws.tgz",
+-    "@mionjs/platform-bun": "file:../../mion-tarballs/mionjs-platform-bun.tgz",
+-    "@mionjs/platform-cloudflare": "file:../../mion-tarballs/mionjs-platform-cloudflare.tgz",
+-    "@mionjs/platform-gcloud": "file:../../mion-tarballs/mionjs-platform-gcloud.tgz",
+-    "@mionjs/platform-node": "file:../../mion-tarballs/mionjs-platform-node.tgz",
+-    "@mionjs/platform-vercel": "file:../../mion-tarballs/mionjs-platform-vercel.tgz",
+-    "@mionjs/router": "file:../../mion-tarballs/mionjs-router.tgz",
+-    "@mionjs/run-types": "file:../../mion-tarballs/mionjs-run-types.tgz",
+-    "@mionjs/type-formats": "file:../../mion-tarballs/mionjs-type-formats.tgz"
++    "typescript": "^6",
++    "vite": "^8.3.5",
++    "vue-tsc": "^3.3.14"
+   }
+ }
+diff -ruN a/nuxt/4/playwright.config.ts b/nuxt/4/playwright.config.ts
+--- a/nuxt/4/playwright.config.ts
++++ b/nuxt/4/playwright.config.ts
+@@ -1,14 +1,22 @@
+ import {defineConfig} from '@playwright/test';
+ 
++const port = Number(process.env.PORT ?? 3000);
++
+ export default defineConfig({
+     testDir: './e2e',
+     timeout: 30_000,
+     use: {
+-        baseURL: 'http://localhost:3000',
++        baseURL: `http://localhost:${port}`,
++        // PW_CHROMIUM lets CI images with a preinstalled Chromium skip `playwright install`
++        launchOptions: process.env.PW_CHROMIUM ? {executablePath: process.env.PW_CHROMIUM} : undefined,
+     },
+     webServer: {
+-        command: 'npm run dev',
+-        port: 3000,
++        // PORT also tells the SSR client where the in-process API lives
++        command: `npx nuxt dev --port ${port}`,
++        env: {PORT: String(port)},
++        // url, not port: nuxi answers 503 (its loading page) until the first build is done
++        url: `http://localhost:${port}/`,
++        timeout: 120_000,
+         reuseExistingServer: !process.env.CI,
+     },
+ });
+diff -ruN a/nuxt/4/tsconfig.mion.json b/nuxt/4/tsconfig.mion.json
+--- a/nuxt/4/tsconfig.mion.json
++++ b/nuxt/4/tsconfig.mion.json
+@@ -0,0 +1,5 @@
++{
++  // ONE program for mion: the Nuxt app (client + SSR) and the API it calls
++  "extends": "./.nuxt/tsconfig.app.json",
++  "include": [".nuxt/nuxt.d.ts", "app/**/*", "app/**/*.vue", "shared/**/*.d.ts", "api/src/**/*"]
++}

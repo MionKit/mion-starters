@@ -1,0 +1,884 @@
+diff -ruN a/nextjs/16/api/drizzle.config.ts b/nextjs/16/api/drizzle.config.ts
+--- a/nextjs/16/api/drizzle.config.ts
++++ b/nextjs/16/api/drizzle.config.ts
+@@ -1,7 +1,7 @@
+ import {defineConfig} from 'drizzle-kit';
+ 
+ export default defineConfig({
+-    schema: './src/db/schema.ts',
++    schema: './src/db/drizzle-schema.ts',
+     out: './drizzle',
+     dialect: 'postgresql',
+     dbCredentials: {
+diff -ruN a/nextjs/16/api/src/api.ts b/nextjs/16/api/src/api.ts
+--- a/nextjs/16/api/src/api.ts
++++ b/nextjs/16/api/src/api.ts
+@@ -1,14 +1,12 @@
+-import { initMionRouter, PublicApi, query, Routes } from "@mionjs/router";
+-import { ordersRoutes } from "./features/orders/orders-handlers.ts";
++import {PublicApi, Routes} from '@mionjs/router';
++import {mion} from './router.ts';
++import {ordersRoutes} from './features/orders/orders-handlers.ts';
+ 
+ const routes = {
+-  hello: query((ctx, name: string): string => `Hello ${name}!`),
+-  getTime: query((ctx): Date => new Date()),
+-  orders: ordersRoutes,
++    hello: mion.query((ctx, name: string): string => `Hello ${name}!`),
++    getTime: mion.query((ctx): Date => new Date()),
++    orders: ordersRoutes,
+ } satisfies Routes;
+ 
++export const myApi = mion.initRoutes(routes);
+ export type MyApi = PublicApi<typeof routes>;
+-
+-export async function initApi() {
+-  return initMionRouter(routes, { basePath: "api/mion" });
+-}
+diff -ruN a/nextjs/16/api/src/db/client.ts b/nextjs/16/api/src/db/client.ts
+--- a/nextjs/16/api/src/db/client.ts
++++ b/nextjs/16/api/src/db/client.ts
+@@ -1,6 +1,6 @@
+ import {neon} from '@neondatabase/serverless';
+ import {drizzle, type NeonHttpDatabase} from 'drizzle-orm/neon-http';
+-import * as schema from './schema.ts';
++import * as schema from './drizzle-schema.ts';
+ 
+ let _db: NeonHttpDatabase<typeof schema> | null = null;
+ 
+diff -ruN a/nextjs/16/api/src/db/drizzle-schema.ts b/nextjs/16/api/src/db/drizzle-schema.ts
+--- a/nextjs/16/api/src/db/drizzle-schema.ts
++++ b/nextjs/16/api/src/db/drizzle-schema.ts
+@@ -0,0 +1,6 @@
++import {toDrizzle} from '@mionjs/drizzle-orm-pg-core/drizzle';
++import {orders, orderEvents} from './schema.ts';
++
++/** real drizzle tables: what drizzle-kit and queries use */
++export const ordersTable = toDrizzle(orders);
++export const orderEventsTable = toDrizzle(orderEvents);
+diff -ruN a/nextjs/16/api/src/db/schema.ts b/nextjs/16/api/src/db/schema.ts
+--- a/nextjs/16/api/src/db/schema.ts
++++ b/nextjs/16/api/src/db/schema.ts
+@@ -1,15 +1,23 @@
+-import {toDrizzlePGTable} from '@mionjs/drizzle';
+-import {uuid, timestamp} from 'drizzle-orm/pg-core';
+-import {Order, OrderEvent} from '../features/orders/orders-models.ts';
++import * as DZ from '@mionjs/drizzle-orm-pg-core';
++import {tableRef, $type} from '@mionjs/drizzle-orm';
++import * as TF from '@mionjs/run-types/formats';
+ 
+-export const ordersTable = toDrizzlePGTable<Order>('orders', {
+-    id: uuid('id').primaryKey(),
+-    createdAt: timestamp('created_at').defaultNow().notNull(),
++/** slim tables: models and routes take types from here, drizzle is only loaded by db/drizzle-schema.ts */
++export const orders = DZ.pgTable('orders', {
++    id: DZ.uuid('id', {primaryKey: true, $type: $type<TF.UUIDv7>()}),
++    customer: DZ.text('customer', {notNull: true}),
++    total: DZ.doublePrecision('total', {notNull: true}),
++    status: DZ.text('status', {enum: ['pending', 'paid', 'shipped', 'delivered', 'cancelled'], notNull: true}),
++    createdAt: DZ.timestamp('created_at', {defaultNow: true, notNull: true}),
+ });
+ 
+-export const orderEventsTable = toDrizzlePGTable<OrderEvent>('order_events', {
+-    orderId: uuid('order_id')
+-        .references(() => ordersTable.id)
+-        .notNull(),
+-    at: timestamp('at').defaultNow().notNull(),
++export const orderEvents = DZ.pgTable('order_events', {
++    id: DZ.uuid('id', {primaryKey: true, defaultRandom: true}),
++    type: DZ.text('type', {enum: ['placed', 'paid', 'shipped', 'delivered', 'cancelled'], notNull: true}),
++    orderId: DZ.uuid('order_id', {notNull: true, $type: $type<TF.UUIDv7>(), references: [() => tableRef(orders, 'id')]}),
++    at: DZ.timestamp('at', {defaultNow: true, notNull: true}),
++    method: DZ.text('method'),
++    carrier: DZ.text('carrier'),
++    tracking: DZ.text('tracking'),
++    reason: DZ.text('reason'),
+ });
+diff -ruN a/nextjs/16/api/src/db/seed.ts b/nextjs/16/api/src/db/seed.ts
+--- a/nextjs/16/api/src/db/seed.ts
++++ b/nextjs/16/api/src/db/seed.ts
+@@ -1,5 +1,7 @@
++import {randomUUID_V7} from '@mionjs/core';
++import * as TF from '@mionjs/run-types/formats';
+ import {getDb} from './client.ts';
+-import {ordersTable, orderEventsTable} from './schema.ts';
++import {ordersTable, orderEventsTable} from './drizzle-schema.ts';
+ 
+ /** Seeds the database with sample order data. Run with: npx vite-node src/db/seed.ts */
+ async function seed() {
+@@ -14,16 +16,19 @@
+         .insert(ordersTable)
+         .values([
+             {
++                id: randomUUID_V7() as TF.UUIDv7,
+                 customer: 'Alice Johnson',
+                 total: 175.97,
+                 status: 'delivered' as const,
+             },
+             {
++                id: randomUUID_V7() as TF.UUIDv7,
+                 customer: 'Bob Smith',
+                 total: 79.99,
+                 status: 'shipped' as const,
+             },
+             {
++                id: randomUUID_V7() as TF.UUIDv7,
+                 customer: 'Carol Davis',
+                 total: 106.96,
+                 status: 'cancelled' as const,
+diff -ruN a/nextjs/16/api/src/dev-reset.ts b/nextjs/16/api/src/dev-reset.ts
+--- a/nextjs/16/api/src/dev-reset.ts
++++ b/nextjs/16/api/src/dev-reset.ts
+@@ -0,0 +1,5 @@
++import {resetRouter} from '@mionjs/router';
++
++// Next dev re-evaluates the route handler after an edit, but mion keeps its route tables on globalThis while
++// its "already initialized" flags are module scoped: without this, initRoutes throws "duplicated route".
++if (process.env.NODE_ENV !== 'production') resetRouter();
+diff -ruN a/nextjs/16/api/src/dev-server.ts b/nextjs/16/api/src/dev-server.ts
+--- a/nextjs/16/api/src/dev-server.ts
++++ b/nextjs/16/api/src/dev-server.ts
+@@ -1,5 +0,0 @@
+-import {initApi} from './api.ts';
+-import {startVercelDevServer} from '@mionjs/platform-vercel/dev-server';
+-
+-await initApi();
+-await startVercelDevServer({port: 3001});
+diff -ruN a/nextjs/16/api/src/features/orders/orders-handlers.ts b/nextjs/16/api/src/features/orders/orders-handlers.ts
+--- a/nextjs/16/api/src/features/orders/orders-handlers.ts
++++ b/nextjs/16/api/src/features/orders/orders-handlers.ts
+@@ -1,23 +1,23 @@
+-import {query, mutation, Routes} from '@mionjs/router';
+-import {FormatUUIDv7} from '@mionjs/type-formats/StringFormats';
++import {Routes} from '@mionjs/router';
++import type * as TF from '@mionjs/run-types/formats';
++import {mion} from '../../router.ts';
+ import {Order, OrderEvent} from './orders-models.ts';
+ import {findAllOrders, findOrderById, insertOrder, findEventsByOrderId, findEventsByOrderIds} from './orders-repository.ts';
+ 
+ export const ordersRoutes = {
+-    listOrders: query((): Order[] => {
++    listOrders: mion.query((): Order[] => {
+         return findAllOrders();
+     }),
+-    getOrder: query((ctx, id: FormatUUIDv7): Order | undefined => {
++    getOrder: mion.query((ctx, id: TF.UUIDv7): Order | undefined => {
+         return findOrderById(id);
+     }),
+-    createOrder: mutation((ctx, customer: string, total: number, id?: FormatUUIDv7): Order => {
++    createOrder: mion.mutation((ctx, customer: string, total: number, id?: TF.UUIDv7): Order => {
+         return insertOrder(customer, total, id);
+     }),
+-
+-    getOrderEvents: query((ctx, orderId: FormatUUIDv7): OrderEvent[] => {
++    getOrderEvents: mion.query((ctx, orderId: TF.UUIDv7): OrderEvent[] => {
+         return findEventsByOrderId(orderId);
+     }),
+-    getOrdersEvents: query((ctx, orderIds: FormatUUIDv7[]): OrderEvent[] => {
++    getOrdersEvents: mion.query((ctx, orderIds: TF.UUIDv7[]): OrderEvent[] => {
+         return findEventsByOrderIds(orderIds);
+     }),
+ } satisfies Routes;
+diff -ruN a/nextjs/16/api/src/features/orders/orders-models.ts b/nextjs/16/api/src/features/orders/orders-models.ts
+--- a/nextjs/16/api/src/features/orders/orders-models.ts
++++ b/nextjs/16/api/src/features/orders/orders-models.ts
+@@ -1,22 +1,16 @@
+-import type { FormatUUIDv7 } from "@mionjs/type-formats/StringFormats";
++import type * as TF from '@mionjs/run-types/formats';
+ 
+ export interface Order {
+-  id: FormatUUIDv7;
+-  customer: string;
+-  total: number;
+-  status: "pending" | "paid" | "shipped" | "delivered" | "cancelled";
+-  createdAt: Date;
++    id: TF.UUIDv7;
++    customer: string;
++    total: number;
++    status: 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
++    createdAt: Date;
+ }
+ 
+ export type OrderEvent =
+-  | { type: "placed"; orderId: FormatUUIDv7; at: Date }
+-  | { type: "paid"; orderId: FormatUUIDv7; at: Date; method: string }
+-  | {
+-      type: "shipped";
+-      orderId: FormatUUIDv7;
+-      at: Date;
+-      carrier: string;
+-      tracking: string;
+-    }
+-  | { type: "delivered"; orderId: FormatUUIDv7; at: Date }
+-  | { type: "cancelled"; orderId: FormatUUIDv7; at: Date; reason: string };
++    | {type: 'placed'; orderId: TF.UUIDv7; at: Date}
++    | {type: 'paid'; orderId: TF.UUIDv7; at: Date; method: string}
++    | {type: 'shipped'; orderId: TF.UUIDv7; at: Date; carrier: string; tracking: string}
++    | {type: 'delivered'; orderId: TF.UUIDv7; at: Date}
++    | {type: 'cancelled'; orderId: TF.UUIDv7; at: Date; reason: string};
+diff -ruN a/nextjs/16/api/src/features/orders/orders-repository-pg-neon.ts b/nextjs/16/api/src/features/orders/orders-repository-pg-neon.ts
+--- a/nextjs/16/api/src/features/orders/orders-repository-pg-neon.ts
++++ b/nextjs/16/api/src/features/orders/orders-repository-pg-neon.ts
+@@ -1,7 +1,7 @@
+ import {eq, inArray} from 'drizzle-orm';
+ import {getDb} from '../../db/client.ts';
+-import {ordersTable, orderEventsTable} from '../../db/schema.ts';
+-import {FormatUUIDv7} from '@mionjs/type-formats/StringFormats';
++import {ordersTable, orderEventsTable} from '../../db/drizzle-schema.ts';
++import * as TF from '@mionjs/run-types/formats';
+ import {randomUUID_V7} from '@mionjs/core';
+ import {Order, OrderEvent} from './orders-models.ts';
+ 
+@@ -9,16 +9,16 @@
+     return (await getDb().select().from(ordersTable)) as Order[];
+ }
+ 
+-export async function findOrderById(id: FormatUUIDv7): Promise<Order | undefined> {
++export async function findOrderById(id: TF.UUIDv7): Promise<Order | undefined> {
+     const [order] = (await getDb().select().from(ordersTable).where(eq(ordersTable.id, id))) as Order[];
+     return order;
+ }
+ 
+-export async function insertOrder(customer: string, total: number, id?: FormatUUIDv7): Promise<Order> {
++export async function insertOrder(customer: string, total: number, id?: TF.UUIDv7): Promise<Order> {
+     const [order] = await getDb()
+         .insert(ordersTable)
+         .values({
+-            id: id ?? (randomUUID_V7() as FormatUUIDv7),
++            id: id ?? (randomUUID_V7() as TF.UUIDv7),
+             customer,
+             total: Math.round(total * 100) / 100,
+             status: 'pending' as const,
+@@ -32,11 +32,11 @@
+     return order;
+ }
+ 
+-export async function findEventsByOrderId(orderId: FormatUUIDv7): Promise<OrderEvent[]> {
++export async function findEventsByOrderId(orderId: TF.UUIDv7): Promise<OrderEvent[]> {
+     return (await getDb().select().from(orderEventsTable).where(eq(orderEventsTable.orderId, orderId))) as OrderEvent[];
+ }
+ 
+-export async function findEventsByOrderIds(orderIds: FormatUUIDv7[]): Promise<OrderEvent[]> {
++export async function findEventsByOrderIds(orderIds: TF.UUIDv7[]): Promise<OrderEvent[]> {
+     return (await getDb()
+         .select()
+         .from(orderEventsTable)
+diff -ruN a/nextjs/16/api/src/features/orders/orders-repository.ts b/nextjs/16/api/src/features/orders/orders-repository.ts
+--- a/nextjs/16/api/src/features/orders/orders-repository.ts
++++ b/nextjs/16/api/src/features/orders/orders-repository.ts
+@@ -1,12 +1,12 @@
+ import {randomUUID_V7} from '@mionjs/core';
+-import {FormatUUIDv7} from '@mionjs/type-formats/StringFormats';
++import * as TF from '@mionjs/run-types/formats';
+ import {Order, OrderEvent} from './orders-models.ts';
+ 
+ // ---- In-memory store with seed data ----
+ 
+-const id1 = randomUUID_V7() as FormatUUIDv7;
+-const id2 = randomUUID_V7() as FormatUUIDv7;
+-const id3 = randomUUID_V7() as FormatUUIDv7;
++const id1 = randomUUID_V7() as TF.UUIDv7;
++const id2 = randomUUID_V7() as TF.UUIDv7;
++const id3 = randomUUID_V7() as TF.UUIDv7;
+ 
+ const orders: Order[] = [
+     {
+@@ -48,13 +48,13 @@
+     return orders;
+ }
+ 
+-export function findOrderById(id: FormatUUIDv7): Order | undefined {
++export function findOrderById(id: TF.UUIDv7): Order | undefined {
+     return orders.find((o) => o.id === id);
+ }
+ 
+-export function insertOrder(customer: string, total: number, id?: FormatUUIDv7): Order {
++export function insertOrder(customer: string, total: number, id?: TF.UUIDv7): Order {
+     const order: Order = {
+-        id: id ?? (randomUUID_V7() as FormatUUIDv7),
++        id: id ?? (randomUUID_V7() as TF.UUIDv7),
+         customer,
+         total: Math.round(total * 100) / 100,
+         status: 'pending',
+@@ -65,11 +65,11 @@
+     return order;
+ }
+ 
+-export function findEventsByOrderId(orderId: FormatUUIDv7): OrderEvent[] {
++export function findEventsByOrderId(orderId: TF.UUIDv7): OrderEvent[] {
+     return events.filter((e) => e.orderId === orderId);
+ }
+ 
+-export function findEventsByOrderIds(orderIds: FormatUUIDv7[]): OrderEvent[] {
++export function findEventsByOrderIds(orderIds: TF.UUIDv7[]): OrderEvent[] {
+     const idSet = new Set(orderIds);
+     return events.filter((e) => idSet.has(e.orderId));
+ }
+diff -ruN a/nextjs/16/api/src/router.ts b/nextjs/16/api/src/router.ts
+--- a/nextjs/16/api/src/router.ts
++++ b/nextjs/16/api/src/router.ts
+@@ -0,0 +1,4 @@
++import {createMionRouter} from '@mionjs/router';
++
++/** The one mion router: mounted by app/api/[...mion]/route.ts, the client uses the same basePath */
++export const mion = createMionRouter({basePath: 'api/mion'});
+diff -ruN a/nextjs/16/api/src/server.bun.ts b/nextjs/16/api/src/server.bun.ts
+--- a/nextjs/16/api/src/server.bun.ts
++++ b/nextjs/16/api/src/server.bun.ts
+@@ -1,5 +0,0 @@
+-import {initApi} from './api.ts';
+-import {startBunServer} from '@mionjs/platform-bun';
+-
+-await initApi();
+-startBunServer({port: 3001});
+diff -ruN a/nextjs/16/api/src/server.node.ts b/nextjs/16/api/src/server.node.ts
+--- a/nextjs/16/api/src/server.node.ts
++++ b/nextjs/16/api/src/server.node.ts
+@@ -1,5 +0,0 @@
+-import {initApi} from './api.ts';
+-import {startNodeServer} from '@mionjs/platform-node';
+-
+-await initApi();
+-startNodeServer({port: 3001});
+diff -ruN a/nextjs/16/api/src/vercel-serverless.ts b/nextjs/16/api/src/vercel-serverless.ts
+--- a/nextjs/16/api/src/vercel-serverless.ts
++++ b/nextjs/16/api/src/vercel-serverless.ts
+@@ -1,5 +0,0 @@
+-import {initApi} from './api.ts';
+-import {createVercelHandler} from '@mionjs/platform-vercel';
+-
+-await initApi();
+-export const {GET, POST, PUT, DELETE, PATCH} = createVercelHandler();
+diff -ruN a/nextjs/16/api/tsconfig.json b/nextjs/16/api/tsconfig.json
+--- a/nextjs/16/api/tsconfig.json
++++ b/nextjs/16/api/tsconfig.json
+@@ -1,18 +0,0 @@
+-{
+-  "compilerOptions": {
+-    "target": "ES2023",
+-    "module": "NodeNext",
+-    "moduleResolution": "NodeNext",
+-    "esModuleInterop": true,
+-    "strict": true,
+-    "outDir": "dist",
+-    "declaration": true,
+-    "sourceMap": true,
+-    "isolatedModules": true,
+-    "allowImportingTsExtensions": true,
+-    "rewriteRelativeImportExtensions": true
+-  },
+-  "include": ["src"],
+-  "exclude": ["node_modules", "dist"],
+-  "reflection": true
+-}
+diff -ruN a/nextjs/16/api/vite.config.ts b/nextjs/16/api/vite.config.ts
+--- a/nextjs/16/api/vite.config.ts
++++ b/nextjs/16/api/vite.config.ts
+@@ -1,29 +0,0 @@
+-import { defineConfig } from "vite";
+-import { resolve } from "path";
+-import { builtinModules } from "module";
+-import { mionVitePlugin } from "@mionjs/devtools/vite-plugin";
+-
+-export default defineConfig({
+-  plugins: [
+-    mionVitePlugin({
+-      runTypes: { tsConfig: resolve(__dirname, "tsconfig.json") },
+-      serverPureFunctions: {
+-        clientSrcPath: resolve(__dirname, "../app"),
+-        noViteClient: true,
+-      },
+-      aotCaches: true,
+-    }),
+-  ],
+-  build: {
+-    ssr: resolve(__dirname, "src/vercel-serverless.ts"),
+-    outDir: "dist",
+-    emptyOutDir: true,
+-    sourcemap: true,
+-    minify: false,
+-    rollupOptions: {
+-      // Bundle @mionjs/* so the output is self-contained for Next.js route handler
+-      external: [...builtinModules, ...builtinModules.map((m) => `node:${m}`)],
+-      output: { format: "es", entryFileNames: "[name].js" },
+-    },
+-  },
+-});
+diff -ruN a/nextjs/16/app/api/[...mion]/route.ts b/nextjs/16/app/api/[...mion]/route.ts
+--- a/nextjs/16/app/api/[...mion]/route.ts
++++ b/nextjs/16/app/api/[...mion]/route.ts
+@@ -1,2 +1,7 @@
+-// Imports from pre-built mion API output (Vite-compiled with deepkit types)
+-export {GET, POST, PUT, DELETE, PATCH} from '../../../api/dist/vercel-serverless.js';
++import {createVercelHandler} from '@mionjs/platform-vercel';
++// must come before the routes module: clears router state a previous dev module instance left behind
++import '@/api/src/dev-reset';
++// creates the router and registers the routes
++import '@/api/src/api';
++
++export const {GET, POST, PUT, DELETE, PATCH} = createVercelHandler();
+diff -ruN a/nextjs/16/app/mion-orders/orders-client.ts b/nextjs/16/app/mion-orders/orders-client.ts
+--- a/nextjs/16/app/mion-orders/orders-client.ts
++++ b/nextjs/16/app/mion-orders/orders-client.ts
+@@ -0,0 +1,25 @@
++// No "use client" here on purpose: mion's build rewrite prepends imports to every file with mion call sites,
++// which would push a directive off line 1. Imported from the client page, so it lands in the client bundle.
++import {initClient, batch, inputFrom} from '@mionjs/client';
++import type {MyApi} from '@mion-app/api';
++import type {Order, OrderEvent} from '@/api/src/features/orders/orders-models';
++
++// Fully typed RPC, automatic Date deserialization
++const {routes} = initClient<MyApi>({
++    baseURL: typeof window !== 'undefined' ? window.location.origin : '',
++    basePath: 'api/mion',
++});
++
++/** Single HTTP request: listOrders -> inputFrom maps the IDs on the server -> getOrdersEvents */
++export async function loadOrdersWithEvents(): Promise<{orders: Order[]; eventsByOrder: Record<string, OrderEvent[]>}> {
++    const ordersList = routes.orders.listOrders();
++    const orderIds = inputFrom(ordersList, (orders) => orders!.map((o) => o.id));
++    const ordersEvents = routes.orders.getOrdersEvents(orderIds.asArg());
++
++    const [[orders, ordersError, response], [allEvents, eventsError]] = await batch([ordersList, ordersEvents]).call();
++    if (ordersError || eventsError || response['@thrownErrors'])
++        throw new Error(ordersError?.publicMessage ?? eventsError?.publicMessage ?? response['@thrownErrors']?.[0]?.publicMessage);
++    const eventsByOrder: Record<string, OrderEvent[]> = {};
++    for (const event of allEvents ?? []) (eventsByOrder[event.orderId] ??= []).push(event);
++    return {orders: orders ?? [], eventsByOrder};
++}
+diff -ruN a/nextjs/16/app/mion-orders/page.tsx b/nextjs/16/app/mion-orders/page.tsx
+--- a/nextjs/16/app/mion-orders/page.tsx
++++ b/nextjs/16/app/mion-orders/page.tsx
+@@ -2,18 +2,11 @@
+ 
+ import { useState, useEffect } from "react";
+ import Image from "next/image";
+-import { initClient, routesFlow, serverMapFrom } from "@mionjs/client";
+-import type { MyApi } from "@mion-app/api";
+ import type {
+   Order,
+   OrderEvent,
+ } from "@/api/src/features/orders/orders-models";
+-
+-// Initialize mion client — fully typed RPC, automatic Date deserialization
+-const { routes } = initClient<MyApi>({
+-  baseURL: typeof window !== "undefined" ? window.location.origin : "",
+-  basePath: "api/mion",
+-});
++import { loadOrdersWithEvents } from "./orders-client";
+ 
+ // ---- Event styling per type (discriminated union in action) ----
+ 
+@@ -186,27 +179,11 @@
+   const [loading, setLoading] = useState(true);
+ 
+   useEffect(() => {
+-    // Single HTTP request: listOrders -> serverMapFrom extracts IDs server-side -> getOrdersEvents
+-    const ordersList = routes.orders.listOrders();
+-    const orderIds = serverMapFrom(
+-      ordersList,
+-      (orders) => orders!.map((o) => o.id),
+-      "serverMapFromOrdersToOrderEvents",
+-    ).asArg();
+-
+-    routesFlow([ordersList, routes.orders.getOrdersEvents(orderIds)])
+-      .call()
+-      .then(([[ordersData, allEvents]]) => {
+-        if (ordersData) setOrders(ordersData);
+-        if (allEvents) {
+-          const eventsMap: Record<string, OrderEvent[]> = {};
+-          for (const event of allEvents) {
+-            (eventsMap[event.orderId] ??= []).push(event);
+-          }
+-          setEventsByOrder(eventsMap);
+-        }
+-        setLoading(false);
+-      });
++    loadOrdersWithEvents().then(({ orders, eventsByOrder }) => {
++      setOrders(orders);
++      setEventsByOrder(eventsByOrder);
++      setLoading(false);
++    });
+   }, []);
+ 
+   if (loading)
+@@ -243,7 +220,7 @@
+             safety, automatic serialization, and built-in validation. This
+             showcase demonstrates how{" "}
+             <code className="rounded bg-zinc-100 px-1.5 py-0.5 text-sm dark:bg-zinc-800">
+-              routesFlow
++              batch
+             </code>{" "}
+             resolves related data across multiple routes in a single HTTP
+             request — a lightweight alternative to GraphQL, but fully typed and
+diff -ruN a/nextjs/16/app/mion-server/actions.ts b/nextjs/16/app/mion-server/actions.ts
+--- a/nextjs/16/app/mion-server/actions.ts
++++ b/nextjs/16/app/mion-server/actions.ts
+@@ -0,0 +1,7 @@
++'use server';
++import {helloFromServer} from './server-client';
++
++/** module-level 'use server' file calling mion through the helper */
++export async function greetAction(name: string) {
++    return helloFromServer(name);
++}
+diff -ruN a/nextjs/16/app/mion-server/page.tsx b/nextjs/16/app/mion-server/page.tsx
+--- a/nextjs/16/app/mion-server/page.tsx
++++ b/nextjs/16/app/mion-server/page.tsx
+@@ -0,0 +1,17 @@
++import {helloFromServer, timeFromServer} from './server-client';
++import {greetAction} from './actions';
++
++export const dynamic = 'force-dynamic';
++
++export default async function ServerPage() {
++    const greeting = await helloFromServer('Server Component');
++    const time = await timeFromServer();
++    const actionResult = await greetAction('Server Action');
++    return (
++        <main style={{padding: 40}}>
++            <p id="rsc-greeting">{greeting}</p>
++            <p id="rsc-time">{time instanceof Date ? `Date: ${time.toISOString()}` : `not a Date: ${String(time)}`}</p>
++            <p id="rsc-action">{actionResult}</p>
++        </main>
++    );
++}
+diff -ruN a/nextjs/16/app/mion-server/server-client.ts b/nextjs/16/app/mion-server/server-client.ts
+--- a/nextjs/16/app/mion-server/server-client.ts
++++ b/nextjs/16/app/mion-server/server-client.ts
+@@ -0,0 +1,24 @@
++import 'server-only';
++import {headers} from 'next/headers';
++import {initClient} from '@mionjs/client';
++import type {MyApi} from '@mion-app/api';
++
++/** mion client for Server Components: calls this app's own route handler over HTTP.
++ *  Returns the client object, never `routes` itself: the routes proxy answers `then`, so awaiting it hangs forever */
++async function serverClient() {
++    const h = await headers();
++    const origin = `${h.get('x-forwarded-proto') ?? 'http'}://${h.get('host')}`;
++    return initClient<MyApi>({baseURL: origin, basePath: 'api/mion'});
++}
++
++export async function helloFromServer(name: string) {
++    const {routes} = await serverClient();
++    const [greeting, error] = await routes.hello(name).call();
++    return error ? `error: ${error.publicMessage}` : greeting;
++}
++
++export async function timeFromServer() {
++    const {routes} = await serverClient();
++    const [time] = await routes.getTime().call();
++    return time;
++}
+diff -ruN a/nextjs/16/e2e/smoke.test.ts b/nextjs/16/e2e/smoke.test.ts
+--- a/nextjs/16/e2e/smoke.test.ts
++++ b/nextjs/16/e2e/smoke.test.ts
+@@ -5,7 +5,7 @@
+     await expect(page).toHaveTitle(/mion|Next/i);
+ });
+ 
+-test('mion API responds through Next.js rewrite', async ({request}) => {
++test('mion API responds from the in-app route handler', async ({request}) => {
+     const res = await request.post('/api/mion/hello', {
+         headers: {'Content-Type': 'application/json'},
+         data: {hello: ['Playwright']},
+@@ -25,27 +25,52 @@
+     expect(new Date(json.getTime).getTime()).not.toBeNaN();
+ });
+ 
++test('UUIDv7 format is validated on the server', async ({request}) => {
++    const res = await request.post('/api/mion/orders/getOrder', {
++        headers: {'Content-Type': 'application/json'},
++        data: {'orders/getOrder': ['not-a-uuid']},
++    });
++    expect(res.status()).toBe(422);
++    const json = await res.json();
++    expect(json['@thrownErrors']['orders/getOrder'].type).toBe('validation-error');
++});
++
+ test('orders showcase page loads and displays orders', async ({page}) => {
+     const errors: string[] = [];
+     const requests: string[] = [];
++    const apiCalls: string[] = [];
+     page.on('console', (msg) => { if (msg.type() === 'error') errors.push(msg.text()); });
+     page.on('pageerror', (err) => errors.push(err.message));
+     page.on('response', (res) => { if (res.status() >= 400) requests.push(`${res.status()} ${res.url()}`); });
++    page.on('request', (req) => { if (req.url().includes('/api/mion/')) apiCalls.push(req.url()); });
+     await page.goto('/mion-orders');
+     // Wait for orders to load (loading state disappears)
+     await expect(page.getByText('Loading orders...')).toBeHidden({timeout: 15_000});
+-    // Log any errors for debugging
+     if (errors.length > 0) console.log('Browser errors:', errors);
+     if (requests.length > 0) console.log('Failed requests:', requests);
+-    // Verify orders are rendered
+     await expect(page.getByText('Alice Johnson')).toBeVisible();
+     await expect(page.getByText('Bob Smith')).toBeVisible();
+     await expect(page.getByText('Carol Davis')).toBeVisible();
++    // the batch (listOrders -> inputFrom -> getOrdersEvents) is ONE request
++    expect(apiCalls.filter((url) => url.includes('/api/mion/mion-batch?id='))).toHaveLength(1);
++    expect(requests).toEqual([]);
+ });
+ 
+-test('orders showcase displays event timeline', async ({page}) => {
++test('orders showcase displays event timeline (discriminated unions + Dates)', async ({page}) => {
+     await page.goto('/mion-orders');
+     await expect(page.getByText('Loading orders...')).toBeHidden({timeout: 15_000});
+-    // Verify event timeline is rendered for at least one order
+     await expect(page.getByText('Event Timeline').first()).toBeVisible();
++    // union-specific fields
++    await expect(page.getByText('via credit_card')).toBeVisible();
++    await expect(page.getByText('FedEx · FX-123456')).toBeVisible();
++    await expect(page.getByText('Customer changed their mind')).toBeVisible();
++    // Date round trip: createdAt arrives as a Date (toLocaleDateString works)
++    await expect(page.getByText('3/1/2025').first()).toBeVisible();
++});
++
++test('server component calls the API through the mion client', async ({page}) => {
++    await page.goto('/mion-server');
++    await expect(page.locator('#rsc-greeting')).toHaveText('Hello Server Component!');
++    await expect(page.locator('#rsc-time')).toContainText('Date: ');
++    await expect(page.locator('#rsc-action')).toHaveText('Hello Server Action!');
+ });
+diff -ruN a/nextjs/16/eslint.config.mjs b/nextjs/16/eslint.config.mjs
+--- a/nextjs/16/eslint.config.mjs
++++ b/nextjs/16/eslint.config.mjs
+@@ -1,11 +1,14 @@
+ import { defineConfig, globalIgnores } from "eslint/config";
+ import nextVitals from "eslint-config-next/core-web-vitals";
+ import nextTs from "eslint-config-next/typescript";
+-import mionPlugin from "@mionjs/devtools/eslint";
++import mion from "@mionjs/devtools/eslint";
+ 
+ const eslintConfig = defineConfig([
+   ...nextVitals,
+   ...nextTs,
++  // mion level rules (mion/error, mion/runtime-error, mion/warning): route checks, pure fn / batch mapper checks,
++  // and rpc-client-imports-server-value (a client file importing the API type without `type`)
++  mion.configs.recommended,
+   // Override default ignores of eslint-config-next.
+   globalIgnores([
+     // Default ignores of eslint-config-next:
+@@ -13,20 +16,8 @@
+     "out/**",
+     "build/**",
+     "next-env.d.ts",
+-    "api/dist/**",
++    ".mion/**",
+   ]),
+-  // Enforce type-only imports from backend in frontend code
+-  {
+-    files: ["app/**/*.ts", "app/**/*.tsx"],
+-    // Exclude Next.js API routes (server-side, allowed to import backend code)
+-    ignores: ["app/api/**"],
+-    plugins: {
+-      "@mionjs": mionPlugin,
+-    },
+-    rules: {
+-      "@mionjs/enforce-type-imports": ["error", { backendSources: ["api/src/", "@mion-app/api"] }],
+-    },
+-  },
+ ]);
+ 
+ export default eslintConfig;
+diff -ruN a/nextjs/16/mion-aot-caches-shim.js b/nextjs/16/mion-aot-caches-shim.js
+--- a/nextjs/16/mion-aot-caches-shim.js
++++ b/nextjs/16/mion-aot-caches-shim.js
+@@ -1,5 +0,0 @@
+-/** Shim for mion virtual modules — provides empty caches when running outside the mion Vite plugin (e.g. Next.js/Turbopack). */
+-export const jitFnsCache = {};
+-export const pureFnsCache = {};
+-export const routerCache = {};
+-export const serverPureFnsCache = {};
+diff -ruN a/nextjs/16/mion-aot-caches.d.ts b/nextjs/16/mion-aot-caches.d.ts
+--- a/nextjs/16/mion-aot-caches.d.ts
++++ b/nextjs/16/mion-aot-caches.d.ts
+@@ -1,6 +0,0 @@
+-/* eslint-disable @typescript-eslint/no-explicit-any */
+-declare module "virtual:mion-aot/caches" {
+-  export const jitFnsCache: Record<string, any>;
+-  export const pureFnsCache: Record<string, Record<string, any>>;
+-  export const routerCache: Record<string, any>;
+-}
+diff -ruN a/nextjs/16/next.config.mts b/nextjs/16/next.config.mts
+--- a/nextjs/16/next.config.mts
++++ b/nextjs/16/next.config.mts
+@@ -0,0 +1,22 @@
++import type {NextConfig} from 'next';
++import {mkdirSync} from 'node:fs';
++import {withMion} from '@mionjs/devtools/next';
++
++// `satisfies` (not `: NextConfig`): withMion takes Record<string, unknown>, which the NextConfig interface is not
++const nextConfig = {
++    turbopack: {root: import.meta.dirname},
++    // one instance of mion's runtime per server process (no "@mionjs/core has been loaded N times" warning)
++    serverExternalPackages: ['@mionjs/core', '@mionjs/router', '@mionjs/run-types', '@mionjs/client', '@mionjs/platform-vercel'],
++} satisfies NextConfig;
++
++// WORKAROUND (Next 16.4): withMion returns before its scan creates .mion/, and a Turbopack build that starts without
++// the folder never sees the generated modules ("Can't resolve '.mion/types/…'") on a clean checkout.
++mkdirSync(new URL('./.mion', import.meta.url), {recursive: true});
++
++// WORKAROUND: `next dev --webpack` evaluates this file in a forked child whose argv has no `--webpack` and whose env has
++// no TURBOPACK, so withMion's isTurbopack() guesses Turbopack and the webpack build gets no mion transform at all.
++// Next 16 always sets TURBOPACK ('auto' | '1') when Turbopack runs, so its absence means webpack.
++if (!process.env.TURBOPACK && !process.argv.includes('--webpack')) process.argv.push('--webpack');
++
++// await is required by withMion's contract (it starts the type scan for Turbopack's loader)
++export default await withMion(nextConfig);
+diff -ruN a/nextjs/16/next.config.ts b/nextjs/16/next.config.ts
+--- a/nextjs/16/next.config.ts
++++ b/nextjs/16/next.config.ts
+@@ -1,25 +0,0 @@
+-import type {NextConfig} from 'next';
+-
+-const isDev = process.env.NODE_ENV !== 'production';
+-
+-const nextConfig: NextConfig = {
+-    // mion packages are type-checked separately with their own tsconfig;
+-    // skip re-checking them under Next.js's DOM-flavored lib settings
+-    typescript: {ignoreBuildErrors: true},
+-    // Transpile linked mion packages so Turbopack can resolve them
+-    transpilePackages: ['@mionjs/client', '@mionjs/core'],
+-    turbopack: {
+-        root: import.meta.dirname,
+-        resolveAlias: {
+-            'virtual:mion-aot/caches': './mion-aot-caches-shim.js',
+-            'virtual:mion-server-pure-fns': './mion-aot-caches-shim.js',
+-        },
+-    },
+-    // In dev, proxy API requests to the standalone mion server (vite-node on port 3001)
+-    // In production, the catch-all route at app/api/[...mion]/route.ts handles requests
+-    ...(isDev && {
+-        rewrites: async () => [{source: '/api/mion/:path*', destination: 'http://localhost:3001/api/mion/:path*'}],
+-    }),
+-};
+-
+-export default nextConfig;
+diff -ruN a/nextjs/16/package.json b/nextjs/16/package.json
+--- a/nextjs/16/package.json
++++ b/nextjs/16/package.json
+@@ -33,58 +33,42 @@
+     "access": "public"
+   },
+   "scripts": {
+-    "dev": "npm-run-all2 --parallel --race dev:*",
+-    "dev:next": "next dev",
+-    "dev:api": "vite-node -c api/vite.config.ts --watch api/src/dev-server.ts",
+-    "build": "npm-run-all2 build:*",
+-    "build:api": "vite build --config api/vite.config.ts",
+-    "build:next": "next build",
++    "dev": "next dev",
++    "dev:webpack": "next dev --webpack",
++    "build": "next build",
++    "build:webpack": "next build --webpack",
+     "start": "next start",
+     "lint": "eslint",
++    "typecheck": "tsc --noEmit",
+     "test": "playwright test",
+     "test:install": "playwright install chromium"
+   },
+   "dependencies": {
+-    "@mionjs/client": "file:../../mion-tarballs/mionjs-client.tgz",
+-    "@mionjs/core": "file:../../mion-tarballs/mionjs-core.tgz",
+-    "@mionjs/drizzle": "file:../../mion-tarballs/mionjs-drizzle.tgz",
+-    "@mionjs/platform-bun": "file:../../mion-tarballs/mionjs-platform-bun.tgz",
+-    "@mionjs/platform-node": "file:../../mion-tarballs/mionjs-platform-node.tgz",
+-    "@mionjs/platform-vercel": "file:../../mion-tarballs/mionjs-platform-vercel.tgz",
+-    "@mionjs/router": "file:../../mion-tarballs/mionjs-router.tgz",
+-    "@mionjs/type-formats": "file:../../mion-tarballs/mionjs-type-formats.tgz",
++    "@mionjs/client": "0.13.2",
++    "@mionjs/core": "0.13.2",
++    "@mionjs/drizzle-orm": "0.45.1",
++    "@mionjs/drizzle-orm-pg-core": "0.45.1",
++    "@mionjs/platform-vercel": "0.13.2",
++    "@mionjs/router": "0.13.2",
++    "@mionjs/run-types": "0.13.2",
++    "@neondatabase/serverless": "^1",
++    "drizzle-orm": "^0.45.1",
+     "next": "16.2.3",
+     "react": "19.2.4",
+     "react-dom": "19.2.4"
+   },
+   "devDependencies": {
+-    "@mionjs/devtools": "file:../../mion-tarballs/mionjs-devtools.tgz",
++    "@mionjs/bin-compiler": "0.13.2",
++    "@mionjs/devtools": "0.13.2",
+     "@playwright/test": "^1",
+     "@tailwindcss/postcss": "^4",
+     "@types/node": "^20",
+     "@types/react": "^19",
+     "@types/react-dom": "^19",
++    "drizzle-kit": "^0.31",
+     "eslint": "^9",
+     "eslint-config-next": "16.2.3",
+-    "npm-run-all2": "^7",
+     "tailwindcss": "^4",
+-    "typescript": "^6",
+-    "vite": "^7.3.1",
+-    "vite-node": "^5.3.0"
+-  },
+-  "overrides": {
+-    "@mionjs/client": "file:../../mion-tarballs/mionjs-client.tgz",
+-    "@mionjs/core": "file:../../mion-tarballs/mionjs-core.tgz",
+-    "@mionjs/devtools": "file:../../mion-tarballs/mionjs-devtools.tgz",
+-    "@mionjs/drizzle": "file:../../mion-tarballs/mionjs-drizzle.tgz",
+-    "@mionjs/platform-aws": "file:../../mion-tarballs/mionjs-platform-aws.tgz",
+-    "@mionjs/platform-bun": "file:../../mion-tarballs/mionjs-platform-bun.tgz",
+-    "@mionjs/platform-cloudflare": "file:../../mion-tarballs/mionjs-platform-cloudflare.tgz",
+-    "@mionjs/platform-gcloud": "file:../../mion-tarballs/mionjs-platform-gcloud.tgz",
+-    "@mionjs/platform-node": "file:../../mion-tarballs/mionjs-platform-node.tgz",
+-    "@mionjs/platform-vercel": "file:../../mion-tarballs/mionjs-platform-vercel.tgz",
+-    "@mionjs/router": "file:../../mion-tarballs/mionjs-router.tgz",
+-    "@mionjs/run-types": "file:../../mion-tarballs/mionjs-run-types.tgz",
+-    "@mionjs/type-formats": "file:../../mion-tarballs/mionjs-type-formats.tgz"
++    "typescript": "^6"
+   }
+ }
+diff -ruN a/nextjs/16/playwright.config.ts b/nextjs/16/playwright.config.ts
+--- a/nextjs/16/playwright.config.ts
++++ b/nextjs/16/playwright.config.ts
+@@ -1,21 +1,20 @@
+ import {defineConfig} from '@playwright/test';
+ 
++const port = Number(process.env.PORT ?? 3000);
++
+ export default defineConfig({
+     testDir: './e2e',
+     timeout: 30_000,
+     use: {
+-        baseURL: 'http://localhost:3000',
++        baseURL: `http://localhost:${port}`,
++        // preinstalled browser in CI images; unset locally to use `playwright install`'s
++        ...(process.env.PW_CHROMIUM_PATH && {launchOptions: {executablePath: process.env.PW_CHROMIUM_PATH}}),
++    },
++    // the mion API runs inside the Next app (app/api/[...mion]/route.ts): one server
++    webServer: {
++        command: `npx next dev -p ${port}`,
++        port,
++        reuseExistingServer: !process.env.CI,
++        timeout: 120_000,
+     },
+-    webServer: [
+-        {
+-            command: 'npm run dev:api',
+-            port: 3001,
+-            reuseExistingServer: !process.env.CI,
+-        },
+-        {
+-            command: 'npm run dev:next',
+-            port: 3000,
+-            reuseExistingServer: !process.env.CI,
+-        },
+-    ],
+ });
+diff -ruN a/nextjs/16/tsconfig.json b/nextjs/16/tsconfig.json
+--- a/nextjs/16/tsconfig.json
++++ b/nextjs/16/tsconfig.json
+@@ -26,5 +26,5 @@
+     }
+   },
+   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts", "**/*.mts"],
+-  "exclude": ["node_modules", "api"]
++  "exclude": ["node_modules"]
+ }
