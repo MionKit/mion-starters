@@ -102,27 +102,25 @@ per-starter reports.
 | 24 | Dev noise: full router options logged on every init, ANSI codes in the 503 body, "resolver died, respawned" printed before the real config error, a failing entry blanks the whole Nuxt site with 503 | all | Low | `packages/rpc-router/src/router.ts:259`, `middlewareMode.ts:151` |
 | 25 | Drizzle: `uuid` columns are typed as version "any", so `UUIDv7` needs `$type`; no way left to build a table from a model type | Next | Low (feature) | `packages/drizzle-orm-pg-core` `PgUuidIn` |
 | 26 | No HTTP method enforcement (a `mutation` runs via GET or OPTIONS, a CORS preflight runs a batch) and no CORS support | Nuxt | High (security) | **Fixed on `main`** by `mionSecurity` (`packages/rpc-router/src/middlewares/security.ts`); needs a release |
-| 27 | Local prerelease flow for downstream projects: `bump-version.mjs` accepts only `X.Y.Z`, and there is no one-command "publish this tree to a local registry" for the starters | starters | Low (tooling) | `scripts/release/bump-version.mjs:31` |
+| 27 | Local prerelease flow for downstream projects: `bump-version.mjs` accepts only `X.Y.Z`, and there is no one-command "publish this tree to a local registry" for the starters | starters | Low (tooling) | Not generic: handled in the starters' tooling with mion's existing scripts (see [DECISIONS.md](DECISIONS.md) section 2) |
 
 ## Process for the migration
 
 1. Fix the mion issues in the mion repo, one background session and PR per fix group, each merged to `main`.
 2. Until a mion release ships them, the starters install a locally built mion from a throwaway verdaccio registry
-   (built from `main` with the fixes, prerelease version), using the shared tooling in this repo.
+   (built from `main` with the fixes), using the shared tooling in this repo and mion's own pack and publish scripts.
 3. Port each starter. A starter is done when all of its e2e pass on the local build, with no workaround left that a
    mion fix removed.
 4. Publish a new mion version, switch the starters to it with `npm run mionupdate`, rerun every e2e, publish the
    starters.
 
-## Decisions still open
+## Decisions
 
-Collected from the reports. Each starter todo repeats the ones it needs.
+The open questions from the reports, and where each fix belongs (mion only when generic), are settled in
+[DECISIONS.md](DECISIONS.md). In short:
 
-- Edge targets (Cloudflare Workers, Vercel Edge): keep them, blocked, until mion issues 1 and 2 ship, or drop them for now.
-- Vercel deploy layout: neither the Nuxt nor the Vue starter had a working Vercel layout before this migration.
-  Rework it or drop it.
-- Nuxt showcase data: SSR (prerendered at `nuxt generate`, needs a live API, data frozen) or client-only (`server: false`).
-- Next.js: keep an optional standalone API recipe (`vite build` of `server.node.ts`, verified) or leave it to the planned standalone starter.
-- Next.js: showcase a Server Component calling the API over HTTP, or call the repository directly.
-- Next.js drizzle: handwritten models next to slim tables, or models inferred from the tables.
-- Next.js version: stay on 16.2.x or move to 16.4.x (needs mion issue 10 fixed or the `mkdirSync('.mion')` workaround).
+- SPA first: the Nuxt starter runs as an SPA with client-only data.
+- Starter ports wait for the mion fixes they need and run on a local-registry build, with no workarounds.
+- Cloudflare stays in Vue and Nuxt; Vercel is dropped there and stays the Next.js target.
+- Batches live in `.ts` modules.
+- The local registry tooling lives in the starters.
