@@ -1,55 +1,43 @@
 # Mion Starters
 
-Starter templates and CLI for scaffolding [mion](https://mion.io) into new or existing projects.
+Starter templates for new [mion](https://mion.io) projects, one `npm create` package per framework.
+
+```bash
+npm create @mionjs/starter-nextjs my-app
+npm create @mionjs/starter-nuxt my-app
+npm create @mionjs/starter-vue my-app
+```
 
 ## Structure
 
 ```
 mion-starters/
-├── cli/                  # CLI tool (@mionjs/starter)
-├── nextjs/
-│   └── 16/               # Next.js 16 starter
-├── nuxt/                 # (planned)
-│   └── 4/
-└── standalone/           # (planned)
+├── nextjs/16/    # @mionjs/create-starter-nextjs
+├── nuxt/4/       # @mionjs/create-starter-nuxt
+├── vue/3/        # @mionjs/create-starter-vue
+├── scripts/      # dev and publish scripts
+└── tests/        # root tests for the create scripts
 ```
 
-Each starter is a **self-contained project** (own `package.json`, `tsconfig.json`, etc.) — no monorepo. Starters can be copied as-is to bootstrap a new project.
+Each starter is a self-contained project (own `package.json`, `tsconfig.json`), not a monorepo. Starters are versioned
+by their framework's major version. All of them ship the same Orders showcase API.
 
-Starters are versioned by the major version of their framework (e.g. `nextjs/16`, `nuxt/4`).
+## Developing against a local mion
 
-## Starters
-
-### Next.js 16
-
-Full-stack Next.js 16 app with mion API showcasing:
-- Mion server routes and handlers
-- Mion client usage from React components
-- Orders API showcase (CRUD, models, repository pattern)
-- Feature-based folder structure under `api/src/features/`
-
-## CLI
-
-The `@mionjs/starter` CLI can:
-- **Create a new project** — copies a full starter into an empty directory
-- **Scaffold into existing project** — copies mion-specific files into an already initialized project
+With the [mion repo](https://github.com/MionKit/mion) cloned and set up next to this one (`../mion`):
 
 ```bash
-npx @mionjs/starter init
+npm run mionlink      # build ../mion, publish it to a local registry, switch every starter to it
+npm run mionstop      # stop the local registry
+npm run mionupdate    # back to the npm-published packages
 ```
 
-## Linking Mion Packages
+Details are in [CLAUDE.md](CLAUDE.md#mion-packages).
 
-Mion packages are not yet published to npm. Link them locally from the [mion monorepo](https://github.com/MionKit/mion):
+## Tests
 
 ```bash
-# From the mion monorepo, link each package:
-cd /path/to/mion
-npm link -w @mionjs/core -w @mionjs/router -w @mionjs/client -w @mionjs/http # ... etc
-
-# Then in a starter directory:
-cd nextjs/16/api
-npm link @mionjs/core @mionjs/router @mionjs/client @mionjs/http # ... etc
+npm test              # every root test: create each starter, build it, run its tests
 ```
 
 ## License

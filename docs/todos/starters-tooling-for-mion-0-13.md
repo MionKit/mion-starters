@@ -85,3 +85,21 @@ this change touched, review its report against the code, and commit it as its ow
 - `CLAUDE.md` describes 0.13 and SPA first, with no rule that only applied to deepkit.
 - The simplify-docs pass ran on every touched page and the simplify-comments pass on every touched source file,
   each committed on its own.
+
+## Plan: shared tooling (approved 2026-11-02)
+
+- `npm run mionlink`: builds `../mion` (`build-binaries.mjs --host-only`, `pnpm run build`, `pack.mjs`), starts
+  `npx verdaccio@6.7.2` on the host with a copy of mion's `.github/verdaccio.yaml` whose storage points into
+  `.mion-registry/` (wiped every start), publishes with `publish-tarballs.mjs --registry` through a throwaway npm
+  user config, then in each starter writes `.npmrc` (`@mionjs:registry=...`), sets every `@mionjs/*` dep to the
+  version the local registry serves, drops `@mionjs/*` overrides, cleans caches and installs with
+  `--cache .mion-local-cache`. `--no-build` reuses the last tarballs; starter folders can be passed as arguments.
+  `npm run mionstop` stops the registry.
+- `npm run mionupdate`: per-package `npm view <pkg> version`, removes the local `.npmrc`, cleans, installs.
+- `create.mjs` (all three, same exclude list): skips `.mion` except `.mion/enriched/`, `dist-server`, `.wrangler`,
+  `.data`, `next-env.d.ts`, `api/drizzle`, `.npmrc`; package name from the folder name; drops `description`,
+  `homepage`, `author`, `version`, `license`. `gitignore` + `.npmignore` get `.mion` and host outputs.
+- Root tests: a fast `create.mjs --no-install` test over all three starters, and the e2e tests also run `build`,
+  `typecheck` and `test:unit` when present. In local mode they install from the local registry.
+- `pre-publish-test`: refuses local mode, also runs the build. `publish-all`: no change needed.
+- Docs: `CLAUDE.md`, `README.md`, `.claude/skills/update-deps/SKILL.md`.

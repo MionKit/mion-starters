@@ -60,7 +60,7 @@ Read the `package.json` from both the fresh scaffold and the existing starter. C
 Create a comparison table of all shared dependencies. Focus on:
 
 - Main framework package (next, nuxt, vue)
-- Build tools (vite, typescript, eslint)
+- Build tools (vite, typescript, eslint). TypeScript stays on `^6`: TypeScript 7 breaks vue-tsc and typescript-eslint
 - CSS tooling (tailwind, postcss)
 - Testing (playwright, vitest)
 - Any other shared non-`@mionjs/*` dependencies
@@ -137,7 +137,7 @@ The following changes require explicit user confirmation before applying:
 
 ## Verification
 
-1. Run e2e tests: `cd <starter-dir> && npm test`
+1. Build, then run the tests: `cd <starter-dir> && npm run build && npm test`
 2. If tests fail:
    - If the error is trivial (renamed import, type mismatch, minor API change): fix and re-test
    - If non-trivial: search for `<package> <version> breaking changes` and report findings
