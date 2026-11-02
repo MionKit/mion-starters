@@ -49,15 +49,14 @@ const EXCLUDE = new Set([
     '.npmrc',
     '.DS_Store',
 ]);
-/** Generated paths, relative to the starter root (drizzle migrations output) */
-const EXCLUDE_PATHS = ['api/drizzle'];
 
 cpSync(__dirname, targetDir, {
     recursive: true,
     filter: (src) => {
         const name = basename(src);
         const rel = relative(__dirname, src).split(sep).join('/');
-        if (EXCLUDE.has(name) || EXCLUDE_PATHS.includes(rel)) return false;
+        // api/drizzle = drizzle migrations output
+        if (EXCLUDE.has(name) || rel === 'api/drizzle') return false;
         // .mion/ is generated, except .mion/enriched/ which holds hand-written texts
         if (rel === '.mion') return existsSync(resolve(src, 'enriched'));
         if (rel.startsWith('.mion/') && rel !== '.mion/enriched' && !rel.startsWith('.mion/enriched/')) return false;

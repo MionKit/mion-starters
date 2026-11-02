@@ -37,7 +37,6 @@ describe.each(STARTERS)('%s create.mjs', (starterDir) => {
             mkdirSync(resolve(sourceCopy, file, '..'), {recursive: true});
             writeFileSync(join(sourceCopy, file), '');
         }
-        mkdirSync(join(TMP_DIR, name, 'out'), {recursive: true});
         // an absolute path, as the e2e tests pass it
         execFileSync('node', [join(sourceCopy, 'create.mjs'), projectDir, '--no-install'], {stdio: 'pipe'});
     });
@@ -58,9 +57,24 @@ describe.each(STARTERS)('%s create.mjs', (starterDir) => {
     });
 
     it('ignores mion generated state and host output in git and npm', () => {
-        const gitignore = readFileSync(join(projectDir, '.gitignore'), 'utf-8').split('\n');
-        expect(gitignore).toEqual(expect.arrayContaining(['/.mion/*', '!/.mion/enriched/', '/dist-server', '/.wrangler', '/.data']));
-        const npmignore = readFileSync(resolve(ROOT, starterDir, '.npmignore'), 'utf-8').split('\n');
-        expect(npmignore).toEqual(expect.arrayContaining(['.mion/*', '!.mion/enriched/', 'dist-server/', '.wrangler/', '.data/']));
+        const lines = (file: string) => readFileSync(file, 'utf-8').split('\n');
+        // `.data` and `/.data` both cover the starter root
+        const covers = (file: string, patterns: string[]) =>
+            expect(patterns.filter((p) => !lines(file).some((l) => l === p || l === p.replace(/^\//, '')))).toEqual([]);
+        covers(join(projectDir, '.gitignore'), ['/.mion/*', '!/.mion/enriched/', '/dist-server', '/.wrangler', '/.data']);
+        covers(resolve(ROOT, starterDir, '.npmignore'), ['.mion/*', '!.mion/enriched/', 'dist-server/', '.wrangler/', '.data/']);
+    });
+});
+
+describe('create.mjs without .mion/enriched', () => {
+    it('copies no .mion folder at all', () => {
+        const sourceCopy = join(TMP_DIR, 'no-enriched', 'package');
+        const projectDir = join(TMP_DIR, 'no-enriched', 'out', 'my-app');
+        rmSync(join(TMP_DIR, 'no-enriched'), {recursive: true, force: true});
+        cpSync(resolve(ROOT, 'vue/3'), sourceCopy, {recursive: true, filter: (src) => basename(src) !== 'node_modules'});
+        mkdirSync(join(sourceCopy, '.mion/types'), {recursive: true});
+        writeFileSync(join(sourceCopy, '.mion/types/x.js'), '');
+        execFileSync('node', [join(sourceCopy, 'create.mjs'), projectDir, '--no-install'], {stdio: 'pipe'});
+        expect(existsSync(join(projectDir, '.mion'))).toBe(false);
     });
 });

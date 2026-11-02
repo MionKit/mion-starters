@@ -40,6 +40,5 @@ yarn-error.log*
 # starters in local mode point @mionjs/* at the local registry here
 .npmrc
 
-# mion generated state (.mion/enriched/ holds hand-written texts and is committed)
-.mion/*
-!.mion/enriched/
+# drizzle migrations a starter generates while it is being developed
+*/*/api/drizzle/
