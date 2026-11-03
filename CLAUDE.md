@@ -125,7 +125,7 @@ npm run mionlink -- vue/3       # only these starter folders
 npm run mionstop                # stop the local registry
 ```
 
-`mionlink` runs mion's own release scripts (`build-binaries.mjs --host-only`, `pnpm run build`, `pack.mjs`). It starts `verdaccio` (a local npm registry) on `http://127.0.0.1:4873/` with mion's `.github/verdaccio.yaml`, then publishes with `publish-tarballs.mjs --registry`. Each starter then gets a `.npmrc` with `@mionjs:registry=http://127.0.0.1:4873/` and installs with its own npm cache (`.mion-local-cache`), because a local build has the same version as the npm one. Registry state lives in `.mion-registry/`.
+`mionlink` runs mion's own scripts (`miondevx core build`, `build-binaries.mjs --host-only`, `pnpm run build`, `pack.mjs`). It starts `verdaccio` (a local npm registry) on `http://127.0.0.1:4873/` with mion's `.github/verdaccio.yaml`, then publishes with `publish-tarballs.mjs --registry`. Each starter then gets a `.npmrc` with `@mionjs:registry=http://127.0.0.1:4873/` and installs with its own npm cache (`.mion-local-cache`), because a local build has the same version as the npm one. Registry state lives in `.mion-registry/`.
 
 The registry keeps running after `mionlink`, so later installs and the root tests still work. `mionupdate` removes the `.npmrc` line and switches back to npm. Never commit a starter in local mode.
 

@@ -23,6 +23,8 @@ if (!fs.existsSync(path.join(MION_REPO, 'scripts', 'release', 'pack.mjs'))) {
 if (!values['no-build']) {
     const run = (cmd, cmdArgs) => execFileSync(cmd, cmdArgs, {cwd: MION_REPO, stdio: 'inherit'});
     console.log('Building mion (resolver binary for this machine, JS packages, tarballs)...');
+    // the JS build runs mion's dev resolver and devtools dist, stale after ../mion moves to new commits
+    run('node', ['scripts/miondevx.mjs', 'core', 'build']);
     run('node', ['scripts/release/build-binaries.mjs', '--host-only']);
     run('pnpm', ['run', 'build']);
     run('node', ['scripts/release/pack.mjs']);
