@@ -7,6 +7,14 @@ recommendation.
 guideline: **SPA first.** mion's main target is the SPA, the browser to server bridge, so starters prefer SPA over
 SSR. The Nuxt starter runs as an SPA (`ssr: false`).
 
+**Update 2026-11-03:**
+
+- The Next.js starter is removed; a simple React + Vite SPA starter replaces it. Drizzle goes with Next, since no
+  other starter had a drizzle showcase.
+- mion RPC drops its Next.js preset (`withMion`). The RunTypes Next adapter stays as it is.
+- Deploy targets become a create-time choice for every starter, later. The React starter starts with a Node server
+  only. Sections 3.9 to 3.13 (Next.js) no longer apply.
+
 **Rule used to place each fix** (from the maintainer): a fix goes into mion only when it is generic, meaning it would
 help any app, framework or starter using mion, and it never depends on or names a starter. Everything else is fixed
 in the starters.
