@@ -37,3 +37,6 @@ yarn-error.log*
 .mion-local-cache
 # starters in local mode point @mionjs/* at the local registry here
 .npmrc
+
+# Playwright output
+test-results
