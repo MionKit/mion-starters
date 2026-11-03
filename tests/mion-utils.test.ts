@@ -5,6 +5,7 @@ import {
     ROOT,
     LOCAL_REGISTRY,
     cleanMionCaches,
+    findStarterDirs,
     isLocalMode,
     resolveVersions,
     setScopeLine,
@@ -104,5 +105,12 @@ describe('resolveVersions', () => {
         const resolve = vi.fn((name: string) => `1.0.0-${name.split('/')[1]}`);
         expect(resolveVersions([DIR, DIR], resolve)).toEqual({'@mionjs/core': '1.0.0-core', '@mionjs/devtools': '1.0.0-devtools'});
         expect(resolve).toHaveBeenCalledTimes(2);
+    });
+});
+
+describe('findStarterDirs', () => {
+    it('finds every starter folder', () => {
+        const dirs = findStarterDirs();
+        for (const starter of ['nextjs/16', 'nuxt/4', 'react/19', 'vue/3']) expect(dirs).toContain(resolve(ROOT, starter));
     });
 });
