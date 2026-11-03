@@ -35,13 +35,11 @@ const EXCLUDE = new Set([
     '.dist',
     'dist-server',
     'build',
-    '.next',
     '.nuxt',
     '.output',
     '.data',
     '.wrangler',
     '.vercel',
-    'next-env.d.ts',
     'test-results',
     'coverage',
     '.coverage',
@@ -55,8 +53,7 @@ cpSync(__dirname, targetDir, {
     filter: (src) => {
         const name = basename(src);
         const rel = relative(__dirname, src).split(sep).join('/');
-        // api/drizzle = drizzle migrations output
-        if (EXCLUDE.has(name) || rel === 'api/drizzle') return false;
+        if (EXCLUDE.has(name)) return false;
         // .mion/ is generated, except .mion/enriched/ which holds hand-written texts
         if (rel === '.mion') return existsSync(resolve(src, 'enriched'));
         if (rel.startsWith('.mion/') && rel !== '.mion/enriched' && !rel.startsWith('.mion/enriched/')) return false;
