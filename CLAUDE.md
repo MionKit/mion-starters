@@ -2,13 +2,15 @@
 
 ## Repo Structure
 - **Not a monorepo**: each starter is an independent `npm create` package with own `package.json`, `tsconfig.json`, etc.
-- Starters are versioned by framework major version: `nuxt/4`, `vue/3`, `standalone/1` (planned)
+- Starters are versioned by framework major version: `nuxt/4`, `react/19`, `vue/3`, `standalone/1` (planned)
 - Each starter is published as a `create-*` package and can be used via `npm create`
 
 ```
 mion-starters/
 ├── nuxt/
 │   └── 4/                       # @mionjs/create-starter-nuxt
+├── react/
+│   └── 19/                      # @mionjs/create-starter-react
 ├── vue/
 │   └── 3/                       # @mionjs/create-starter-vue
 ├── standalone/                   # (planned)
@@ -23,6 +25,7 @@ mion-starters/
 ## Creating a New Project
 ```bash
 npm create @mionjs/starter-nuxt my-app
+npm create @mionjs/starter-react my-app
 npm create @mionjs/starter-vue my-app
 ```
 
@@ -81,7 +84,7 @@ export type MyApi = typeof myApi;
 ```
 
 ## Client Batches
-Write `batch()` calls in `.ts` modules that use a module-level `initClient()`, never in `.vue` files or in a client passed through `provide` / `inject`. mion traces the client back to `initClient()` at build time to give each batch an id.
+Write `batch()` calls in `.ts` modules that use a module-level `initClient()`, never in `.vue` or `.tsx` component files or in a client passed through `provide` / `inject` or React context. mion traces the client back to `initClient()` at build time to give each batch an id.
 
 ```ts
 // app/mion-client.ts

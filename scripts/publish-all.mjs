@@ -16,6 +16,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 const STARTERS = [
     {name: 'nuxt', dir: 'nuxt/4', pkg: '@mionjs/create-starter-nuxt'},
+    {name: 'react', dir: 'react/19', pkg: '@mionjs/create-starter-react'},
     {name: 'vue', dir: 'vue/3', pkg: '@mionjs/create-starter-vue'},
 ];
 

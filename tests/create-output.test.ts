@@ -5,7 +5,7 @@ import {describe, it, expect, beforeAll, afterAll} from 'vitest';
 
 const ROOT = resolve(import.meta.dirname, '..');
 const TMP_DIR = resolve(ROOT, '.tmp-create-output');
-const STARTERS = ['nuxt/4', 'vue/3'];
+const STARTERS = ['nuxt/4', 'react/19', 'vue/3'];
 
 /** Generated state a maintainer's starter folder holds after a dev run or build */
 const GENERATED = [
