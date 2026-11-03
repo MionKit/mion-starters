@@ -34,9 +34,8 @@ test('orders showcase page loads and displays orders', async ({page}) => {
     await page.goto('/mion-orders');
     // Wait for orders to load (loading state disappears)
     await expect(page.getByText('Loading orders...')).toBeHidden({timeout: 15_000});
-    // Log any errors for debugging
-    if (errors.length > 0) console.log('Browser errors:', errors);
-    if (requests.length > 0) console.log('Failed requests:', requests);
+    expect(errors).toEqual([]);
+    expect(requests).toEqual([]);
     // Verify orders are rendered
     await expect(page.getByText('Alice Johnson')).toBeVisible();
     await expect(page.getByText('Bob Smith')).toBeVisible();
@@ -49,3 +48,16 @@ test('orders showcase displays event timeline', async ({page}) => {
     // Verify event timeline is rendered for at least one order
     await expect(page.getByText('Event Timeline').first()).toBeVisible();
 });
+
+for (const [colorScheme, logo, highlight] of [
+    ['light', '/mion-logo.svg', 'rgb(9, 9, 11)'],
+    ['dark', '/mion-logo-dark.svg', 'rgb(250, 250, 250)'],
+] as const) {
+    test(`orders showcase logo and highlight are readable in ${colorScheme} mode`, async ({page}) => {
+        await page.emulateMedia({colorScheme});
+        await page.goto('/mion-orders');
+        const logoImg = page.getByAltText('Mion logo');
+        await expect.poll(() => logoImg.evaluate((img: HTMLImageElement) => new URL(img.currentSrc).pathname)).toBe(logo);
+        await expect(page.getByText('A fully typed lightweight alternative to GraphQL.')).toHaveCSS('color', highlight);
+    });
+}
