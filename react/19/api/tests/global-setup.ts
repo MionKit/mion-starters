@@ -6,7 +6,7 @@ import '../src/api.ts';
 let server: Server | undefined;
 
 export async function setup() {
-    server = (await startNodeServer({port: 3001})) as Server;
+    server = await startNodeServer({port: 3001});
 }
 
 export async function teardown() {

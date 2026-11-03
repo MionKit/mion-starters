@@ -9,27 +9,9 @@ const id2 = '0195546a-5c00-7000-8000-000000000002' as UUIDv7;
 const id3 = '0195546a-5c00-7000-8000-000000000003' as UUIDv7;
 
 const orders: Order[] = [
-    {
-        id: id1,
-        customer: 'Alice Johnson',
-        total: 175.97,
-        status: 'delivered',
-        createdAt: new Date('2025-03-01T10:00:00Z'),
-    },
-    {
-        id: id2,
-        customer: 'Bob Smith',
-        total: 79.99,
-        status: 'shipped',
-        createdAt: new Date('2025-03-05T14:30:00Z'),
-    },
-    {
-        id: id3,
-        customer: 'Carol Davis',
-        total: 106.96,
-        status: 'cancelled',
-        createdAt: new Date('2025-03-07T09:15:00Z'),
-    },
+    {id: id1, customer: 'Alice Johnson', total: 175.97, status: 'delivered', createdAt: new Date('2025-03-01T10:00:00Z')},
+    {id: id2, customer: 'Bob Smith', total: 79.99, status: 'shipped', createdAt: new Date('2025-03-05T14:30:00Z')},
+    {id: id3, customer: 'Carol Davis', total: 106.96, status: 'cancelled', createdAt: new Date('2025-03-07T09:15:00Z')},
 ];
 
 const events: OrderEvent[] = [

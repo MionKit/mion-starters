@@ -1,16 +1,27 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --page-bg: #fafafa;
+  --surface: #ffffff;
+  --heading: #000000;
+  --text-muted: #52525b;
+  --link: #09090b;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --page-bg: #000000;
+    --surface: #000000;
+    --heading: #fafafa;
+    --text-muted: #a1a1aa;
+    --link: #fafafa;
   }
 }
 
 body {
+  margin: 0;
   background: var(--background);
   color: var(--foreground);
   font-family: system-ui, -apple-system, sans-serif;

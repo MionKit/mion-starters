@@ -1,59 +1,18 @@
 .pageWrapper {
-  display: flex;
-  min-height: 100vh;
-  justify-content: center;
-  background-color: #fafafa;
-  font-family: system-ui, -apple-system, sans-serif;
+  composes: pageWrapper from '../assets/layout.module.css';
 }
 
 .pageMain {
-  display: flex;
-  width: 100%;
-  max-width: 48rem;
-  flex-direction: column;
+  composes: pageMain from '../assets/layout.module.css';
   align-items: center;
   gap: 2rem;
-  padding: 4rem;
-  background-color: #ffffff;
-}
-
-.logo {
-  align-self: center;
 }
 
 .contentSection {
-  display: flex;
-  flex-direction: column;
+  composes: contentSection from '../assets/layout.module.css';
   align-items: center;
-  gap: 1.5rem;
   text-align: center;
   padding: 2rem 0;
-}
-
-.contentSection h1 {
-  font-size: 1.875rem;
-  font-weight: 600;
-  line-height: 2.5rem;
-  letter-spacing: -0.025em;
-  color: #000000;
-  margin: 0;
-}
-
-.contentSection p {
-  font-size: 1.125rem;
-  line-height: 2rem;
-  color: #52525b;
-  margin: 0;
-}
-
-.contentSection a {
-  font-weight: 500;
-  color: #09090b;
-  text-decoration: none;
-}
-
-.contentSection a:hover {
-  text-decoration: underline;
 }
 
 .contentSection code {
@@ -184,37 +143,13 @@
 }
 
 .hl {
-  color: #09090b;
+  color: var(--link);
   display: block;
 }
 
 @media (prefers-color-scheme: dark) {
-  .pageWrapper {
-    background-color: #000000;
-  }
-
-  .pageMain {
-    background-color: #000000;
-  }
-
-  .contentSection h1 {
-    color: #fafafa;
-  }
-
-  .contentSection p {
-    color: #a1a1aa;
-  }
-
-  .contentSection a {
-    color: #fafafa;
-  }
-
   .contentSection code {
     background-color: #27272a;
-  }
-
-  .hl {
-    color: #fafafa;
   }
 
   .orderCard {

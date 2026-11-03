@@ -34,7 +34,7 @@ function getEventDetails(event: OrderEvent): string | null {
 
 interface OrdersState {
     orders: Order[];
-    eventsByOrder: Record<string, OrderEvent[]>;
+    eventsByOrder: Record<Order['id'], OrderEvent[]>;
     apiErrors: string[];
 }
 
@@ -70,7 +70,7 @@ export default function MionOrdersPage() {
     return (
         <div className={styles.pageWrapper}>
             <main className={styles.pageMain}>
-                <picture className={styles.logo}>
+                <picture>
                     <source srcSet="/mion-logo-dark.svg" media="(prefers-color-scheme: dark)" />
                     <img src="/mion-logo.svg" alt="Mion logo" width="300" height="80" />
                 </picture>

@@ -1,5 +1,6 @@
 import {describe, it, expect} from 'vitest';
 import {initClient, batch, inputFrom} from '@mionjs/client';
+import type {UUIDv7} from '@mionjs/run-types/formats';
 import type {MyApi} from '../src/api.ts';
 
 const {routes} = initClient<MyApi>({baseURL: 'http://localhost:3001', basePath: 'api/mion'});
@@ -17,7 +18,7 @@ describe('mion client', () => {
     });
 
     it('UUIDv7 format is validated in the client before sending', async () => {
-        const [order, error] = await routes.orders.getOrder('not-a-uuid' as never).call();
+        const [order, error] = await routes.orders.getOrder('not-a-uuid' as UUIDv7).call();
         expect(order).toBeUndefined();
         expect(error?.type).toBe('validation-error');
     });
@@ -32,5 +33,9 @@ describe('mion client', () => {
         expect(orders!.length).toBeGreaterThanOrEqual(3);
         expect(events!.some((e) => e.type === 'shipped' && e.carrier === 'FedEx')).toBe(true);
         expect(events![0].at).toBeInstanceOf(Date);
+    });
+    it('getOrderEvents returns one order\'s timeline', async () => {
+        const [events] = await routes.orders.getOrderEvents('0195546a-5c00-7000-8000-000000000001' as UUIDv7).call();
+        expect(events!.map((e) => e.type)).toEqual(['placed', 'paid', 'shipped', 'delivered']);
     });
 });
