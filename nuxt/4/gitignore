@@ -17,8 +17,6 @@ logs
 *.log
 
 # Misc
-test-results
-playwright-report
 .DS_Store
 .fleet
 .idea

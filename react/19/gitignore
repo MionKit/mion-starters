@@ -11,8 +11,6 @@ logs
 # Misc
 .DS_Store
 .idea
-test-results
-playwright-report
 
 # Local env files
 .env
@@ -26,4 +24,5 @@ playwright-report
 # host build output
 /dist-server
 /.wrangler
+/test-results
 /.data

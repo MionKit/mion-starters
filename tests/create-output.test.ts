@@ -13,6 +13,7 @@ const GENERATED = [
     '.mion/api/x.json',
     'dist/x.js',
     'dist-server/x.js',
+    'test-results/x',
     '.wrangler/x',
     '.data/kv/x',
     '.nuxt/x',
