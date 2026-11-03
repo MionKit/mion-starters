@@ -29,7 +29,8 @@ npm run build:api   # API only
 ## Preview
 
 ```bash
-npm run preview
+npm run preview:api # the API, on port 3001
+npm run preview     # in a second terminal: the SPA, forwarding /api/mion to the API
 ```
 
 ## Test

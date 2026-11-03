@@ -1,0 +1,47 @@
+.pageWrapper {
+  display: flex;
+  min-height: 100vh;
+  justify-content: center;
+  background-color: var(--page-bg);
+}
+
+.pageMain {
+  display: flex;
+  width: 100%;
+  max-width: 48rem;
+  flex-direction: column;
+  padding: 4rem;
+  background-color: var(--surface);
+}
+
+.contentSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.contentSection h1 {
+  font-size: 1.875rem;
+  font-weight: 600;
+  line-height: 2.5rem;
+  letter-spacing: -0.025em;
+  color: var(--heading);
+  margin: 0;
+}
+
+.contentSection p {
+  font-size: 1.125rem;
+  line-height: 2rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.contentSection a {
+  font-weight: 500;
+  color: var(--link);
+  text-decoration: none;
+}
+
+.contentSection a:hover {
+  text-decoration: underline;
+}

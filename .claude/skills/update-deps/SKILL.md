@@ -1,6 +1,6 @@
 ---
 name: update-deps
-description: Update a starter's framework dependencies by comparing with a fresh official scaffold. Use when you need to update nuxt or vue starter dependencies to the latest versions.
+description: Update a starter's framework dependencies by comparing with a fresh official scaffold. Use when you need to update nuxt, react or vue starter dependencies to the latest versions.
 user-invocable: true
 allowed-tools: Bash Read Grep Glob WebSearch WebFetch AskUserQuestion
 ---
@@ -15,6 +15,7 @@ we should focus just on dependencies updates and logic, no cosmetic updates or a
 use the AskUserQuestion to Ask the user which starter to update:
 
 - `nuxt` (nuxt/4)
+- `react` (react/19)
 - `vue` (vue/3)
 
 Do NOT proceed until the user has chosen one.
@@ -34,6 +35,14 @@ Run the command for the chosen starter:
 npm create nuxt@latest tmp-update-nuxt -- --no-install
 ```
 
+### react
+
+```bash
+npm create vite@latest tmp-update-react -- --template react-ts --no-interactive
+```
+
+The starter adds `react-router`, vitest and Playwright to this scaffold: compare those with their latest npm versions.
+
 ### vue
 
 ```bash
@@ -50,7 +59,7 @@ Read the `package.json` from both the fresh scaffold and the existing starter. C
 
 Create a comparison table of all shared dependencies. Focus on:
 
-- Main framework package (nuxt, vue)
+- Main framework package (nuxt, react, vue)
 - Build tools (vite, typescript, eslint). TypeScript stays on `^6`: TypeScript 7 breaks vue-tsc and typescript-eslint
 - CSS tooling (tailwind, postcss)
 - Testing (playwright, vitest)

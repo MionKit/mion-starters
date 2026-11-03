@@ -4,7 +4,10 @@
       <div class="logos">
         <img src="/vue.svg" alt="Vue logo" height="60" />
         <span class="logo-separator">+</span>
-        <img src="/mion-logo-dark.svg" alt="Mion logo" height="60" />
+        <picture>
+          <source srcset="/mion-logo-dark.svg" media="(prefers-color-scheme: dark)" />
+          <img src="/mion-logo.svg" alt="Mion logo" height="60" />
+        </picture>
       </div>
       <div class="content-section">
         <h1>To get started, edit the pages.</h1>

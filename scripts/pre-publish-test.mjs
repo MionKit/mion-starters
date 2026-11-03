@@ -11,6 +11,7 @@ const TMP_ROOT = path.join(ROOT, '.tmp-pre-publish');
 
 const STARTERS = [
     {name: 'nuxt', dir: 'nuxt/4'},
+    {name: 'react', dir: 'react/19'},
     {name: 'vue', dir: 'vue/3'},
 ];
 

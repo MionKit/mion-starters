@@ -4,6 +4,7 @@ Starter templates for new [mion](https://mion.io) projects, one `npm create` pac
 
 ```bash
 npm create @mionjs/starter-nuxt my-app
+npm create @mionjs/starter-react my-app
 npm create @mionjs/starter-vue my-app
 ```
 
@@ -12,6 +13,7 @@ npm create @mionjs/starter-vue my-app
 ```
 mion-starters/
 ├── nuxt/4/       # @mionjs/create-starter-nuxt
+├── react/19/     # @mionjs/create-starter-react
 ├── vue/3/        # @mionjs/create-starter-vue
 ├── scripts/      # dev and publish scripts
 └── tests/        # root tests for the create scripts

@@ -1,12 +1,13 @@
-import {execSync} from 'node:child_process';
+import {execSync, spawn} from 'node:child_process';
 import {readFileSync, rmSync, mkdirSync} from 'node:fs';
 import {resolve, join} from 'node:path';
-import {describe, it, beforeAll, afterAll} from 'vitest';
+import {describe, it, expect, beforeAll, afterAll} from 'vitest';
 import {ROOT, isLocalMode, localModeEnv} from '../scripts/mion-utils.mjs';
 
 /** create.mjs installs too: from the local registry when the starter is in local mode */
 describe.each([
     ['nuxt', 'nuxt/4'],
+    ['react', 'react/19'],
     ['vue', 'vue/3'],
 ])('create-starter-%s e2e', (name, starterDir) => {
     const tmpDir = resolve(ROOT, `.tmp-${name}`);
@@ -29,5 +30,22 @@ describe.each([
     it('builds', () => run('npm run build'), 300_000);
     it('typechecks', ({skip}) => (hasScript('typecheck') ? run('npm run typecheck') : skip()), 300_000);
     it('passes unit tests', ({skip}) => (hasScript('test:unit') ? run('npm run test:unit') : skip()), 300_000);
+    it('serves the built API with node', async ({skip}) => {
+        if (!hasScript('preview:api')) return skip();
+        const api = spawn('npm', ['run', 'preview:api'], {cwd: projectDir, env, detached: true, stdio: 'ignore'});
+        try {
+            const hello = () =>
+                fetch('http://localhost:3001/api/mion/hello', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({hello: ['Node']}),
+                })
+                    .then((res) => res.json())
+                    .catch(() => undefined);
+            await expect.poll(hello, {timeout: 30_000, interval: 500}).toEqual({hello: 'Hello Node!'});
+        } finally {
+            process.kill(-api.pid!);
+        }
+    }, 60_000);
     it('passes playwright e2e tests', () => run('npx playwright test'), 300_000);
 });

@@ -1,0 +1,72 @@
+{
+  "name": "@mionjs/create-starter-react",
+  "version": "0.1.0",
+  "description": "Starter template for building full-stack apps with mion + React 19 (SPA). Run `npm create @mionjs/starter-react <project-name>` to scaffold.",
+  "type": "module",
+  "license": "MIT",
+  "author": "mion",
+  "homepage": "https://mion.io",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mionjs/mion-starters.git",
+    "directory": "react/19"
+  },
+  "bugs": {
+    "url": "https://github.com/mionjs/mion-starters/issues"
+  },
+  "keywords": [
+    "mion",
+    "mionjs",
+    "react",
+    "react19",
+    "vite",
+    "starter",
+    "template",
+    "create",
+    "rpc",
+    "api",
+    "typescript",
+    "spa"
+  ],
+  "bin": {
+    "create-starter-react": "create.mjs"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "preview:api": "node dist-server/server.node.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint",
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test",
+    "test": "vitest run && playwright test",
+    "test:install": "playwright install chromium"
+  },
+  "dependencies": {
+    "@mionjs/client": "0.13.2",
+    "@mionjs/core": "0.13.2",
+    "@mionjs/platform-node": "0.13.2",
+    "@mionjs/router": "0.13.2",
+    "@mionjs/run-types": "0.13.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router": "^8.5.1"
+  },
+  "devDependencies": {
+    "@mionjs/bin-compiler": "0.13.2",
+    "@mionjs/devtools": "0.13.2",
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "oxlint": "^1.89.0",
+    "typescript": "^6",
+    "vite": "^8.3.5",
+    "vitest": "^5.1.0"
+  }
+}

@@ -1,0 +1,28 @@
+# Build outputs
+dist
+
+# Node dependencies
+node_modules
+
+# Logs
+logs
+*.log
+
+# Misc
+.DS_Store
+.idea
+
+# Local env files
+.env
+.env.*
+!.env.example
+
+# mion generated state (.mion/enriched/ holds hand-written texts and is committed)
+/.mion/*
+!/.mion/enriched/
+
+# host build output
+/dist-server
+/.wrangler
+/test-results
+/.data

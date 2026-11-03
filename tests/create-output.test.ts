@@ -5,7 +5,7 @@ import {describe, it, expect, beforeAll, afterAll} from 'vitest';
 
 const ROOT = resolve(import.meta.dirname, '..');
 const TMP_DIR = resolve(ROOT, '.tmp-create-output');
-const STARTERS = ['nuxt/4', 'vue/3'];
+const STARTERS = ['nuxt/4', 'react/19', 'vue/3'];
 
 /** Generated state a maintainer's starter folder holds after a dev run or build */
 const GENERATED = [
@@ -13,6 +13,7 @@ const GENERATED = [
     '.mion/api/x.json',
     'dist/x.js',
     'dist-server/x.js',
+    'test-results/x',
     '.wrangler/x',
     '.data/kv/x',
     '.nuxt/x',
@@ -60,6 +61,17 @@ describe.each(STARTERS)('%s create.mjs', (starterDir) => {
             expect(patterns.filter((p) => !lines(file).some((l) => l === p || l === p.replace(/^\//, '')))).toEqual([]);
         covers(join(projectDir, '.gitignore'), ['/.mion/*', '!/.mion/enriched/', '/dist-server', '/.wrangler', '/.data', '/test-results']);
         covers(resolve(ROOT, starterDir, '.npmignore'), ['.mion/*', '!.mion/enriched/', 'dist-server/', '.wrangler/', '.data/', 'test-results/']);
+    });
+});
+
+describe('create.mjs arguments', () => {
+    it('takes the first non-flag argument as the project name', () => {
+        const projectDir = join(TMP_DIR, 'flag-first', 'my-app');
+        rmSync(join(TMP_DIR, 'flag-first'), {recursive: true, force: true});
+        mkdirSync(join(TMP_DIR, 'flag-first'), {recursive: true});
+        execFileSync('node', [resolve(ROOT, 'react/19/create.mjs'), '--no-install', projectDir], {cwd: join(TMP_DIR, 'flag-first'), stdio: 'pipe'});
+        expect(existsSync(join(projectDir, 'package.json'))).toBe(true);
+        expect(existsSync(join(TMP_DIR, 'flag-first', '--no-install'))).toBe(false);
     });
 });
 

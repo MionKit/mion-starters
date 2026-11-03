@@ -7,7 +7,7 @@ import {fileURLToPath} from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const projectName = process.argv[2];
+const projectName = process.argv.slice(2).find((arg) => !arg.startsWith('-'));
 if (!projectName) {
     console.log(`
 Usage: npm create @mionjs/starter-vue <project-name>
@@ -65,7 +65,7 @@ cpSync(__dirname, targetDir, {
     },
 });
 
-// npm strips dotfiles from published packages
+// npm strips .gitignore from published packages, so the starter ships it as gitignore
 renameSync(resolve(targetDir, 'gitignore'), resolve(targetDir, '.gitignore'));
 
 const pkgPath = resolve(targetDir, 'package.json');

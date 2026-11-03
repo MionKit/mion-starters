@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.dist/
+build/
+coverage/
+.coverage/
+dist-server/
+.wrangler/
+.data/
+test-results/
+package-lock.json
+.DS_Store
+*.pem
+*.tsbuildinfo
+.env*
+.mion/*
+!.mion/enriched/
