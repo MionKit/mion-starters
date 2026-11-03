@@ -27,7 +27,7 @@ The implementer plans the details. Verified on `main` (`f535697`):
   - the `EXCLUDE` lists in the remaining `create.mjs` files and the `gitignore` / `.gitignore` / `.npmignore`
     entries that only Next needed. Keep them identical across the remaining starters.
 - Drizzle goes with it: no other starter has a drizzle showcase. Remove drizzle-only notes the same way.
-- Keep `docs/investigations/mion-0.13-migration/` as is: it is the record of the investigation, Next.js included.
+- Keep `docs/done/` as is: it is the record of past work, Next.js included.
 - A React starter session runs in parallel and adds `react` to the same lists: rebase onto `origin/main` before
   merge and keep both changes.
 
@@ -40,7 +40,7 @@ this change touched, review its report against the code, and commit it as its ow
 
 ## Done when
 
-- No `nextjs` folder, script entry, test case or doc mention remains outside `docs/investigations/`.
+- No `nextjs` folder, script entry, test case or doc mention remains outside `docs/done/` and this spec.
 - The root fast tests (`tests/create-output.test.ts`, `tests/mion-utils.test.ts`) pass.
 - The simplify-docs pass ran on every touched page and the simplify-comments pass on every touched source file,
   each committed on its own.
