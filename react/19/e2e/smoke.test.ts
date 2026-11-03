@@ -32,11 +32,9 @@ test('orders showcase page loads and displays orders', async ({page}) => {
     page.on('pageerror', (err) => errors.push(err.message));
     page.on('response', (res) => { if (res.status() >= 400) requests.push(`${res.status()} ${res.url()}`); });
     await page.goto('/mion-orders');
-    // Wait for orders to load (loading state disappears)
     await expect(page.getByText('Loading orders...')).toBeHidden({timeout: 15_000});
     expect(errors).toEqual([]);
     expect(requests).toEqual([]);
-    // Verify orders are rendered
     await expect(page.getByText('Alice Johnson')).toBeVisible();
     await expect(page.getByText('Bob Smith')).toBeVisible();
     await expect(page.getByText('Carol Davis')).toBeVisible();
@@ -45,7 +43,6 @@ test('orders showcase page loads and displays orders', async ({page}) => {
 test('orders showcase displays event timeline', async ({page}) => {
     await page.goto('/mion-orders');
     await expect(page.getByText('Loading orders...')).toBeHidden({timeout: 15_000});
-    // Verify event timeline is rendered for at least one order
     await expect(page.getByText('Event Timeline').first()).toBeVisible();
 });
 

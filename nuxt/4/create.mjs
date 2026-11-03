@@ -65,7 +65,7 @@ cpSync(__dirname, targetDir, {
     },
 });
 
-// npm strips dotfiles from published packages
+// npm strips .gitignore from published packages, so the starter ships it as gitignore
 renameSync(resolve(targetDir, 'gitignore'), resolve(targetDir, '.gitignore'));
 
 const pkgPath = resolve(targetDir, 'package.json');
