@@ -1,7 +1,7 @@
 ---
 type: feature
 spec: guidelines
-status: ready
+status: done
 created: 2026-11-03
 ---
 
@@ -74,3 +74,20 @@ this change touched, review its report against the code, and commit it as its ow
   tests, root `package.json`, `CLAUDE.md` and root `README.md`.
 - Starters publish by hand (`scripts/publish-all.mjs`); a GitHub Actions workflow for every starter is filed as its
   own todo.
+
+## What shipped
+
+- `react/19/` as planned. Lint is oxlint (the official scaffold's linter) extending
+  `@mionjs/devtools/oxlint-recommended.json`, not ESLint. TypeScript stays on `^6` like the other starters, although
+  the scaffold now ships TypeScript 7.
+- Page styles are CSS modules (`*.module.css`), React's match for Vue's scoped styles: both pages use the same class
+  names.
+- The client uses `export const {routes} = initClient(...)`; batches built from it work in dev, build and tests.
+- Verified on the local-registry build of mion `main`: typecheck, oxlint, `vite build`, vitest 8/8, Playwright 5/5,
+  the built API on Node, and `npm run test:create:react`.
+- Fixed along the way: the mion logo and the "alternative to GraphQL" line were white on white on the light theme
+  (React, Vue, Nuxt); Playwright result files were committed in every starter.
+- mion gaps still on mion `main`, reported, not worked around: `server.build` copies `public/` into `dist-server/`,
+  `mion-pure-fns/` lands in the public `dist/`, and 23 "Sourcemap points to missing source files" warnings on every
+  `vite dev` / `vitest` start.
+- Filed: `docs/todos/starters-ci-workflow.md` (test and publish the starters from GitHub Actions).
