@@ -1,7 +1,7 @@
 ---
 type: chore
 spec: guidelines
-status: ready
+status: done
 created: 2026-11-03
 ---
 
@@ -54,4 +54,5 @@ this change touched, review its report against the code, and commit it as its ow
   root `.gitignore` (`.next`, `out`, `*/*/api/drizzle/`).
 - Drop the stale `@mionjs/drizzle` override from the nuxt and vue `package.json` (their lockfiles already lack it).
 - Root tests, `CLAUDE.md`, `README.md`, the update-deps skill and `docs/todos/starters-repository-urls.md` follow.
-- Unrelated finding fixed in the same PR: committed Playwright `test-results/` removed and gitignored.
+- Unrelated finding fixed in the same PR: committed Playwright `test-results/` removed, `test-results` added to
+  the root `.gitignore` and `/test-results` to every starter `gitignore` / `.gitignore` (the create-output test checks it).
