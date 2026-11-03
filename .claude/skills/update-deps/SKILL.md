@@ -26,7 +26,7 @@ Do NOT proceed until the user has chosen one.
 Create a fresh project using the official framework CLI into a temp directory at the repo root. Do NOT run `npm install` in the scaffolded project — we only need the generated files for comparison.
 
 **IMPORTANT:** Most framework CLIs (`npm create nuxt`, `npm create vue`, etc.) use interactive TUI prompts please do not try to find workarounds for non interactive version specially do not use nuxi as is not used anymore, instead please try to find workarounds to use the interactive version of the CLI, like sleeping and send new command to terminal after a bit of time, or use the --no-install flag to avoid the install step. (basically try to work with the interactive version of the CLI)
-Use the appropriate command based on the chosen starter:
+Run the command for the chosen starter:
 
 ### nuxt
 

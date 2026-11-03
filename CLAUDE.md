@@ -2,7 +2,7 @@
 
 ## Repo Structure
 - **Not a monorepo**: each starter is an independent `npm create` package with own `package.json`, `tsconfig.json`, etc.
-- Starters are versioned by framework major version: `nuxt/4`, `vue/3`, `standalone/1`
+- Starters are versioned by framework major version: `nuxt/4`, `vue/3`, `standalone/1` (planned)
 - Each starter is published as a `create-*` package and can be used via `npm create`
 
 ```
