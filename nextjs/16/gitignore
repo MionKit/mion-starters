@@ -44,3 +44,12 @@ next-env.d.ts
 api/node_modules
 api/dist
 api/.dist
+
+# mion generated state (.mion/enriched/ holds hand-written texts and is committed)
+/.mion/*
+!/.mion/enriched/
+
+# host build output
+/dist-server
+/.wrangler
+/.data

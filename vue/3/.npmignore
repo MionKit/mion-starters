@@ -11,3 +11,10 @@ package-lock.json
 *.pem
 *.tsbuildinfo
 .env*
+.mion/*
+!.mion/enriched/
+dist-server/
+.wrangler/
+.data/
+next-env.d.ts
+api/drizzle/

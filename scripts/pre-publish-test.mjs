@@ -1,16 +1,12 @@
 #!/usr/bin/env node
 
-/**
- * Simulates the full `npm create @mionjs/starter-*` flow before publishing.
- * Packs each starter, extracts the tarball, runs create.mjs, and verifies e2e tests pass.
- */
+/** Simulates the full `npm create @mionjs/starter-*` flow before publishing. */
 
 import fs from 'node:fs';
 import path from 'node:path';
 import {execSync} from 'node:child_process';
-import {findStarterPackageJsons, isCurrentlyFileMode} from './mion-utils.mjs';
+import {ROOT, findStarterDirs, isLocalMode} from './mion-utils.mjs';
 
-const ROOT = path.resolve(import.meta.dirname, '..');
 const TMP_ROOT = path.join(ROOT, '.tmp-pre-publish');
 
 const STARTERS = [
@@ -27,14 +23,21 @@ function run(cmd, cwd) {
     execSync(cmd, {cwd, stdio: 'inherit', timeout: 300_000, env});
 }
 
-function validateNoDeps() {
-    const packageJsons = findStarterPackageJsons();
-    if (isCurrentlyFileMode(packageJsons)) {
-        console.error('Error: Starters are using file: references for @mionjs/* deps.');
+function hasFileDeps(dir) {
+    const pkg = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf-8'));
+    const blocks = [pkg.dependencies, pkg.devDependencies, pkg.overrides];
+    return blocks.some((deps) => Object.entries(deps ?? {}).some(([n, v]) => n.startsWith('@mionjs/') && String(v).startsWith('file:')));
+}
+
+function validateNpmMode() {
+    const local = findStarterDirs().filter((dir) => isLocalMode(dir) || hasFileDeps(dir));
+    if (local.length) {
+        console.error('Error: these starters do not install @mionjs/* from npm:');
+        for (const dir of local) console.error(`  ${path.relative(ROOT, dir)}`);
         console.error("Run 'npm run mionupdate' first to switch to npm versions.");
         process.exit(1);
     }
-    console.log('All starters using npm versions (no file: references).\n');
+    console.log('All starters use npm-published @mionjs/* packages.\n');
 }
 
 function testStarter({name, dir}) {
@@ -46,24 +49,23 @@ function testStarter({name, dir}) {
     const tmpDir = path.join(TMP_ROOT, name);
     const projectDir = path.join(tmpDir, `test-${name}`);
 
-    // 1. npm pack
     console.log('--- npm pack ---');
     const tarballName = execSync('npm pack', {cwd: starterDir, env, encoding: 'utf-8'}).trim();
     const tarballPath = path.join(starterDir, tarballName);
 
     try {
-        // 2. Extract tarball
         console.log('--- extract tarball ---');
         fs.mkdirSync(tmpDir, {recursive: true});
         run(`tar xzf ${tarballPath} -C ${tmpDir}`, ROOT);
 
-        // 3. Run create.mjs from the extracted package (simulates npm create)
         const extractedDir = path.join(tmpDir, 'package');
         const createScript = path.join(extractedDir, 'create.mjs');
         console.log('--- run create.mjs ---');
         run(`node ${createScript} ${projectDir}`, tmpDir);
 
-        // 4. Install playwright and run e2e tests
+        console.log('--- build ---');
+        run('npm run build', projectDir);
+
         console.log('--- install playwright ---');
         run('npx playwright install chromium', projectDir);
 
@@ -72,7 +74,6 @@ function testStarter({name, dir}) {
 
         console.log(`\n  ${name} starter: PASSED\n`);
     } finally {
-        // Clean up tarball from starter directory
         if (fs.existsSync(tarballPath)) fs.rmSync(tarballPath);
     }
 }
@@ -80,7 +81,7 @@ function testStarter({name, dir}) {
 // Main
 console.log('Pre-publish test: simulating npm create flow\n');
 
-validateNoDeps();
+validateNpmMode();
 
 try {
     // Clean any previous run

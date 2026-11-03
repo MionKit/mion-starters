@@ -15,3 +15,10 @@ package-lock.json
 *.tsbuildinfo
 .env*
 .vercel
+.mion/*
+!.mion/enriched/
+dist-server/
+.wrangler/
+.data/
+next-env.d.ts
+api/drizzle/
