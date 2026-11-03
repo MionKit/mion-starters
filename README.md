@@ -3,7 +3,6 @@
 Starter templates for new [mion](https://mion.io) projects, one `npm create` package per framework.
 
 ```bash
-npm create @mionjs/starter-nextjs my-app
 npm create @mionjs/starter-nuxt my-app
 npm create @mionjs/starter-vue my-app
 ```
@@ -12,7 +11,6 @@ npm create @mionjs/starter-vue my-app
 
 ```
 mion-starters/
-├── nextjs/16/    # @mionjs/create-starter-nextjs
 ├── nuxt/4/       # @mionjs/create-starter-nuxt
 ├── vue/3/        # @mionjs/create-starter-vue
 ├── scripts/      # dev and publish scripts

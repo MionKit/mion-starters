@@ -1,6 +1,6 @@
 ---
 name: update-deps
-description: Update a starter's framework dependencies by comparing with a fresh official scaffold. Use when you need to update nextjs, nuxt, or vue starter dependencies to the latest versions.
+description: Update a starter's framework dependencies by comparing with a fresh official scaffold. Use when you need to update nuxt or vue starter dependencies to the latest versions.
 user-invocable: true
 allowed-tools: Bash Read Grep Glob WebSearch WebFetch AskUserQuestion
 ---
@@ -14,7 +14,6 @@ we should focus just on dependencies updates and logic, no cosmetic updates or a
 
 use the AskUserQuestion to Ask the user which starter to update:
 
-- `nextjs` (nextjs/16)
 - `nuxt` (nuxt/4)
 - `vue` (vue/3)
 
@@ -28,14 +27,6 @@ Create a fresh project using the official framework CLI into a temp directory at
 
 **IMPORTANT:** Most framework CLIs (`npm create nuxt`, `npm create vue`, etc.) use interactive TUI prompts please do not try to find workarounds for non interactive version specially do not use nuxi as is not used anymore, instead please try to find workarounds to use the interactive version of the CLI, like sleeping and send new command to terminal after a bit of time, or use the --no-install flag to avoid the install step. (basically try to work with the interactive version of the CLI)
 Use the appropriate command based on the chosen starter:
-
-### nextjs
-
-```bash
-npx create-next-app@latest tmp-update-nextjs --yes
-```
-
-The `--yes` flag accepts all defaults (TypeScript, Tailwind, ESLint, App Router, Turbopack, `@/*` import alias) which matches the current starter setup. This will also run `npm install` — that's fine since it's a temp directory.
 
 ### nuxt
 
@@ -59,7 +50,7 @@ Read the `package.json` from both the fresh scaffold and the existing starter. C
 
 Create a comparison table of all shared dependencies. Focus on:
 
-- Main framework package (next, nuxt, vue)
+- Main framework package (nuxt, vue)
 - Build tools (vite, typescript, eslint). TypeScript stays on `^6`: TypeScript 7 breaks vue-tsc and typescript-eslint
 - CSS tooling (tailwind, postcss)
 - Testing (playwright, vitest)
@@ -73,7 +64,7 @@ Compare these config files between the fresh scaffold and existing starter:
 
 - `tsconfig.json` / `tsconfig.*.json`
 - `eslint.config.*`
-- Framework config: `next.config.ts`, `nuxt.config.ts`, or `vite.config.ts`
+- Framework config: `nuxt.config.ts` or `vite.config.ts`
 - `tailwind.config.*` / `postcss.config.*`
 - `.gitignore`
 
@@ -99,7 +90,7 @@ The plan must include the analysis from Step 2 AND the implementation/testing st
 
 | Package | Current | New    | Action |
 | ------- | ------- | ------ | ------ |
-| next    | 16.1.6  | 16.3.0 | update |
+| nuxt    | 4.1.0   | 4.2.0  | update |
 
 Action values: `update` / `skip` / `investigate`
 

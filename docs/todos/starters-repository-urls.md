@@ -18,8 +18,8 @@ of every `@mionjs/create-starter-*` package links to a missing repository and is
 - Check whether `https://github.com/mionjs/mion-starters` resolves (it could not be checked from the sandbox that
   found this: the proxy blocked it).
 - If it does not: set `repository.url` to `git+https://github.com/MionKit/mion-starters.git` and `bugs.url` to
-  `https://github.com/MionKit/mion-starters/issues` in `nextjs/16`, `nuxt/4` and `vue/3` `package.json`.
+  `https://github.com/MionKit/mion-starters/issues` in every starter `package.json`.
 
 ## Done when
 
-- The three starters' `repository` and `bugs` links open the real repository.
+- Every starter's `repository` and `bugs` links open the real repository.
