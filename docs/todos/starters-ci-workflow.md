@@ -21,11 +21,11 @@ The maintainer wants GitHub Actions to cover this for every starter.
   `tests/mion-utils.test.ts`) and, per starter, the create e2e block (`npm run test:create:<name>`: create, install,
   build, typecheck, unit tests, Playwright). One job per starter so they run in parallel and fail on their own.
 - **mion version:** pull requests run against the npm-published `@mionjs/*` (what users get). Decide whether a
-  second lane should run against mion `main` through the local registry flow (`npm run mionlink` needs a mion
-  checkout next to this repo, with Go and pnpm to build it).
+  second job should run against mion `main` through `npm run mionlink` (needs a mion checkout next to this repo,
+  with Go and pnpm to build it).
 - **Publishing:** a manually started (or tag-started) workflow that runs the pre-publish test and publishes each
-  changed starter. Needs an npm token or npm trusted publishing set up for the `@mionjs` scope; `publish-all.mjs`
-  asks for an OTP interactively, so CI needs a non-interactive path.
+  changed starter. Needs an npm token or npm trusted publishing set up for the `@mionjs` scope, so CI can publish
+  without the 2FA prompt.
 - Playwright browsers: install with `npx playwright install --with-deps chromium` in the job.
 
 ## Done when

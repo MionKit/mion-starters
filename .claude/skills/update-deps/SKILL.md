@@ -41,7 +41,7 @@ npm create nuxt@latest tmp-update-nuxt -- --no-install
 npm create vite@latest tmp-update-react -- --template react-ts --no-interactive
 ```
 
-The starter adds `react-router`, vitest and Playwright on top of this scaffold, so compare those against their latest npm versions.
+The starter adds `react-router`, vitest and Playwright to this scaffold: compare those with their latest npm versions.
 
 ### vue
 

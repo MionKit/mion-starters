@@ -10,7 +10,7 @@ npm install
 
 ## Development
 
-Runs the Vite dev server with the mion API mounted inside it, under `/api/mion`:
+Runs the Vite dev server with the mion API inside it, under `/api/mion`:
 
 ```bash
 npm run dev
@@ -24,11 +24,11 @@ Open [http://localhost:5173](http://localhost:5173).
 npm run build       # SPA into dist/, API into dist-server/
 ```
 
-## Run the API
+## Preview
 
 ```bash
-npm run preview:api # node dist-server/server.node.js, on port 3001
-npm run preview     # in a second terminal: `vite preview` serves the SPA and forwards /api/mion to the API
+npm run preview:api # the built API, on port 3001
+npm run preview     # in a second terminal: the SPA, forwarding /api/mion to the API
 ```
 
 ## Test
@@ -40,15 +40,15 @@ npm run test:unit   # vitest: raw API calls and the typed client
 npm run test:e2e    # playwright
 ```
 
-## Project layout
+## Project Layout
 
-- `app/` - React SPA: pages, router, mion client, batch calls
-- `api/` - mion API: routes, models, repository, Node server entry
+- `app/`: React SPA (pages, router, mion client, batch calls)
+- `api/`: mion API (routes, models, repository, Node server entry)
 
 Write `batch()` calls in `.ts` modules that use the module-level client from `app/mion-client.ts`, like
 `app/orders-batch.ts`. React components only call those functions.
 
-## Learn more
+## Learn More
 
 - [mion docs](https://mion.io)
 - [React docs](https://react.dev)
