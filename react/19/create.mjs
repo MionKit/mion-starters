@@ -7,7 +7,7 @@ import {fileURLToPath} from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const projectName = process.argv[2];
+const projectName = process.argv.slice(2).find((arg) => !arg.startsWith('-'));
 if (!projectName) {
     console.log(`
 Usage: npm create @mionjs/starter-react <project-name>

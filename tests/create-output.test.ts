@@ -64,6 +64,17 @@ describe.each(STARTERS)('%s create.mjs', (starterDir) => {
     });
 });
 
+describe('create.mjs arguments', () => {
+    it('takes the first non-flag argument as the project name', () => {
+        const projectDir = join(TMP_DIR, 'flag-first', 'my-app');
+        rmSync(join(TMP_DIR, 'flag-first'), {recursive: true, force: true});
+        mkdirSync(join(TMP_DIR, 'flag-first'), {recursive: true});
+        execFileSync('node', [resolve(ROOT, 'react/19/create.mjs'), '--no-install', projectDir], {cwd: join(TMP_DIR, 'flag-first'), stdio: 'pipe'});
+        expect(existsSync(join(projectDir, 'package.json'))).toBe(true);
+        expect(existsSync(join(TMP_DIR, 'flag-first', '--no-install'))).toBe(false);
+    });
+});
+
 describe('create.mjs without .mion/enriched', () => {
     it('copies no .mion folder at all', () => {
         const sourceCopy = join(TMP_DIR, 'no-enriched', 'package');
