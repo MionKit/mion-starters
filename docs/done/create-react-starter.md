@@ -85,12 +85,11 @@ this change touched, review its report against the code, and commit it as its ow
 - The client uses `export const {routes} = initClient(...)`; batches built from it work in dev, build and tests.
 - Verified on the local-registry build of mion `main`: typecheck, oxlint, `vite build`, vitest 10/10, Playwright 7/7,
   the built API on Node, and `npm run test:create:react`.
-- `nextjs/16` stays registered in this PR: the parallel Next.js removal PR takes it out.
+- Rebased onto `main` after the Next.js removal (#3) landed: the starter lists now hold nuxt, react and vue.
 - Fixed along the way, in every starter it applies to: the mion logo and the "alternative to GraphQL" line were
-  white on white on the light theme; Playwright result files were committed and not ignored; `create.mjs` took a
-  leading flag (`--no-install`) as the project name; `createOrder` took a client-chosen id with no uniqueness check;
-  `npm run preview` backgrounded the API with `&`; pages kept the default body margin; the e2e test only logged
-  browser errors. The root create e2e test now also starts the built API with Node.
+  white on white on the light theme; `create.mjs` took a leading flag (`--no-install`) as the project name;
+  `createOrder` took a client-chosen id with no uniqueness check; `npm run preview` backgrounded the API with `&`;
+  pages kept the default body margin; the e2e test only logged browser errors. The root create e2e test now also starts the built API with Node.
 - mion gaps still on mion `main`, reported, not worked around: `server.build` copies `public/` into `dist-server/`,
   `mion-pure-fns/` lands in the public `dist/`, and 23 "Sourcemap points to missing source files" warnings on every
   `vite dev` / `vitest` start.

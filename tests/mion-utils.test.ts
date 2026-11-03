@@ -111,6 +111,6 @@ describe('resolveVersions', () => {
 describe('findStarterDirs', () => {
     it('finds every starter folder', () => {
         const dirs = findStarterDirs();
-        for (const starter of ['nextjs/16', 'nuxt/4', 'react/19', 'vue/3']) expect(dirs).toContain(resolve(ROOT, starter));
+        for (const starter of ['nuxt/4', 'react/19', 'vue/3']) expect(dirs).toContain(resolve(ROOT, starter));
     });
 });

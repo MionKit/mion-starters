@@ -7,7 +7,6 @@ coverage/
 dist-server/
 .wrangler/
 .data/
-api/drizzle/
 test-results/
 package-lock.json
 .DS_Store
