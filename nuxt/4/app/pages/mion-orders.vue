@@ -73,7 +73,10 @@ function getEventDetails(event: OrderEvent): string | null {
 <template>
   <div class="page-wrapper">
     <main class="page-main">
-      <img src="/mion-logo-dark.svg" alt="Mion logo" width="300" height="80" class="logo" />
+      <picture class="logo">
+        <source srcset="/mion-logo-dark.svg" media="(prefers-color-scheme: dark)" />
+        <img src="/mion-logo.svg" alt="Mion logo" width="300" height="80" />
+      </picture>
 
       <div class="content-section">
         <h1>Mion Orders Showcase</h1>
@@ -328,7 +331,7 @@ function getEventDetails(event: OrderEvent): string | null {
 }
 
 .hl {
-  color: #fafafa;
+  color: #09090b;
   display: block;
 }
 
@@ -355,6 +358,10 @@ function getEventDetails(event: OrderEvent): string | null {
 
   .content-section code {
     background-color: #27272a;
+  }
+
+  .hl {
+    color: #fafafa;
   }
 
   .order-card {
