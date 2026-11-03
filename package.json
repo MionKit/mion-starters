@@ -4,7 +4,6 @@
   "scripts": {
     "test": "vitest run --no-file-parallelism",
     "test:create:output": "vitest run tests/create-output.test.ts",
-    "test:create:nextjs": "vitest run tests/create-e2e.test.ts -t create-starter-nextjs",
     "test:create:nuxt": "vitest run tests/create-e2e.test.ts -t create-starter-nuxt",
     "test:create:vue": "vitest run tests/create-e2e.test.ts -t create-starter-vue",
     "mionlink": "node scripts/mionlink.mjs",

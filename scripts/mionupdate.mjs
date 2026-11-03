@@ -1,9 +1,6 @@
 #!/usr/bin/env node
 
-/**
- * Switches starters to npm-published mion, each @mionjs/* dep on its own latest version.
- * Usage: `npm run mionupdate [-- 0.13.2] [starter folders]`; a pin skips `@mionjs/drizzle-orm*` (drizzle's line).
- */
+/** Switches starters to npm-published mion. Usage: `npm run mionupdate [-- 0.13.2] [starter folders]` */
 
 import {parseArgs} from 'node:util';
 import {latestVersion, resolveVersions, starterDirs, switchStarters} from './mion-utils.mjs';
@@ -11,8 +8,7 @@ import {latestVersion, resolveVersions, starterDirs, switchStarters} from './mio
 const {positionals} = parseArgs({allowPositionals: true});
 const pinned = positionals.find((a) => /^\d+\.\d+\.\d+/.test(a));
 const starters = starterDirs(positionals.filter((a) => a !== pinned));
-const onOwnLine = (name) => name.startsWith('@mionjs/drizzle-orm');
 // a pin resolves through npm too, so a version that does not exist fails before anything is written
-const versions = resolveVersions(starters, (name) => latestVersion(pinned && !onOwnLine(name) ? `${name}@${pinned}` : name));
+const versions = resolveVersions(starters, (name) => latestVersion(pinned ? `${name}@${pinned}` : name));
 switchStarters(starters, versions, false);
 console.log('\nDone: starters use npm-published @mionjs/* packages.');

@@ -4,8 +4,6 @@ node_modules
 # build output
 .dist
 dist
-.next
-out
 .nuxt
 .output
 build
@@ -40,5 +38,5 @@ yarn-error.log*
 # starters in local mode point @mionjs/* at the local registry here
 .npmrc
 
-# drizzle migrations a starter generates while it is being developed
-*/*/api/drizzle/
+# Playwright output
+test-results

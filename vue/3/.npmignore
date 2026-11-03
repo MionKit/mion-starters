@@ -16,5 +16,3 @@ package-lock.json
 dist-server/
 .wrangler/
 .data/
-next-env.d.ts
-api/drizzle/

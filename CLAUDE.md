@@ -2,13 +2,11 @@
 
 ## Repo Structure
 - **Not a monorepo**: each starter is an independent `npm create` package with own `package.json`, `tsconfig.json`, etc.
-- Starters are versioned by framework major version: `nextjs/16`, `nuxt/4`, `vue/3`, `standalone/1`
+- Starters are versioned by framework major version: `nuxt/4`, `vue/3`, `standalone/1` (planned)
 - Each starter is published as a `create-*` package and can be used via `npm create`
 
 ```
 mion-starters/
-├── nextjs/
-│   └── 16/                       # @mionjs/create-starter-nextjs
 ├── nuxt/
 │   └── 4/                       # @mionjs/create-starter-nuxt
 ├── vue/
@@ -24,16 +22,14 @@ mion-starters/
 
 ## Creating a New Project
 ```bash
-npm create @mionjs/starter-nextjs my-app
 npm create @mionjs/starter-nuxt my-app
 npm create @mionjs/starter-vue my-app
 ```
 
 Each starter contains a `create.mjs` bin script that copies the starter files into a new project directory, cleans up the `package.json`, and runs `npm install`.
 - The package name is the new folder's name (`basename(targetDir)`), never the raw argument: mion uses it as a path segment in generated files.
-- Generated state is never copied: `.mion` (except `.mion/enriched/`), build output (`dist`, `dist-server`, `.next`, `.nuxt`, `.output`), `.wrangler`, `.data`, `next-env.d.ts`, `api/drizzle`, `.npmrc`.
-- Keep the `EXCLUDE` list the same in all three `create.mjs`. A new generated folder goes into `EXCLUDE`, `gitignore`, `.gitignore` and `.npmignore`.
-  Exception: `api/drizzle` stays out of `gitignore` (a real project commits its migrations). The root `.gitignore` keeps it out of this repo.
+- Generated state is never copied: `.mion` (except `.mion/enriched/`), build output (`dist`, `dist-server`, `.nuxt`, `.output`), `.wrangler`, `.data`, `.npmrc`.
+- Keep the `EXCLUDE` list the same in every `create.mjs`. A new generated folder goes into `EXCLUDE`, `gitignore`, `.gitignore` and `.npmignore`.
 
 ## Mion API Structure (shared across all starters)
 `api/` is a source folder, not a package. Client and server code share one `tsconfig.json` at the starter root, so mion sees every route and every client call.
@@ -104,14 +100,13 @@ export async function loadOrdersWithEvents() {
 All `@mionjs/*` packages are published to npm:
 - `@mionjs/core`, `@mionjs/router`, `@mionjs/client`, `@mionjs/run-types`, `@mionjs/platform-*`
 - `@mionjs/devtools` (dev) plus its required peer `@mionjs/bin-compiler`, which pulls this machine's `@mionjs/native-compiler-<os>-<arch>`
-- `@mionjs/drizzle-orm*`: on drizzle's version line (0.45.x), not mion's
 
 TypeScript stays on `^6`: TypeScript 7 breaks vue-tsc and typescript-eslint.
 
 ### Using npm versions (default for CI / release)
 ```bash
 npm run mionupdate              # each @mionjs/* dep to its own latest npm version
-npm run mionupdate -- 0.13.2    # this version for every @mionjs/* dep except @mionjs/drizzle-orm*
+npm run mionupdate -- 0.13.2    # this version for every @mionjs/* dep
 npm run mionupdate -- vue/3     # only these starter folders
 ```
 

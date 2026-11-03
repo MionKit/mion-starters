@@ -10,7 +10,6 @@ import {ROOT, findStarterDirs, isLocalMode} from './mion-utils.mjs';
 const TMP_ROOT = path.join(ROOT, '.tmp-pre-publish');
 
 const STARTERS = [
-    {name: 'nextjs', dir: 'nextjs/16'},
     {name: 'nuxt', dir: 'nuxt/4'},
     {name: 'vue', dir: 'vue/3'},
 ];

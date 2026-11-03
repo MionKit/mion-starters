@@ -5,7 +5,7 @@ import {describe, it, expect, beforeAll, afterAll} from 'vitest';
 
 const ROOT = resolve(import.meta.dirname, '..');
 const TMP_DIR = resolve(ROOT, '.tmp-create-output');
-const STARTERS = ['nextjs/16', 'nuxt/4', 'vue/3'];
+const STARTERS = ['nuxt/4', 'vue/3'];
 
 /** Generated state a maintainer's starter folder holds after a dev run or build */
 const GENERATED = [
@@ -15,11 +15,8 @@ const GENERATED = [
     'dist-server/x.js',
     '.wrangler/x',
     '.data/kv/x',
-    '.next/x',
     '.nuxt/x',
     '.output/x',
-    'next-env.d.ts',
-    'api/drizzle/0000_init.sql',
     '.npmrc',
 ];
 
@@ -61,8 +58,8 @@ describe.each(STARTERS)('%s create.mjs', (starterDir) => {
         // `.data` and `/.data` both cover the starter root
         const covers = (file: string, patterns: string[]) =>
             expect(patterns.filter((p) => !lines(file).some((l) => l === p || l === p.replace(/^\//, '')))).toEqual([]);
-        covers(join(projectDir, '.gitignore'), ['/.mion/*', '!/.mion/enriched/', '/dist-server', '/.wrangler', '/.data']);
-        covers(resolve(ROOT, starterDir, '.npmignore'), ['.mion/*', '!.mion/enriched/', 'dist-server/', '.wrangler/', '.data/']);
+        covers(join(projectDir, '.gitignore'), ['/.mion/*', '!/.mion/enriched/', '/dist-server', '/.wrangler', '/.data', '/test-results']);
+        covers(resolve(ROOT, starterDir, '.npmignore'), ['.mion/*', '!.mion/enriched/', 'dist-server/', '.wrangler/', '.data/', 'test-results/']);
     });
 });
 
