@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react';
 import type {Order, OrderEvent} from '../../api/src/models.ts';
 import {fetchOrdersWithEvents} from '../orders-batch.ts';
+import layout from '../assets/layout.module.css';
 import styles from './MionOrdersPage.module.css';
 
 const eventStyles: Record<OrderEvent['type'], {color: string; icon: string; label: string}> = {
@@ -68,14 +69,14 @@ export default function MionOrdersPage() {
     }, []);
 
     return (
-        <div className={styles.pageWrapper}>
-            <main className={styles.pageMain}>
+        <div className={layout.pageWrapper}>
+            <main className={`${layout.pageMain} ${styles.pageMain}`}>
                 <picture>
                     <source srcSet="/mion-logo-dark.svg" media="(prefers-color-scheme: dark)" />
                     <img src="/mion-logo.svg" alt="Mion logo" width="300" height="80" />
                 </picture>
 
-                <div className={styles.contentSection}>
+                <div className={`${layout.contentSection} ${styles.contentSection}`}>
                     <h1>Mion Orders Showcase</h1>
                     <p>
                         <a href="https://mion.io" target="_blank" rel="noopener noreferrer">

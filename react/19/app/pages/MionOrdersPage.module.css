@@ -1,15 +1,9 @@
-.pageWrapper {
-  composes: pageWrapper from '../assets/layout.module.css';
-}
-
 .pageMain {
-  composes: pageMain from '../assets/layout.module.css';
   align-items: center;
   gap: 2rem;
 }
 
 .contentSection {
-  composes: contentSection from '../assets/layout.module.css';
   align-items: center;
   text-align: center;
   padding: 2rem 0;

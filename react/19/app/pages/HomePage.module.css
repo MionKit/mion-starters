@@ -1,10 +1,8 @@
 .pageWrapper {
-  composes: pageWrapper from '../assets/layout.module.css';
   align-items: center;
 }
 
 .pageMain {
-  composes: pageMain from '../assets/layout.module.css';
   align-items: center;
   min-height: 100vh;
   justify-content: center;
@@ -23,7 +21,6 @@
 }
 
 .contentSection {
-  composes: contentSection from '../assets/layout.module.css';
   align-items: center;
   text-align: center;
 }

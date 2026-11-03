@@ -1,10 +1,11 @@
 import {Link} from 'react-router';
+import layout from '../assets/layout.module.css';
 import styles from './HomePage.module.css';
 
 export default function HomePage() {
     return (
-        <div className={styles.pageWrapper}>
-            <main className={styles.pageMain}>
+        <div className={`${layout.pageWrapper} ${styles.pageWrapper}`}>
+            <main className={`${layout.pageMain} ${styles.pageMain}`}>
                 <div className={styles.logos}>
                     <img src="/react.svg" alt="React logo" height="60" />
                     <span className={styles.logoSeparator}>+</span>
@@ -13,7 +14,7 @@ export default function HomePage() {
                         <img src="/mion-logo.svg" alt="Mion logo" height="60" />
                     </picture>
                 </div>
-                <div className={styles.contentSection}>
+                <div className={`${layout.contentSection} ${styles.contentSection}`}>
                     <h1>To get started, edit the pages.</h1>
                     <p>
                         Looking for a starting point? Head over to the{' '}
