@@ -12,7 +12,7 @@ export const LOCAL_REGISTRY = 'http://127.0.0.1:4873/';
 /** Dedicated npm cache for local mode: a local build shares its version with the npmjs one */
 const LOCAL_CACHE = path.join(ROOT, '.mion-local-cache');
 
-const STARTER_DIRS = ['nextjs', 'nuxt', 'vue', 'standalone'];
+const STARTER_DIRS = ['nuxt', 'vue', 'standalone'];
 const DEP_BLOCKS = ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies'];
 const SCOPE_LINE = `@mionjs:registry=${LOCAL_REGISTRY}`;
 

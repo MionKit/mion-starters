@@ -6,7 +6,6 @@ import {ROOT, isLocalMode, localModeEnv} from '../scripts/mion-utils.mjs';
 
 /** create.mjs installs too: from the local registry when the starter is in local mode */
 describe.each([
-    ['nextjs', 'nextjs/16'],
     ['nuxt', 'nuxt/4'],
     ['vue', 'vue/3'],
 ])('create-starter-%s e2e', (name, starterDir) => {

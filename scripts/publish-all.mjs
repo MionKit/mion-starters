@@ -9,7 +9,7 @@
  *
  * Usage:
  *   node scripts/publish-all.mjs              publish all
- *   node scripts/publish-all.mjs nextjs nuxt  publish a subset
+ *   node scripts/publish-all.mjs nuxt vue     publish a subset
  *   node scripts/publish-all.mjs --dry-run    npm publish --dry-run for each
  *   node scripts/publish-all.mjs --skip-test  skip pre-publish-test
  */
@@ -23,7 +23,6 @@ import {stdin, stdout} from 'node:process';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 const STARTERS = [
-    {name: 'nextjs', dir: 'nextjs/16', pkg: '@mionjs/create-starter-nextjs'},
     {name: 'nuxt', dir: 'nuxt/4', pkg: '@mionjs/create-starter-nuxt'},
     {name: 'vue', dir: 'vue/3', pkg: '@mionjs/create-starter-vue'},
 ];
