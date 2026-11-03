@@ -11,8 +11,8 @@ export const ordersRoutes = {
     getOrder: mion.query((ctx, id: UUIDv7): Order | undefined => {
         return findOrderById(id);
     }),
-    createOrder: mion.mutation((ctx, customer: string, total: number, id?: UUIDv7): Order => {
-        return insertOrder(customer, total, id);
+    createOrder: mion.mutation((ctx, customer: string, total: number): Order => {
+        return insertOrder(customer, total);
     }),
     getOrderEvents: mion.query((ctx, orderId: UUIDv7): OrderEvent[] => {
         return findEventsByOrderId(orderId);

@@ -50,4 +50,21 @@ describe('mion API', () => {
         expect(order.customer).toBe('Test Customer');
         expect(order.status).toBe('pending');
     });
+    it('orders.createOrder takes no client-chosen id', async () => {
+        const seedId = '0195546a-5c00-7000-8000-000000000001';
+        const res = await fetch(`${API_BASE}/orders/createOrder`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({'orders/createOrder': ['Eve', 10, seedId]}),
+        });
+        const json = await res.json();
+        expect(json['orders/createOrder']?.id).not.toBe(seedId);
+        const list = await fetch(`${API_BASE}/orders/listOrders`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({'orders/listOrders': []}),
+        });
+        const orders: {id: string}[] = (await list.json())['orders/listOrders'];
+        expect(orders.filter((o) => o.id === seedId)).toHaveLength(1);
+    });
 });

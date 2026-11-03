@@ -10,8 +10,8 @@ export const ordersRoutes = {
     getOrder: query((ctx, id: FormatUUIDv7): Order | undefined => {
         return findOrderById(id);
     }),
-    createOrder: mutation((ctx, customer: string, total: number, id?: FormatUUIDv7): Order => {
-        return insertOrder(customer, total, id);
+    createOrder: mutation((ctx, customer: string, total: number): Order => {
+        return insertOrder(customer, total);
     }),
 
     getOrderEvents: query((ctx, orderId: FormatUUIDv7): OrderEvent[] => {

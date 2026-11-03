@@ -52,9 +52,9 @@ export function findOrderById(id: UUIDv7): Order | undefined {
     return orders.find((o) => o.id === id);
 }
 
-export function insertOrder(customer: string, total: number, id?: UUIDv7): Order {
+export function insertOrder(customer: string, total: number): Order {
     const order: Order = {
-        id: id ?? (randomUUID_V7() as UUIDv7),
+        id: randomUUID_V7() as UUIDv7,
         customer,
         total: Math.round(total * 100) / 100,
         status: 'pending',
