@@ -37,6 +37,3 @@ yarn-error.log*
 .mion-local-cache
 # starters in local mode point @mionjs/* at the local registry here
 .npmrc
-
-# drizzle migrations a starter generates while it is being developed
-*/*/api/drizzle/
