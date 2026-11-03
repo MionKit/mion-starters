@@ -1,0 +1,15 @@
+node_modules/
+dist/
+dist-server/
+.wrangler/
+.data/
+test-results/
+playwright-report/
+package-lock.json
+.DS_Store
+*.pem
+*.tsbuildinfo
+.env*
+.mion/*
+!.mion/enriched/
+.mion-local-cache/
