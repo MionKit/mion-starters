@@ -33,3 +33,4 @@ logs
 # host build output
 /dist-server
 /.wrangler
+/test-results

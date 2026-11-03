@@ -58,8 +58,8 @@ describe.each(STARTERS)('%s create.mjs', (starterDir) => {
         // `.data` and `/.data` both cover the starter root
         const covers = (file: string, patterns: string[]) =>
             expect(patterns.filter((p) => !lines(file).some((l) => l === p || l === p.replace(/^\//, '')))).toEqual([]);
-        covers(join(projectDir, '.gitignore'), ['/.mion/*', '!/.mion/enriched/', '/dist-server', '/.wrangler', '/.data']);
-        covers(resolve(ROOT, starterDir, '.npmignore'), ['.mion/*', '!.mion/enriched/', 'dist-server/', '.wrangler/', '.data/']);
+        covers(join(projectDir, '.gitignore'), ['/.mion/*', '!/.mion/enriched/', '/dist-server', '/.wrangler', '/.data', '/test-results']);
+        covers(resolve(ROOT, starterDir, '.npmignore'), ['.mion/*', '!.mion/enriched/', 'dist-server/', '.wrangler/', '.data/', 'test-results/']);
     });
 });
 
