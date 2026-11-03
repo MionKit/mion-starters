@@ -1,9 +1,6 @@
 #!/usr/bin/env node
 
-/**
- * Switches starters to npm-published mion, each @mionjs/* dep on its own latest version.
- * Usage: `npm run mionupdate [-- 0.13.2] [starter folders]`.
- */
+/** Switches starters to npm-published mion. Usage: `npm run mionupdate [-- 0.13.2] [starter folders]` */
 
 import {parseArgs} from 'node:util';
 import {latestVersion, resolveVersions, starterDirs, switchStarters} from './mion-utils.mjs';

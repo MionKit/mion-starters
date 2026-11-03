@@ -1,17 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * Publishes all starter packages to npm.
- *
- * Runs `npm publish` interactively in each starter dir so npm can prompt
- * for the 2FA OTP each time (passing --otp as a flag fails — the code
- * expires before the second package goes through).
- *
- * Usage:
- *   node scripts/publish-all.mjs              publish all
- *   node scripts/publish-all.mjs nuxt vue     publish a subset
- *   node scripts/publish-all.mjs --dry-run    npm publish --dry-run for each
- *   node scripts/publish-all.mjs --skip-test  skip pre-publish-test
+ * Publishes every starter, one interactive `npm publish` each so npm prompts for a fresh 2FA OTP:
+ * an --otp flag expires before the second package goes through.
+ * Usage: `node scripts/publish-all.mjs [nuxt vue] [--dry-run] [--skip-test]`
  */
 
 import path from 'node:path';
