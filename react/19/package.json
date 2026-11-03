@@ -37,7 +37,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "npm run preview:api & vite preview",
+    "preview": "vite preview",
     "preview:api": "node dist-server/server.node.js",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint",

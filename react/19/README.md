@@ -28,7 +28,7 @@ npm run build       # SPA into dist/, API into dist-server/
 
 ```bash
 npm run preview:api # node dist-server/server.node.js, on port 3001
-npm run preview     # the API plus `vite preview` for the SPA, which forwards /api/mion to it
+npm run preview     # in a second terminal: `vite preview` serves the SPA and forwards /api/mion to the API
 ```
 
 ## Test
