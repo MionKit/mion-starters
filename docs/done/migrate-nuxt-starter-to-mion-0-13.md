@@ -108,12 +108,17 @@ this change touched, review its report against the code, and commit it as its ow
 
 ## Shipped (2026-11-04)
 
-Built as planned on mion `main` through the local registry. Differences from the text above:
+Built as planned and verified on mion `main` through the local registry. The committed starter pins the latest
+published `@mionjs/*` (`0.13.2`), which lacks the fixes below: it needs the next mion release, tracked as its own
+todo. Differences from the text above:
 
 - No mion workaround was needed: no `vite.root`, no `server.build`, `.vue` files linted, the Worker boots on workerd.
 - The root Nuxt test is the `create-starter-nuxt` block of `tests/create-e2e.test.ts`.
 - `plans/mion-nuxt-integration.md` no longer existed: nothing to rewrite.
 - `nuxt generate` needs no API: the SPA loads data in the browser.
 - `preview:api:cloudflare` runs `npx wrangler@4` instead of a `wrangler` dependency, to keep installs light.
+- Review added: the root create test now also lints, builds every `build:api:*` target, runs Playwright on the
+  `npm run build` output (`test:e2e:build`) and runs `generate`. The shared API tests (also in `react/19`) lost
+  their copy-paste and two tests that could not fail.
 - Vitest 5's on-disk module cache kept a stale test transform after a tsconfig `include` change: a mion bug,
   filed in the mion repo and not worked around here.
