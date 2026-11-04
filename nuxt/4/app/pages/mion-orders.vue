@@ -76,7 +76,7 @@ function getEventDetails(event: OrderEvent): string | null {
               <span class="order-id">{{ order.id }}</span>
             </div>
             <div class="order-meta">
-              <span class="status-badge" :style="{backgroundColor: statusColors[order.status] || '#6b7280'}">
+              <span class="status-badge" :style="{backgroundColor: statusColors[order.status]}">
                 {{ order.status }}
               </span>
               <div class="order-total">${{ order.total.toFixed(2) }}</div>
@@ -90,11 +90,11 @@ function getEventDetails(event: OrderEvent): string | null {
             <div class="timeline">
               <div class="timeline-line" />
               <div v-for="(event, i) in eventsByOrder[order.id]" :key="i" class="timeline-event">
-                <div class="timeline-dot" :style="{backgroundColor: eventStyles[event.type]?.color}">
-                  {{ eventStyles[event.type]?.icon }}
+                <div class="timeline-dot" :style="{backgroundColor: eventStyles[event.type].color}">
+                  {{ eventStyles[event.type].icon }}
                 </div>
                 <div>
-                  <div class="event-label">{{ eventStyles[event.type]?.label }}</div>
+                  <div class="event-label">{{ eventStyles[event.type].label }}</div>
                   <div class="event-date">{{ event.at.toLocaleString() }}</div>
                   <div v-if="getEventDetails(event)" class="event-details">
                     <span :style="{color: event.type === 'cancelled' ? '#ef4444' : '#6b7280'}">

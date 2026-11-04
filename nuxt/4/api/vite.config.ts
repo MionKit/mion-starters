@@ -5,11 +5,10 @@ import { builtinModules } from "node:module";
 import { mionVitePlugin } from "@mionjs/devtools/vite";
 
 const root = resolve(import.meta.dirname, "..");
-const targets = ["server.node", "server.bun", "cloudflare-worker"];
-
 /** The API bundle, one target per run: `vite build --config api/vite.config.ts --mode <target>` */
 export default defineConfig(({ mode }) => {
-  const target = targets.includes(mode) ? mode : "server.node";
+  // an unknown mode fails: no api/src/<mode>.ts to build
+  const target = mode === "test" ? "server.node" : mode;
   const isWorker = target === "cloudflare-worker";
   return {
     root,
@@ -33,7 +32,6 @@ export default defineConfig(({ mode }) => {
       target: "es2023",
       rollupOptions: {
         external: isWorker ? [] : [...builtinModules, ...builtinModules.map((m) => `node:${m}`), "bun"],
-        output: { format: "es", entryFileNames: "[name].js" },
       },
     },
     test: { root, include: ["api/tests/**/*.test.ts"], globalSetup: ["api/tests/global-setup.ts"] },

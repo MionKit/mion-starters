@@ -5,7 +5,7 @@ import { mionVitePlugin } from "@mionjs/devtools/vite";
 const fromRoot = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 
 // where the built app forwards /api/mion (proxy mode: the browser only talks to the app's own origin)
-const apiURL = process.env.MION_API_URL ?? "http://localhost:3001";
+const apiURL = (process.env.MION_API_URL || "http://localhost:3001").replace(/\/$/, "");
 
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",

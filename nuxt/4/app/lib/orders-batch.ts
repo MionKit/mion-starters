@@ -12,7 +12,7 @@ export async function fetchOrdersWithEvents() {
     if (ordersError) apiErrors.push(`listOrders: ${ordersError.publicMessage} (${ordersError.type})`);
     if (eventsError) apiErrors.push(`getOrdersEvents: ${eventsError.publicMessage} (${eventsError.type})`);
     for (const thrown of response?.['@thrownErrors'] ?? []) apiErrors.push(`batch: ${thrown.publicMessage} (${thrown.type})`);
-    const eventsByOrder: Record<string, OrderEvent[]> = {};
+    const eventsByOrder: Record<OrderEvent['orderId'], OrderEvent[]> = {};
     for (const event of events ?? []) (eventsByOrder[event.orderId] ??= []).push(event);
     return {orders: orders ?? [], eventsByOrder, apiErrors};
 }
