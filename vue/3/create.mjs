@@ -39,7 +39,6 @@ const EXCLUDE = new Set([
     '.output',
     '.data',
     '.wrangler',
-    '.vercel',
     'test-results',
     'coverage',
     '.coverage',

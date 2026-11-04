@@ -1,7 +1,7 @@
 ---
 type: chore
 spec: guidelines
-status: ready
+status: done
 created: 2026-11-04
 ---
 
@@ -44,3 +44,31 @@ this change touched, review its report against the code, and commit it as its ow
   the local-registry mion build.
 - The simplify-docs pass ran on every touched page and the simplify-comments pass on every touched source file,
   each committed on its own.
+
+## Plan: sweep (approved 2026-11-04)
+
+Remove:
+
+- `.claude/settings.local.json`: one person's permissions with stale paths. Untracked, ignored in the root `.gitignore`.
+- `.vercel` in every `create.mjs` `EXCLUDE`, `nuxt/4/.npmignore` and the root `.gitignore`: Vercel is no target.
+- The `@mionjs/*` `overrides` cleanup in `writeVersions` and its tests, and the `overrides` read in
+  `pre-publish-test.mjs`: only the tarball setup wrote those overrides.
+- Tailwind / PostCSS in the update-deps skill: no starter uses them.
+
+Change:
+
+- Root `vitest` `^3` to `^5`, as in the starters: drops `vite-node` from the root lockfile.
+- Nuxt `@nuxt/eslint` to `devDependencies`, next to `eslint`.
+- update-deps skill: compare oxlint, not the scaffold's ESLint, for React and Vue (create-vue's `--eslint` adds
+  both, it has no oxlint-only option), and compare `.oxlintrc.json`.
+- Regenerate every lockfile.
+
+Keep:
+
+- `@mionjs/core` in every starter: `orders-repository.ts` imports `randomUUID_V7` from it.
+- Nuxt `vue` + `vue-router`: not imported, but Nuxt's official template ships both and update-deps compares with it.
+- Accidental-looking differences that are choices: Nuxt lints with ESLint (`@nuxt/eslint`), React and Vue with oxlint;
+  React targets Node only; React has no `updatelogs/` yet.
+- `updatelogs/`: history.
+- `hasFileDeps` in `pre-publish-test.mjs`: still refuses a hand-written `file:` mion dependency before publishing.
+- `.wrangler` / `.data` in React's ignore files: `tests/create-output.test.ts` keeps one list for every starter.

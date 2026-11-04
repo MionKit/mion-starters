@@ -26,24 +26,16 @@ beforeEach(() => {
 afterAll(() => rmSync(DIR, {recursive: true, force: true}));
 
 describe('writeVersions', () => {
-    it('sets every @mionjs/* dep, drops @mionjs/* overrides and keeps the indent', () => {
+    it('sets every @mionjs/* dep and keeps the indent', () => {
         writeJson('package.json', {
-            dependencies: {'@mionjs/core': 'file:../x.tgz', vue: '^3'},
+            dependencies: {'@mionjs/core': '0.12.0', vue: '^3'},
             devDependencies: {'@mionjs/devtools': '0.12.0'},
-            overrides: {'@mionjs/core': 'file:../x.tgz', esbuild: '1'},
         });
         writeVersions(DIR, {'@mionjs/core': '0.13.2', '@mionjs/devtools': '0.13.2'});
         const pkg = JSON.parse(read('package.json'));
         expect(pkg.dependencies).toEqual({'@mionjs/core': '0.13.2', vue: '^3'});
         expect(pkg.devDependencies).toEqual({'@mionjs/devtools': '0.13.2'});
-        expect(pkg.overrides).toEqual({esbuild: '1'});
         expect(read('package.json')).toMatch(/^ {4}"dependencies"/m);
-    });
-
-    it('removes an overrides block left empty', () => {
-        writeJson('package.json', {dependencies: {'@mionjs/core': '0'}, overrides: {'@mionjs/core': 'file:x'}});
-        writeVersions(DIR, {'@mionjs/core': '0.13.2'});
-        expect(JSON.parse(read('package.json'))).not.toHaveProperty('overrides');
     });
 });
 

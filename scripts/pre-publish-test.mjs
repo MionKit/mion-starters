@@ -25,7 +25,7 @@ function run(cmd, cwd) {
 
 function hasFileDeps(dir) {
     const pkg = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf-8'));
-    const blocks = [pkg.dependencies, pkg.devDependencies, pkg.overrides];
+    const blocks = [pkg.dependencies, pkg.devDependencies];
     return blocks.some((deps) => Object.entries(deps ?? {}).some(([n, v]) => n.startsWith('@mionjs/') && String(v).startsWith('file:')));
 }
 

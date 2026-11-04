@@ -42,12 +42,15 @@ npm create vite@latest tmp-update-react -- --template react-ts --no-interactive
 ```
 
 The starter adds `react-router`, vitest and Playwright to this scaffold: compare those with their latest npm versions.
+It uses oxlint, not the scaffold's ESLint: compare oxlint with its latest npm version.
 
 ### vue
 
 ```bash
 npm create vue@latest tmp-update-vue -- --ts --router --vitest --playwright --eslint
 ```
+
+`--eslint` adds ESLint and oxlint. The starter uses only oxlint: compare oxlint, skip ESLint.
 
 **If the command fails** (e.g., unknown flags), check what flags are available (`--help`) and retry with sensible defaults. The goal is a TypeScript project with routing and the standard tooling for that framework.
 
@@ -61,7 +64,6 @@ Create a comparison table of all shared dependencies. Focus on:
 
 - Main framework package (nuxt, react, vue)
 - Build tools (vite, typescript, eslint). TypeScript stays on `^6`: TypeScript 7 breaks vue-tsc and typescript-eslint
-- CSS tooling (tailwind, postcss)
 - Testing (playwright, vitest)
 - Any other shared non-`@mionjs/*` dependencies
 
@@ -72,9 +74,8 @@ Note any NEW dependencies in the scaffold that don't exist in the starter, and a
 Compare these config files between the fresh scaffold and existing starter:
 
 - `tsconfig.json` / `tsconfig.*.json`
-- `eslint.config.*`
+- `eslint.config.*` (nuxt) / `.oxlintrc.json` (react, vue)
 - Framework config: `nuxt.config.ts` or `vite.config.ts`
-- `tailwind.config.*` / `postcss.config.*`
 - `.gitignore`
 
 For each file that differs, note the key differences. Ignore mion-specific config (proxy rules, mion plugins, API server config) — those are intentional customizations.

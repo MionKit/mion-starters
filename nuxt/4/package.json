@@ -61,7 +61,6 @@
     "@mionjs/platform-node": "0.13.2",
     "@mionjs/router": "0.13.2",
     "@mionjs/run-types": "0.13.2",
-    "@nuxt/eslint": "^1.17.0",
     "nuxt": "^4.6.4",
     "vue": "^3.5.44",
     "vue-router": "^5.4.0"
@@ -69,6 +68,7 @@
   "devDependencies": {
     "@mionjs/bin-compiler": "0.13.2",
     "@mionjs/devtools": "0.13.2",
+    "@nuxt/eslint": "^1.17.0",
     "@playwright/test": "^1.64.1",
     "@types/node": "^24.19.2",
     "eslint": "^10.14.0",

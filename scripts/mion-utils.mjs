@@ -125,10 +125,6 @@ export function writeVersions(starterDir, versions) {
             pkg[block][name] = versions[name];
         }
     }
-    if (pkg.overrides) {
-        for (const key of Object.keys(pkg.overrides)) if (key.startsWith('@mionjs/')) delete pkg.overrides[key];
-        if (Object.keys(pkg.overrides).length === 0) delete pkg.overrides;
-    }
     const indent = content.match(/^(\s+)"/m)?.[1] || '  ';
     fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, indent) + '\n');
 }
