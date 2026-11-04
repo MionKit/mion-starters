@@ -46,6 +46,12 @@ test('orders showcase displays event timeline', async ({page}) => {
     await expect(page.getByText('Event Timeline').first()).toBeVisible();
 });
 
+test('orders showcase shows a failed batch request as an API error', async ({page}) => {
+    await page.route('**/api/mion/mion-batch**', (route) => route.abort());
+    await page.goto('/mion-orders');
+    await expect(page.getByText(/API Error: batch:/)).toBeVisible({timeout: 15_000});
+});
+
 for (const [colorScheme, logo, highlight] of [
     ['light', '/mion-logo.svg', 'rgb(9, 9, 11)'],
     ['dark', '/mion-logo-dark.svg', 'rgb(250, 250, 250)'],
