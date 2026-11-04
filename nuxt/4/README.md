@@ -31,7 +31,7 @@ npm run build:cloudflare  # static SPA + one Worker serving it and the API
 npm run preview:api         # the built Node API, on port 3001
 npm run preview:bun         # or the Bun API
 npm run preview             # in a second terminal: the built app, forwarding /api/mion to the API
-npm run preview:cloudflare  # or alone: the Worker with the SPA and the API, on local workerd (port 8787)
+npm run preview:cloudflare  # or alone: the Worker, on local workerd (port 8787)
 ```
 
 ## Deploy
