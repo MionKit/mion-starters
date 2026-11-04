@@ -4,7 +4,7 @@ import {resolve, join} from 'node:path';
 import {describe, it, expect, beforeAll, afterAll} from 'vitest';
 import {ROOT, isLocalMode, localModeEnv} from '../scripts/mion-utils.mjs';
 
-/** create.mjs installs too: from the local registry when the starter is in local mode */
+/** create.mjs installs too, so it needs the local-mode env */
 describe.each([
     ['nuxt', 'nuxt/4'],
     ['react', 'react/19'],
@@ -22,7 +22,7 @@ describe.each([
         rmSync(tmpDir, {recursive: true, force: true});
         mkdirSync(tmpDir, {recursive: true});
         run(`node ${join(starter, 'create.mjs')} ${projectDir}`, tmpDir);
-        // its own repo, as a new project is: else oxlint obeys this repo's .gitignore, which ignores .tmp-*
+        // A new project is its own repo; else oxlint obeys this repo's .gitignore, which ignores .tmp-*
         run('git init -q');
         run('npx playwright install chromium');
     }, 600_000);
@@ -33,14 +33,13 @@ describe.each([
     it('typechecks', ({skip}) => (hasScript('typecheck') ? run('npm run typecheck') : skip()), 300_000);
     it('passes unit tests', ({skip}) => (hasScript('test:unit') ? run('npm run test:unit') : skip()), 300_000);
     it('lints', ({skip}) => (hasScript('lint') ? run('npm run lint') : skip()), 300_000);
-    /** Each deploy target the starter has a preview script for: build it, run it, poll hello until it answers */
     it.for([
         ['node', 'build', 'preview:api', 3001],
         ['bun', 'build:bun', 'preview:bun', 3001],
         ['Cloudflare workerd', 'build:cloudflare', 'preview:cloudflare', 8787],
     ] as const)('serves the built API with %s', async ([target, build, serve, port], {skip}) => {
         if (!hasScript(serve) || (target === 'bun' && spawnSync('bun', ['--version']).status !== 0)) return skip();
-        if (build !== 'build') run(`npm run ${build}`);
+        if (build !== 'build') run(`npm run ${build}`); // plain `build` already ran in 'builds'
         const api = spawn('npm', ['run', serve], {cwd: projectDir, env, detached: true, stdio: 'inherit'});
         try {
             const hello = () =>

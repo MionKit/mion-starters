@@ -69,8 +69,8 @@ export function isLocalMode(starterDir) {
     return read('.npmrc').split('\n').includes(SCOPE_LINE) || read('package-lock.json').includes(LOCAL_REGISTRY);
 }
 
-/** Lets a copy of a local-mode starter install from the local registry too. The scope goes through a user
- *  config file: `/bin/sh` (dash) drops an `npm_config_@mionjs:registry` env var before npm sees it. */
+/** Lets a copy of a local-mode starter install from the local registry too.
+ *  Scope goes in a user config file: `/bin/sh` (dash) drops an `npm_config_@mionjs:registry` env var. */
 export function localModeEnv() {
     const userConfig = path.join(ROOT, '.mion-registry', 'npmrc');
     // npm reads the key in any case, and an upper-case one wins: replace every spelling present

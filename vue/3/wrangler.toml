@@ -1,4 +1,4 @@
-# One Worker serves the SPA from dist/ and runs the API built by `npm run build:cloudflare`
+# Built by `npm run build:cloudflare`: one Worker serves both the SPA and the API
 name = "mion-vue-app"
 main = "dist-server/cloudflare-worker.js"
 compatibility_date = "2026-11-01"

@@ -3,7 +3,7 @@ import {defineConfig} from 'vite';
 import vue from '@vitejs/plugin-vue';
 import {mionVitePlugin} from '@mionjs/devtools/vite';
 
-/** API entry per deploy target: `vite build --mode bun` builds the bun one; dev and plain `vite build` use node */
+/** Keyed by `vite build --mode <target>`; dev and plain `vite build` use node */
 const API_ENTRIES: Record<string, string> = {
     bun: 'api/src/server.bun.ts',
     cloudflare: 'api/src/cloudflare-worker.ts',
