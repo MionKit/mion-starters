@@ -7,9 +7,10 @@ const {routes} = initClient<MyApi>({baseURL: 'http://localhost:3001', basePath: 
 
 describe('mion client', () => {
     it('call() returns [result, error, response]', async () => {
-        const [greeting, error] = await routes.hello('Client').call();
+        const [greeting, error, response] = await routes.hello('Client').call();
         expect(error).toBeUndefined();
         expect(greeting).toBe('Hello Client!');
+        expect(response).toEqual({hello: 'Hello Client!'});
     });
 
     it('Date round trip', async () => {
@@ -21,9 +22,11 @@ describe('mion client', () => {
         const [order, error] = await routes.orders.getOrder('not-a-uuid' as UUIDv7).call();
         expect(order).toBeUndefined();
         expect(error?.type).toBe('validation-error');
+        // the server words it "Invalid params in ...": this message proves no request was sent
+        expect(error?.publicMessage).toMatch(/^Invalid params for /);
     });
 
-    it('batch + inputFrom resolves orders and their events in one request', async () => {
+    it('batch + inputFrom resolves orders and their events', async () => {
         const ordersReq = routes.orders.listOrders();
         const ids = inputFrom(ordersReq, (list) => list!.map((o) => o.id));
         const eventsReq = routes.orders.getOrdersEvents(ids.asArg());
