@@ -5,11 +5,19 @@ import { builtinModules } from "node:module";
 import { mionVitePlugin } from "@mionjs/devtools/vite";
 
 const root = resolve(import.meta.dirname, "..");
+/** Keyed by `--mode`; vitest runs in mode `test` against the node server */
+const API_ENTRIES: Record<string, string> = {
+  node: "server.node",
+  bun: "server.bun",
+  cloudflare: "cloudflare-worker",
+  test: "server.node",
+};
+
 /** The API bundle, one target per run: `vite build --config api/vite.config.ts --mode <target>` */
 export default defineConfig(({ mode }) => {
-  // an unknown mode fails: no api/src/<mode>.ts to build
-  const target = mode === "test" ? "server.node" : mode;
-  const isWorker = target === "cloudflare-worker";
+  const target = API_ENTRIES[mode];
+  if (!target) throw new Error(`unknown --mode ${mode}: use ${Object.keys(API_ENTRIES).join(" | ")}`);
+  const isWorker = mode === "cloudflare";
   return {
     root,
     // public/ belongs to the Nuxt app, not the API bundle

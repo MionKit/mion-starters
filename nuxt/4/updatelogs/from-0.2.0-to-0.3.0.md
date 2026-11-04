@@ -16,7 +16,7 @@ mion 0.8 to 0.13, and the starter becomes an SPA (`ssr: false`).
 | eslint       | ^10     | ^10.14.0 |
 | @playwright/test | ^1.59.1 | ^1.64.1 |
 
-Added: `@mionjs/run-types`, `@mionjs/bin-compiler`, `vite`, `vitest`, `vue-tsc`, `@types/node`.
+Added: `@mionjs/run-types`, `@mionjs/bin-compiler`, `vite`, `vitest`, `vue-tsc`, `@types/node`, `wrangler`.
 Removed: `@mionjs/type-formats`, `@mionjs/platform-vercel`, `vite-node`, the `overrides` block.
 
 ## Skipped
@@ -34,9 +34,12 @@ Removed: `@mionjs/type-formats`, `@mionjs/platform-vercel`, `vite-node`, the `ov
   `FormatUUIDv7` becomes `UUIDv7` from `@mionjs/run-types/formats`. Seed orders use fixed ids.
 - Client: the Nuxt plugin client becomes a module-level `initClient()` in `app/lib/mion-client.ts`.
   `routesFlow` + `serverMapFrom` become `batch` + `inputFrom` in `app/lib/orders-batch.ts`.
-- `api/vite.config.ts` builds one target per run: `--mode server.node | server.bun | cloudflare-worker`.
+- `api/vite.config.ts` builds one target per run: `--mode node | bun | cloudflare`.
 - Dropped: Vercel (`deploy/vercel.json`, `vercel-serverless.ts`) and `deploy/aws`.
+- Cloudflare: `wrangler.toml` at the root, one Worker serving the generated SPA and the API.
 - `nuxt build` forwards `/api/mion/**` to `MION_API_URL` (proxy mode).
 - Scripts: `build` runs `nuxt build` and the Node API build (was `nuxt generate`); `build:api` takes the place of
-  `build:api:node`; `build:api:vercel` is gone. New: `preview:api*`, `typecheck`, `test:unit`, `test:e2e:build`.
+  `build:api:node`; `build:api:bun` and `build:api:cloudflare` become `build:bun` and `build:cloudflare`;
+  `build:api:vercel` is gone. New: `preview:api`, `preview:bun`, `preview:cloudflare`, `typecheck`,
+  `test:unit`, `test:e2e:build`.
 - New Vitest API tests (`npm run test:unit`).

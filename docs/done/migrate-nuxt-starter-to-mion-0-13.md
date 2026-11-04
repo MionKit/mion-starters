@@ -110,15 +110,16 @@ this change touched, review its report against the code, and commit it as its ow
 
 Built as planned and verified on mion `main` through the local registry. The committed starter pins the latest
 published `@mionjs/*` (`0.13.2`), which lacks the fixes below: it needs the next mion release, tracked as its own
-todo. Differences from the text above:
+todo shared with the Vue starter. Differences from the text above:
 
 - No mion workaround was needed: no `vite.root`, no `server.build`, `.vue` files linted, the Worker boots on workerd.
 - The root Nuxt test is the `create-starter-nuxt` block of `tests/create-e2e.test.ts`.
 - `plans/mion-nuxt-integration.md` no longer existed: nothing to rewrite.
 - `nuxt generate` needs no API: the SPA loads data in the browser.
-- `preview:api:cloudflare` runs `npx wrangler@4` instead of a `wrangler` dependency, to keep installs light.
-- Review added: the root create test now also lints, builds every `build:api:*` target, runs Playwright on the
-  `npm run build` output (`test:e2e:build`) and runs `generate`. The shared API tests (also in `react/19`) lost
+- Cloudflare follows the Vue starter: `build:cloudflare` generates the SPA and builds one Worker that serves it
+  and the API (`wrangler.toml` at the root, `preview:cloudflare` on local workerd). Script names match Vue's.
+- Review added: the root create test runs Playwright on the `npm run build` output (`test:e2e:build`). Its lint
+  step, per-target builds and local-mode fix landed first with the Vue port, so this PR uses them. The shared API tests (also in `react/19`) lost
   their copy-paste and two tests that could not fail.
 - Vitest 5's on-disk module cache kept a stale test transform after a tsconfig `include` change: a mion bug,
   filed in the mion repo and not worked around here.

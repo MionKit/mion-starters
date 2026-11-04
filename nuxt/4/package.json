@@ -38,12 +38,12 @@
     "build": "nuxt build && npm run build:api",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "build:api": "vite build --config api/vite.config.ts --mode server.node",
-    "build:api:bun": "vite build --config api/vite.config.ts --mode server.bun",
-    "build:api:cloudflare": "vite build --config api/vite.config.ts --mode cloudflare-worker",
+    "build:api": "vite build --config api/vite.config.ts --mode node",
+    "build:bun": "vite build --config api/vite.config.ts --mode bun",
+    "build:cloudflare": "nuxt generate && vite build --config api/vite.config.ts --mode cloudflare",
     "preview:api": "node api/dist/server.node.js",
-    "preview:api:bun": "bun api/dist/server.bun.js",
-    "preview:api:cloudflare": "npx wrangler@4 dev --config deploy/wrangler.toml --port 3001",
+    "preview:bun": "bun api/dist/server.bun.js",
+    "preview:cloudflare": "wrangler dev",
     "typecheck": "nuxi typecheck && tsc -p api",
     "lint": "eslint",
     "test:unit": "vitest run --config api/vite.config.ts",
@@ -75,6 +75,7 @@
     "typescript": "^6",
     "vite": "^8.3.5",
     "vitest": "^5.1.0",
-    "vue-tsc": "^3.3.14"
+    "vue-tsc": "^3.3.14",
+    "wrangler": "^4.157.0"
   }
 }

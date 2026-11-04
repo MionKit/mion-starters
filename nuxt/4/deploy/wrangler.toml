@@ -1,6 +1,0 @@
-# Cloudflare Worker for the API: npm run build:api:cloudflare, then wrangler deploy --config deploy/wrangler.toml
-# Static files (.output/public) deploy separately, e.g. to Cloudflare Pages, which routes /api/mion/* to this Worker
-
-name = "mion-nuxt-api"
-main = "../api/dist/cloudflare-worker.js"
-compatibility_date = "2026-11-01"
