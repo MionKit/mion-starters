@@ -30,6 +30,8 @@ describe.each([
     afterAll(() => rmSync(tmpDir, {recursive: true, force: true}));
 
     it('builds', () => run('npm run build'), 300_000);
+    // before the per-target builds below, which may overwrite this build's output
+    it('passes playwright e2e tests on the build', ({skip}) => (hasScript('test:e2e:build') ? run('npm run test:e2e:build') : skip()), 300_000);
     it('typechecks', ({skip}) => (hasScript('typecheck') ? run('npm run typecheck') : skip()), 300_000);
     it('passes unit tests', ({skip}) => (hasScript('test:unit') ? run('npm run test:unit') : skip()), 300_000);
     it('lints', ({skip}) => (hasScript('lint') ? run('npm run lint') : skip()), 300_000);

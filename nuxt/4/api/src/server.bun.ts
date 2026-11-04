@@ -1,5 +1,4 @@
-import {initApi} from './api.ts';
 import {startBunServer} from '@mionjs/platform-bun';
+import './api.ts';
 
-await initApi();
-startBunServer({port: 3001});
+await startBunServer({port: 3001});

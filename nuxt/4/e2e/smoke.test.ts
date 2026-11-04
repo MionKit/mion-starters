@@ -25,12 +25,14 @@ test('mion API getTime returns valid date', async ({request}) => {
     expect(new Date(json.getTime).getTime()).not.toBeNaN();
 });
 
-test('orders showcase page loads and displays orders', async ({page}) => {
+test('orders showcase page loads orders and events in one batch request', async ({page}) => {
     const errors: string[] = [];
     const requests: string[] = [];
+    const mionRequests: string[] = [];
     page.on('console', (msg) => { if (msg.type() === 'error') errors.push(msg.text()); });
     page.on('pageerror', (err) => errors.push(err.message));
     page.on('response', (res) => { if (res.status() >= 400) requests.push(`${res.status()} ${res.url()}`); });
+    page.on('request', (req) => { if (new URL(req.url()).pathname.startsWith('/api/mion/')) mionRequests.push(req.url()); });
     await page.goto('/mion-orders');
     await expect(page.getByText('Loading orders...')).toBeHidden({timeout: 15_000});
     expect(errors).toEqual([]);
@@ -38,13 +40,21 @@ test('orders showcase page loads and displays orders', async ({page}) => {
     await expect(page.getByText('Alice Johnson')).toBeVisible();
     await expect(page.getByText('Bob Smith')).toBeVisible();
     await expect(page.getByText('Carol Davis')).toBeVisible();
+    await expect(page.getByText('FedEx · FX-123456')).toBeVisible();
+    expect(mionRequests).toHaveLength(1);
+    expect(new URL(mionRequests[0]).pathname).toBe('/api/mion/mion-batch');
 });
 
 test('orders showcase displays event timeline', async ({page}) => {
     await page.goto('/mion-orders');
     await expect(page.getByText('Loading orders...')).toBeHidden({timeout: 15_000});
-    // Verify event timeline is rendered for at least one order
     await expect(page.getByText('Event Timeline').first()).toBeVisible();
+});
+
+test('orders showcase shows a failed batch request as an API error', async ({page}) => {
+    await page.route('**/api/mion/mion-batch**', (route) => route.abort());
+    await page.goto('/mion-orders');
+    await expect(page.getByText(/API Error: batch:/)).toBeVisible({timeout: 15_000});
 });
 
 for (const [colorScheme, logo, highlight] of [

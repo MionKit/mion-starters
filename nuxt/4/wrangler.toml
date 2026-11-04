@@ -1,0 +1,9 @@
+# Built by `npm run build:cloudflare`: one Worker serves both the SPA and the API
+name = "mion-nuxt-app"
+main = "api/dist/cloudflare-worker.js"
+compatibility_date = "2026-11-01"
+
+[assets]
+directory = ".output/public"
+not_found_handling = "single-page-application"
+run_worker_first = ["/api/*"]
