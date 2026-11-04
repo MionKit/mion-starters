@@ -3,6 +3,7 @@
 /** Shared helpers for switching the starters' @mionjs/* deps between npm and the local registry. */
 
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
 
@@ -68,9 +69,19 @@ export function isLocalMode(starterDir) {
     return read('.npmrc').split('\n').includes(SCOPE_LINE) || read('package-lock.json').includes(LOCAL_REGISTRY);
 }
 
-/** Lets a copy of a local-mode starter install from the local registry too */
+/** Lets a copy of a local-mode starter install from the local registry too. The scope goes through a user
+ *  config file: `/bin/sh` (dash) drops an `npm_config_@mionjs:registry` env var before npm sees it. */
 export function localModeEnv() {
-    return {'npm_config_@mionjs:registry': LOCAL_REGISTRY, npm_config_cache: LOCAL_CACHE};
+    const userConfig = path.join(ROOT, '.mion-registry', 'npmrc');
+    // npm reads the key in any case, and an upper-case one wins: replace every spelling present
+    const keys = Object.keys(process.env).filter((key) => key.toLowerCase() === 'npm_config_userconfig');
+    const ownConfig = keys.map((key) => process.env[key]).find((file) => file !== userConfig) ?? path.join(os.homedir(), '.npmrc');
+    const own = fs.existsSync(ownConfig) ? fs.readFileSync(ownConfig, 'utf-8') : '';
+    const lines = own.split('\n').filter((line) => line && !line.startsWith('@mionjs:registry='));
+    fs.mkdirSync(path.dirname(userConfig), {recursive: true});
+    fs.writeFileSync(userConfig, [...lines, SCOPE_LINE].join('\n') + '\n');
+    const env = Object.fromEntries([...keys, 'npm_config_userconfig'].map((key) => [key, userConfig]));
+    return {...env, npm_config_cache: LOCAL_CACHE};
 }
 
 export function resolveVersions(dirs, resolve) {

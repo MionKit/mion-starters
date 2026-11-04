@@ -1,5 +1,6 @@
 import {mkdirSync, readFileSync, rmSync, writeFileSync, existsSync} from 'node:fs';
 import {join, resolve} from 'node:path';
+import {execSync} from 'node:child_process';
 import {describe, it, expect, beforeEach, afterAll, vi} from 'vitest';
 import {
     ROOT,
@@ -7,6 +8,7 @@ import {
     cleanMionCaches,
     findStarterDirs,
     isLocalMode,
+    localModeEnv,
     resolveVersions,
     setScopeLine,
     writeVersions,
@@ -112,5 +114,17 @@ describe('findStarterDirs', () => {
     it('finds every starter folder', () => {
         const dirs = findStarterDirs();
         for (const starter of ['nuxt/4', 'react/19', 'vue/3']) expect(dirs).toContain(resolve(ROOT, starter));
+    });
+});
+
+describe('localModeEnv', () => {
+    it('points npm at the local registry through /bin/sh, keeping the user config', () => {
+        writeFileSync(join(DIR, 'user.npmrc'), 'save-exact=true\n');
+        vi.stubEnv('NPM_CONFIG_USERCONFIG', join(DIR, 'user.npmrc'));
+        const env = {...process.env, ...localModeEnv()};
+        vi.unstubAllEnvs();
+        const get = (key: string) => execSync(`npm config get ${key}`, {cwd: DIR, env, encoding: 'utf-8'}).trim();
+        expect(get('@mionjs:registry')).toBe(LOCAL_REGISTRY);
+        expect(get('save-exact')).toBe('true');
     });
 });
