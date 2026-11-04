@@ -37,4 +37,6 @@ Removed: `@mionjs/type-formats`, `@mionjs/platform-vercel`, `vite-node`, the `ov
 - `api/vite.config.ts` builds one target per run: `--mode server.node | server.bun | cloudflare-worker`.
 - Dropped: Vercel (`deploy/vercel.json`, `vercel-serverless.ts`) and `deploy/aws`.
 - `nuxt build` forwards `/api/mion/**` to `MION_API_URL` (proxy mode).
+- Scripts: `build` runs `nuxt build` and the Node API build (was `nuxt generate`); `build:api` takes the place of
+  `build:api:node`; `build:api:vercel` is gone. New: `preview:api*`, `typecheck`, `test:unit`, `test:e2e:build`.
 - New Vitest API tests (`npm run test:unit`).
