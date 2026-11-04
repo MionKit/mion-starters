@@ -1,5 +1,5 @@
-import {initApi} from './api.ts';
 import {createCloudflareHandler} from '@mionjs/platform-cloudflare';
+import './api.ts';
 
-await initApi();
+/** Cloudflare Worker */
 export default createCloudflareHandler();

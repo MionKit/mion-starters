@@ -1,0 +1,5 @@
+{
+  // ONE program for mion: the Nuxt app and the API it calls (Nuxt's own tsconfig.json only holds references)
+  "extends": "./.nuxt/tsconfig.app.json",
+  "include": [".nuxt/nuxt.d.ts", "app/**/*", "shared/**/*.d.ts", "api/src/**/*", "api/tests/**/*"]
+}

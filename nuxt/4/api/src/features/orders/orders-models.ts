@@ -1,7 +1,7 @@
-import {FormatUUIDv7} from '@mionjs/type-formats/StringFormats';
+import type {UUIDv7} from '@mionjs/run-types/formats';
 
 export interface Order {
-    id: FormatUUIDv7;
+    id: UUIDv7;
     customer: string;
     total: number;
     status: 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
@@ -9,8 +9,8 @@ export interface Order {
 }
 
 export type OrderEvent =
-    | {type: 'placed'; orderId: FormatUUIDv7; at: Date}
-    | {type: 'paid'; orderId: FormatUUIDv7; at: Date; method: string}
-    | {type: 'shipped'; orderId: FormatUUIDv7; at: Date; carrier: string; tracking: string}
-    | {type: 'delivered'; orderId: FormatUUIDv7; at: Date}
-    | {type: 'cancelled'; orderId: FormatUUIDv7; at: Date; reason: string};
+    | {type: 'placed'; orderId: UUIDv7; at: Date}
+    | {type: 'paid'; orderId: UUIDv7; at: Date; method: string}
+    | {type: 'shipped'; orderId: UUIDv7; at: Date; carrier: string; tracking: string}
+    | {type: 'delivered'; orderId: UUIDv7; at: Date}
+    | {type: 'cancelled'; orderId: UUIDv7; at: Date; reason: string};

@@ -8,7 +8,9 @@ export default defineConfig({
     },
     webServer: {
         command: 'npm run dev',
-        port: 3000,
+        // url, not port: nuxi answers its "Starting Nuxt..." page on the port before the app is ready
+        url: 'http://localhost:3000/',
+        timeout: 120_000,
         reuseExistingServer: !process.env.CI,
     },
 });
