@@ -1,10 +1,10 @@
 import { fileURLToPath } from "node:url";
 import { mionVitePlugin } from "@mionjs/devtools/vite";
 
-// absolute: Nuxt's Vite root is app/, so relative paths would resolve from there
+// Nuxt's Vite root is app/, so relative paths would resolve from there
 const fromRoot = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 
-// where the built app forwards /api/mion (proxy mode: the browser only talks to the app's own origin)
+// the built app proxies /api/mion here, so the browser only talks to the app's own origin
 const apiURL = (process.env.MION_API_URL || "http://localhost:3001").replace(/\/$/, "");
 
 export default defineNuxtConfig({

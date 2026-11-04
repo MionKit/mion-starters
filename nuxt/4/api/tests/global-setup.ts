@@ -1,6 +1,6 @@
 import type {Server} from 'node:http';
 import {startNodeServer} from '@mionjs/platform-node';
-// importing the routes module registers the router, in this (vitest's main) process
+// registers the router in this (vitest's main) process
 import '../src/api.ts';
 
 let server: Server | undefined;
