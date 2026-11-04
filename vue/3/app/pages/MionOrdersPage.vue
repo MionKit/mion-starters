@@ -1,12 +1,9 @@
 <script setup lang="ts">
 import {ref, onMounted} from 'vue';
-import {routesFlow, serverMapFrom} from '@mionjs/client';
-import type {Order, OrderEvent} from '../../api/src/features/orders/orders-models';
-import {useMionClient} from '../composables/useMionClient';
+import type {Order, OrderEvent} from '../../api/src/models.ts';
+import {fetchOrdersWithEvents} from '../orders-batch.ts';
 
-const {routes} = useMionClient();
-
-const eventStyles: Record<string, {color: string; icon: string; label: string}> = {
+const eventStyles: Record<OrderEvent['type'], {color: string; icon: string; label: string}> = {
   placed: {color: '#3b82f6', icon: '\u{1F4E6}', label: 'Order Placed'},
   paid: {color: '#10b981', icon: '\u{1F4B3}', label: 'Payment Received'},
   shipped: {color: '#f59e0b', icon: '\u{1F69A}', label: 'Shipped'},
@@ -14,7 +11,7 @@ const eventStyles: Record<string, {color: string; icon: string; label: string}> 
   cancelled: {color: '#ef4444', icon: '\u274C', label: 'Cancelled'},
 };
 
-const statusColors: Record<string, string> = {
+const statusColors: Record<Order['status'], string> = {
   pending: '#f59e0b',
   paid: '#10b981',
   shipped: '#3b82f6',
@@ -23,33 +20,21 @@ const statusColors: Record<string, string> = {
 };
 
 const orders = ref<Order[]>([]);
-const eventsByOrder = ref<Record<string, OrderEvent[]>>({});
+const eventsByOrder = ref<Record<Order['id'], OrderEvent[]>>({});
 const apiErrors = ref<string[]>([]);
 const loading = ref(true);
 
 onMounted(async () => {
-  apiErrors.value = [];
   try {
-    const ordersList = routes.orders.listOrders();
-    const orderIds = serverMapFrom(
-      ordersList,
-      (orders) => orders!.map((o) => o.id),
-      'serverMapFromOrdersToOrderEvents',
-    ).asArg();
-
-    const [[ordersData, allEvents], [ordersError, eventsError]] = await routesFlow([ordersList, routes.orders.getOrdersEvents(orderIds)]).call();
-
+    const [[ordersData, ordersError, response], [allEvents, eventsError]] = await fetchOrdersWithEvents();
     if (ordersError) apiErrors.value.push(`listOrders: ${ordersError.publicMessage} (${ordersError.type})`);
     if (eventsError) apiErrors.value.push(`getOrdersEvents: ${eventsError.publicMessage} (${eventsError.type})`);
-
+    const thrown = response?.['@thrownErrors'];
+    if (thrown?.length) apiErrors.value.push(...thrown.map((e) => `batch: ${e.publicMessage} (${e.type})`));
     if (ordersData) orders.value = ordersData;
-    if (allEvents) {
-      const eventsMap: Record<string, OrderEvent[]> = {};
-      for (const event of allEvents) {
-        (eventsMap[event.orderId] ??= []).push(event);
-      }
-      eventsByOrder.value = eventsMap;
-    }
+    const byOrder: Record<Order['id'], OrderEvent[]> = {};
+    for (const event of allEvents ?? []) (byOrder[event.orderId] ??= []).push(event);
+    eventsByOrder.value = byOrder;
   } catch (e: unknown) {
     apiErrors.value.push(`Unexpected error: ${e instanceof Error ? e.message : e}`);
   } finally {
@@ -85,7 +70,8 @@ function getEventDetails(event: OrderEvent): string | null {
           <a href="https://mion.io" target="_blank" rel="noopener noreferrer">Mion</a>
           is a lightweight TypeScript API framework with end-to-end type safety, automatic serialization, and built-in validation.
           This showcase demonstrates how
-          <code>routesFlow</code>
+          <code>batch</code> +
+          <code>inputFrom</code>
           resolves related data across multiple routes in a single HTTP request. <strong class="hl">A fully typed lightweight alternative to GraphQL.</strong>
         </p>
       </div>

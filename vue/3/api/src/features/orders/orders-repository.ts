@@ -1,35 +1,17 @@
 import {randomUUID_V7} from '@mionjs/core';
-import {FormatUUIDv7} from '@mionjs/type-formats/StringFormats';
-import {Order, OrderEvent} from './orders-models.ts';
+import type {UUIDv7} from '@mionjs/run-types/formats';
+import type {Order, OrderEvent} from './orders-models.ts';
 
-// ---- In-memory store with seed data ----
+// In-memory store; fixed seed ids so the same orders come back after every restart
 
-const id1 = randomUUID_V7() as FormatUUIDv7;
-const id2 = randomUUID_V7() as FormatUUIDv7;
-const id3 = randomUUID_V7() as FormatUUIDv7;
+const id1 = '0195546a-5c00-7000-8000-000000000001' as UUIDv7;
+const id2 = '0195546a-5c00-7000-8000-000000000002' as UUIDv7;
+const id3 = '0195546a-5c00-7000-8000-000000000003' as UUIDv7;
 
 const orders: Order[] = [
-    {
-        id: id1,
-        customer: 'Alice Johnson',
-        total: 175.97,
-        status: 'delivered',
-        createdAt: new Date('2025-03-01T10:00:00Z'),
-    },
-    {
-        id: id2,
-        customer: 'Bob Smith',
-        total: 79.99,
-        status: 'shipped',
-        createdAt: new Date('2025-03-05T14:30:00Z'),
-    },
-    {
-        id: id3,
-        customer: 'Carol Davis',
-        total: 106.96,
-        status: 'cancelled',
-        createdAt: new Date('2025-03-07T09:15:00Z'),
-    },
+    {id: id1, customer: 'Alice Johnson', total: 175.97, status: 'delivered', createdAt: new Date('2025-03-01T10:00:00Z')},
+    {id: id2, customer: 'Bob Smith', total: 79.99, status: 'shipped', createdAt: new Date('2025-03-05T14:30:00Z')},
+    {id: id3, customer: 'Carol Davis', total: 106.96, status: 'cancelled', createdAt: new Date('2025-03-07T09:15:00Z')},
 ];
 
 const events: OrderEvent[] = [
@@ -48,13 +30,13 @@ export function findAllOrders(): Order[] {
     return orders;
 }
 
-export function findOrderById(id: FormatUUIDv7): Order | undefined {
+export function findOrderById(id: UUIDv7): Order | undefined {
     return orders.find((o) => o.id === id);
 }
 
 export function insertOrder(customer: string, total: number): Order {
     const order: Order = {
-        id: randomUUID_V7() as FormatUUIDv7,
+        id: randomUUID_V7() as UUIDv7,
         customer,
         total: Math.round(total * 100) / 100,
         status: 'pending',
@@ -65,11 +47,11 @@ export function insertOrder(customer: string, total: number): Order {
     return order;
 }
 
-export function findEventsByOrderId(orderId: FormatUUIDv7): OrderEvent[] {
+export function findEventsByOrderId(orderId: UUIDv7): OrderEvent[] {
     return events.filter((e) => e.orderId === orderId);
 }
 
-export function findEventsByOrderIds(orderIds: FormatUUIDv7[]): OrderEvent[] {
+export function findEventsByOrderIds(orderIds: UUIDv7[]): OrderEvent[] {
     const idSet = new Set(orderIds);
     return events.filter((e) => idSet.has(e.orderId));
 }

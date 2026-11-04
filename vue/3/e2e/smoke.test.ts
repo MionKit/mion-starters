@@ -5,7 +5,7 @@ test('homepage loads', async ({page}) => {
     await expect(page.getByText('To get started')).toBeVisible();
 });
 
-test('mion API responds through dev server proxy', async ({request}) => {
+test('mion API responds through the Vite dev server', async ({request}) => {
     const res = await request.post('/api/mion/hello', {
         headers: {'Content-Type': 'application/json'},
         data: {hello: ['Playwright']},
@@ -43,7 +43,6 @@ test('orders showcase page loads and displays orders', async ({page}) => {
 test('orders showcase displays event timeline', async ({page}) => {
     await page.goto('/mion-orders');
     await expect(page.getByText('Loading orders...')).toBeHidden({timeout: 15_000});
-    // Verify event timeline is rendered for at least one order
     await expect(page.getByText('Event Timeline').first()).toBeVisible();
 });
 
