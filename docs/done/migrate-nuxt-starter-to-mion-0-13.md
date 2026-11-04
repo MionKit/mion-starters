@@ -1,7 +1,7 @@
 ---
 type: chore
 spec: guidelines
-status: blocked
+status: done
 created: 2026-11-02
 ---
 
@@ -105,3 +105,15 @@ this change touched, review its report against the code, and commit it as its ow
   `app/plugins/mion.ts`.
 - Checks: unit + Playwright cold and warm, root nuxt create test, `nuxt build` / `nuxt generate` behind a proxy,
   node, bun and Cloudflare (local workerd) bundles each running the e2e suite.
+
+## Shipped (2026-11-04)
+
+Built as planned on mion `main` through the local registry. Differences from the text above:
+
+- No mion workaround was needed: no `vite.root`, no `server.build`, `.vue` files linted, the Worker boots on workerd.
+- The root Nuxt test is the `create-starter-nuxt` block of `tests/create-e2e.test.ts`.
+- `plans/mion-nuxt-integration.md` no longer existed: nothing to rewrite.
+- `nuxt generate` needs no API: the SPA loads data in the browser.
+- `preview:api:cloudflare` runs `npx wrangler@4` instead of a `wrangler` dependency, to keep installs light.
+- Vitest 5's on-disk module cache kept a stale test transform after a tsconfig `include` change: a mion bug,
+  filed in the mion repo and not worked around here.
