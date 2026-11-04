@@ -81,6 +81,7 @@ describe('create.mjs without .mion/enriched', () => {
         const projectDir = join(TMP_DIR, 'no-enriched', 'out', 'my-app');
         rmSync(join(TMP_DIR, 'no-enriched'), {recursive: true, force: true});
         cpSync(resolve(ROOT, 'vue/3'), sourceCopy, {recursive: true, filter: (src) => basename(src) !== 'node_modules'});
+        rmSync(join(sourceCopy, '.mion'), {recursive: true, force: true});
         mkdirSync(join(sourceCopy, '.mion/types'), {recursive: true});
         writeFileSync(join(sourceCopy, '.mion/types/x.js'), '');
         execFileSync('node', [join(sourceCopy, 'create.mjs'), projectDir, '--no-install'], {stdio: 'pipe'});
