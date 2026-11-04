@@ -42,7 +42,7 @@ npm create vite@latest tmp-update-react -- --template react-ts --no-interactive
 ```
 
 The starter adds `react-router`, vitest and Playwright to this scaffold: compare those with their latest npm versions.
-It lints with oxlint in place of the scaffold's ESLint: compare oxlint with its latest npm version.
+It uses oxlint, not the scaffold's ESLint: compare oxlint with its latest npm version.
 
 ### vue
 
@@ -50,7 +50,7 @@ It lints with oxlint in place of the scaffold's ESLint: compare oxlint with its 
 npm create vue@latest tmp-update-vue -- --ts --router --vitest --playwright --eslint
 ```
 
-`--eslint` adds ESLint and oxlint. The starter lints with oxlint only: compare oxlint, skip ESLint.
+`--eslint` adds ESLint and oxlint. The starter uses only oxlint: compare oxlint, skip ESLint.
 
 **If the command fails** (e.g., unknown flags), check what flags are available (`--help`) and retry with sensible defaults. The goal is a TypeScript project with routing and the standard tooling for that framework.
 
