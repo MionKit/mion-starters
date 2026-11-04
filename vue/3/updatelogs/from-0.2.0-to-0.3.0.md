@@ -21,7 +21,7 @@
 | @mionjs/run-types             | 0.13.2    | `UUIDv7` format                                       |
 | @mionjs/bin-compiler          | 0.13.2    | required peer of `@mionjs/devtools`                   |
 | vue-tsc, @types/node          | ^3.3.14, ^24.19.2 | `npm run typecheck` over one tsconfig         |
-| oxlint                        | ^1.91.0   | lint with the mion rules, `.vue` files included        |
+| oxlint                        | ^1.89.0   | lint with the mion rules, `.vue` files included        |
 | wrangler                      | ^4.157.0  | run and deploy the Cloudflare Workers build           |
 
 ## Removed
@@ -29,7 +29,7 @@
 | Package                                     | Why                                                   |
 | ------------------------------------------- | ----------------------------------------------------- |
 | @mionjs/type-formats                        | formats moved to `@mionjs/run-types/formats`          |
-| @mionjs/platform-vercel                     | Vercel was never wired up; not a target of this starter |
+| @mionjs/platform-vercel                     | never deployable from this starter; not one of its targets |
 | vite-node                                   | the API runs inside the Vite dev server               |
 | eslint, eslint-plugin-vue, typescript-eslint | replaced by oxlint                                   |
 
@@ -41,9 +41,10 @@
 
 ## Code Changes
 
-- One `vite.config.ts` and one `tsconfig.json` for the SPA, the API and the tests. `vite build` emits both bundles;
+- One `vite.config.ts` and one `tsconfig.json` for the SPA, the API and the tests. `vite build` builds both bundles;
   `--mode bun` or `--mode cloudflare` picks the API target.
-- Router in `api/src/router.ts` (`createMionRouter`, `mion.query`, `mion.mutation`, sync `initRoutes`), fixed seed ids.
+- Router in `api/src/router.ts` (`createMionRouter`, `mion.query`, `mion.mutation`, sync `initRoutes`).
+  Fixed seed ids in the orders repository.
 - Batch demo (`batch` + `inputFrom`, was `routesFlow` + `serverMapFrom`) in `app/orders-batch.ts`, with a
   module-level client. No more provide/inject composable.
 - Vue Router set up in `app/main.ts`; `App.vue` and `app/router.ts` removed.

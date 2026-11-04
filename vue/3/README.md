@@ -21,7 +21,7 @@ Open [http://localhost:5173](http://localhost:5173).
 
 ## Build
 
-Each build emits the SPA into `dist/` and the API for one target into `dist-server/`:
+Each build writes the SPA to `dist/` and the API for one target to `dist-server/`:
 
 ```bash
 npm run build             # Node: dist-server/server.node.js
@@ -38,11 +38,11 @@ npm run preview     # in a second terminal: the SPA, forwarding /api/mion to the
 
 - Bun: `npm run build:bun`, then `npm run preview:bun` in place of `preview:api`.
 - Cloudflare Workers: `npm run build:cloudflare`, then `npm run preview:cloudflare`. One Worker serves the SPA and
-  the API on [http://localhost:8787](http://localhost:8787), the way `wrangler.toml` deploys them.
+  the API on [http://localhost:8787](http://localhost:8787), as `wrangler.toml` deploys them.
 
 ## Deploy
 
-- Node or Bun: copy `dist/` to any static host or CDN and run the matching file in `dist-server/`.
+- Node or Bun: run the matching file in `dist-server/`, and put `dist/` on a static host or CDN that forwards `/api/mion` to it.
 - Cloudflare Workers: `npm run build:cloudflare`, then `npx wrangler deploy`.
 
 ## Test
