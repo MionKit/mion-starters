@@ -8,11 +8,11 @@
   "homepage": "https://mion.io",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mionjs/mion-starters.git",
+    "url": "git+https://github.com/MionKit/mion-starters.git",
     "directory": "vue/3"
   },
   "bugs": {
-    "url": "https://github.com/mionjs/mion-starters/issues"
+    "url": "https://github.com/MionKit/mion-starters/issues"
   },
   "keywords": [
     "mion",

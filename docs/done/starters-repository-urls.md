@@ -1,7 +1,7 @@
 ---
 type: fix
 spec: guidelines
-status: ready
+status: done
 created: 2026-11-02
 ---
 
@@ -23,3 +23,11 @@ of every `@mionjs/create-starter-*` package links to a missing repository and is
 ## Done when
 
 - Every starter's `repository` and `bugs` links open the real repository.
+
+## Plan: fix the links (approved 2026-11-04)
+
+- `github.com/mionjs/mion-starters` does not resolve: git asks for a login, which GitHub does for a missing repository.
+  Every mion package already links to `github.com/MionKit/mion`.
+- `react/19`, `vue/3` and `nuxt/4` `package.json`: `repository.url` and `bugs.url` point at `MionKit/mion-starters`.
+- `tests/create-output.test.ts` fails on a wrong `repository` or `bugs` link in any starter.
+- No README, `CLAUDE.md` or `create.mjs` output named the wrong repository: `create.mjs` already drops both fields.

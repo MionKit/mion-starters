@@ -48,6 +48,12 @@ describe.each(STARTERS)('%s create.mjs', (starterDir) => {
         }
     });
 
+    it('links the published package to the real repository', () => {
+        const pkg = JSON.parse(readFileSync(resolve(ROOT, starterDir, 'package.json'), 'utf-8'));
+        expect(pkg.repository).toEqual({type: 'git', url: 'git+https://github.com/MionKit/mion-starters.git', directory: starterDir});
+        expect(pkg.bugs).toEqual({url: 'https://github.com/MionKit/mion-starters/issues'});
+    });
+
     it('copies no generated state but keeps .mion/enriched', () => {
         for (const file of GENERATED) expect(existsSync(join(projectDir, file)), file).toBe(false);
         expect(existsSync(join(projectDir, '.mion/enriched/texts.ts'))).toBe(true);
