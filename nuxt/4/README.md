@@ -60,7 +60,8 @@ An API on another domain needs CORS: add the [`mionSecurity`](https://mion.io/rp
 npm run typecheck   # nuxi typecheck + tsc for the API entries
 npm run lint        # eslint with the Nuxt and mion rules
 npm run test:unit   # vitest: raw API calls and the typed client
-npm run test:e2e    # playwright
+npm run test:e2e    # playwright, on nuxt dev
+npm run test:e2e:build # playwright, on the npm run build output
 ```
 
 ## Project Layout
