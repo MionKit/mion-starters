@@ -51,14 +51,16 @@ Remove:
 
 - `.claude/settings.local.json`: one person's permissions with stale paths. Untracked, ignored in the root `.gitignore`.
 - `.vercel` in every `create.mjs` `EXCLUDE`, `nuxt/4/.npmignore` and the root `.gitignore`: Vercel is no target.
-- The `@mionjs/*` `overrides` cleanup in `writeVersions` and its tests: only the tarball setup wrote those overrides.
+- The `@mionjs/*` `overrides` cleanup in `writeVersions` and its tests, and the `overrides` read in
+  `pre-publish-test.mjs`: only the tarball setup wrote those overrides.
 - Tailwind / PostCSS in the update-deps skill: no starter uses them.
 
 Change:
 
 - Root `vitest` `^3` to `^5`, as in the starters: drops `vite-node` from the root lockfile.
 - Nuxt `@nuxt/eslint` to `devDependencies`, next to `eslint`.
-- update-deps skill: scaffold Vue with oxlint, as the starter lints, and compare `.oxlintrc.json`.
+- update-deps skill: compare oxlint, not the scaffold's ESLint, for React and Vue (create-vue's `--eslint` adds
+  both, it has no oxlint-only option), and compare `.oxlintrc.json`.
 - Regenerate every lockfile.
 
 Keep:
@@ -68,3 +70,5 @@ Keep:
 - Accidental-looking differences that are choices: Nuxt lints with ESLint (`@nuxt/eslint`), React and Vue with oxlint;
   React targets Node only; React has no `updatelogs/` yet.
 - `updatelogs/`: history.
+- `hasFileDeps` in `pre-publish-test.mjs`: still refuses a hand-written `file:` mion dependency before publishing.
+- `.wrangler` / `.data` in React's ignore files: `tests/create-output.test.ts` keeps one list for every starter.
