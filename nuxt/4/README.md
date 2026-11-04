@@ -1,7 +1,6 @@
 # Nuxt 4 + mion Starter
 
-A full-stack starter that pairs a Nuxt 4 SPA (`ssr: false`) with a [mion](https://mion.io) API. The API runs on
-Node, Bun or Cloudflare Workers.
+A Nuxt 4 SPA (`ssr: false`) with a [mion](https://mion.io) API that runs on Node, Bun or Cloudflare Workers.
 
 ## Setup
 
@@ -11,24 +10,19 @@ npm install
 
 ## Development
 
-Runs `nuxt dev` with the mion API inside it, under `/api/mion`:
+The mion API runs inside `nuxt dev`, under `/api/mion`.
 
 ```bash
-npm run dev
+npm run dev   # open http://localhost:3000
 ```
-
-Open [http://localhost:3000](http://localhost:3000).
 
 ## Build
 
-```bash
-npm run build       # Nuxt app into .output/, Node API into api/dist/
-npm run generate    # static SPA only, into .output/public/
-```
-
-API bundles, one per target, into `api/dist/`:
+Each `build:api` script builds one API target into `api/dist/`.
 
 ```bash
+npm run build                 # Nuxt app into .output/, Node API into api/dist/
+npm run generate              # static SPA only, into .output/public/
 npm run build:api             # Node
 npm run build:api:bun         # Bun
 npm run build:api:cloudflare  # Cloudflare Workers
@@ -37,11 +31,11 @@ npm run build:api:cloudflare  # Cloudflare Workers
 ## Preview
 
 ```bash
-npm run preview:api # the built Node API, on port 3001 (or preview:api:bun, preview:api:cloudflare)
-npm run preview     # in a second terminal: the built app, forwarding /api/mion to the API
+npm run preview:api             # the built Node API, on port 3001
+npm run preview:api:bun         # or the Bun API
+npm run preview:api:cloudflare  # or the Worker, on local workerd through npx wrangler
+npm run preview                 # in a second terminal: the built app, forwarding /api/mion to the API
 ```
-
-`preview:api:cloudflare` runs the Worker on local workerd through `npx wrangler`.
 
 ## Deploy
 

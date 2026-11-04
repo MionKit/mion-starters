@@ -27,7 +27,7 @@ Removed: `@mionjs/type-formats`, `@mionjs/platform-vercel`, `vite-node`, the `ov
 
 ## Changes
 
-- The mion Vite plugin (`@mionjs/devtools/vite`) runs in `nuxt.config.ts`: the API answers inside `nuxt dev`.
+- The mion Vite plugin (`@mionjs/devtools/vite`) runs in `nuxt.config.ts`: the API runs inside `nuxt dev`.
   `api/mion-plugin.ts` and `api/src/dev-server.ts` are gone.
 - `tsconfig.mion.json`: one program for the app and the API (Nuxt's `tsconfig.json` only holds references).
 - Router: `createMionRouter` in `api/src/router.ts`, `mion.query` / `mion.mutation`, sync `mion.initRoutes`.
