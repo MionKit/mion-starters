@@ -1,23 +1,24 @@
-import { defineConfig } from "vite";
-import { resolve } from "path";
-import vue from "@vitejs/plugin-vue";
-import { mionVitePlugin } from "@mionjs/devtools/vite-plugin";
+/// <reference types="vitest/config" />
+import {defineConfig} from 'vite';
+import vue from '@vitejs/plugin-vue';
+import {mionVitePlugin} from '@mionjs/devtools/vite';
 
-const apiDir = resolve(import.meta.dirname, "api");
+/** Keyed by `vite build --mode <target>`; dev and plain `vite build` use node */
+const API_ENTRIES: Record<string, string> = {
+    bun: 'api/src/server.bun.ts',
+    cloudflare: 'api/src/cloudflare-worker.ts',
+};
 
-export default defineConfig({
-  plugins: [
-    vue(),
-    mionVitePlugin({
-      runTypes: { tsConfig: resolve(apiDir, "tsconfig.json") },
-      serverPureFunctions: { clientSrcPath: resolve(apiDir, "../app") },
-      aotCaches: true,
-      server: {
-        startScript: resolve(apiDir, "src/server.node.ts"),
-        viteConfig: resolve(apiDir, "vite.config.ts"),
-        runMode: "middleware",
-      },
-    }),
-  ],
-  build: { outDir: "dist/app" },
-});
+export default defineConfig(({mode}) => ({
+    plugins: [
+        vue(),
+        mionVitePlugin({
+            server: {entry: API_ENTRIES[mode] ?? 'api/src/server.node.ts', build: {outDir: 'dist-server'}},
+            // Workers refuse `new Function`, so that build ships every compiled function ready to run
+            runTypes: mode === 'cloudflare' ? {emitMode: 'both'} : undefined,
+        }),
+    ],
+    test: {include: ['api/tests/**/*.test.ts'], globalSetup: ['api/tests/global-setup.ts']},
+    // `vite preview` serves only dist/: the API bundle runs on its own (npm run preview:api)
+    preview: {proxy: {'/api/mion': 'http://localhost:3001'}},
+}));

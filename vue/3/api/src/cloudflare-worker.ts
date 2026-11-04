@@ -1,5 +1,5 @@
-import {initApi} from './api.ts';
 import {createCloudflareHandler} from '@mionjs/platform-cloudflare';
+import './api.ts';
 
-await initApi();
+/** Built with `npm run build:cloudflare`; wrangler.toml serves dist/ next to it */
 export default createCloudflareHandler();

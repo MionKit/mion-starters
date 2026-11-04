@@ -4,6 +4,9 @@ dist/
 build/
 coverage/
 .coverage/
+dist-server/
+.wrangler/
+.data/
 test-results/
 updatelogs/
 package-lock.json
@@ -13,6 +16,3 @@ package-lock.json
 .env*
 .mion/*
 !.mion/enriched/
-dist-server/
-.wrangler/
-.data/

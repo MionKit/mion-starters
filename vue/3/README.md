@@ -1,6 +1,7 @@
 # Vue 3 + mion Starter
 
-A full-stack starter that pairs a Vue 3 SPA with a [mion](https://mion.io) API. The same `api/` package builds for Node, Bun, Vercel, and Cloudflare Workers.
+A full-stack starter that pairs a Vue 3 SPA (Vite + Vue Router) with a [mion](https://mion.io) API. The API deploys
+to Node, Bun or Cloudflare Workers.
 
 ## Setup
 
@@ -10,7 +11,7 @@ npm install
 
 ## Development
 
-Runs the Vue dev server with the mion API mounted as Vite middleware:
+Runs the Vite dev server with the mion API inside it, under `/api/mion`:
 
 ```bash
 npm run dev
@@ -20,34 +21,49 @@ Open [http://localhost:5173](http://localhost:5173).
 
 ## Build
 
+Each build writes the SPA to `dist/` and the API for one target to `dist-server/`:
+
 ```bash
-npm run build       # builds both the SPA and the API
-npm run build:app   # SPA only
-npm run build:api   # API only
+npm run build             # Node: dist-server/server.node.js
+npm run build:bun         # Bun: dist-server/server.bun.js
+npm run build:cloudflare  # Cloudflare Workers: dist-server/cloudflare-worker.js
 ```
 
 ## Preview
 
 ```bash
-npm run preview:api # the API, on port 3001
+npm run preview:api # after `npm run build`: the API on Node, port 3001
 npm run preview     # in a second terminal: the SPA, forwarding /api/mion to the API
 ```
+
+- Bun: `npm run build:bun`, then `npm run preview:bun` in place of `preview:api`.
+- Cloudflare Workers: `npm run build:cloudflare`, then `npm run preview:cloudflare`. One Worker serves the SPA and
+  the API on [http://localhost:8787](http://localhost:8787), as `wrangler.toml` deploys them.
+
+## Deploy
+
+- Node or Bun: run the matching file in `dist-server/`, and put `dist/` on a static host or CDN that forwards `/api/mion` to it.
+- Cloudflare Workers: `npm run build:cloudflare`, then `npx wrangler deploy`.
 
 ## Test
 
 ```bash
-npm run test:unit   # vitest
+npm run typecheck   # vue-tsc
+npm run lint        # oxlint with the mion rules
+npm run test:unit   # vitest: raw API calls and the typed client
 npm run test:e2e    # playwright
 ```
 
-## Project layout
+## Project Layout
 
-- `app/` — Vue 3 SPA (router, pages, mion client)
-- `api/` — mion API (routes, models, repositories, platform entries)
-- `deploy/` — Cloudflare Workers config
-- `functions/` — Cloudflare Pages Functions wrapper
+- `app/`: Vue SPA (pages, router, mion client, batch calls)
+- `api/`: mion API (routes, models, repository, one entry per deploy target)
 
-## Learn more
+Write `batch()` calls in `.ts` modules that use the module-level client from `app/mion-client.ts`, like
+`app/orders-batch.ts`. Vue components only call those functions.
+
+## Learn More
 
 - [mion docs](https://mion.io)
-- [Vue 3 docs](https://vuejs.org)
+- [Vue docs](https://vuejs.org)
+- [Vue Router docs](https://router.vuejs.org)

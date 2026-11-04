@@ -1,10 +1,15 @@
 import {createApp} from 'vue';
-import App from './App.vue';
-import {router} from './router';
-import {mionClient} from './mion-client';
+import {createRouter, createWebHistory, RouterView} from 'vue-router';
+import HomePage from './pages/HomePage.vue';
+import MionOrdersPage from './pages/MionOrdersPage.vue';
 import './assets/main.css';
 
-const app = createApp(App);
-app.use(router);
-app.provide('mionClient', mionClient);
-app.mount('#app');
+const router = createRouter({
+    history: createWebHistory(),
+    routes: [
+        {path: '/', component: HomePage},
+        {path: '/mion-orders', component: MionOrdersPage},
+    ],
+});
+
+createApp(RouterView).use(router).mount('#app');
