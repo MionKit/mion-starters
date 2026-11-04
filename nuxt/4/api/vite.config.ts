@@ -5,7 +5,7 @@ import { builtinModules } from "node:module";
 import { mionVitePlugin } from "@mionjs/devtools/vite";
 
 const root = resolve(import.meta.dirname, "..");
-/** Keyed by `--mode`; vitest runs in mode `test` against the node server */
+/** vitest runs in mode `test` */
 const API_ENTRIES: Record<string, string> = {
   node: "server.node",
   bun: "server.bun",
