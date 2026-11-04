@@ -22,6 +22,8 @@ describe.each([
         rmSync(tmpDir, {recursive: true, force: true});
         mkdirSync(tmpDir, {recursive: true});
         run(`node ${join(starter, 'create.mjs')} ${projectDir}`, tmpDir);
+        // its own repo, as a new project is: else oxlint obeys this repo's .gitignore, which ignores .tmp-*
+        run('git init -q');
         run('npx playwright install chromium');
     }, 600_000);
 
@@ -30,34 +32,31 @@ describe.each([
     it('builds', () => run('npm run build'), 300_000);
     it('typechecks', ({skip}) => (hasScript('typecheck') ? run('npm run typecheck') : skip()), 300_000);
     it('passes unit tests', ({skip}) => (hasScript('test:unit') ? run('npm run test:unit') : skip()), 300_000);
-    /** Builds one deploy target, runs it and polls the hello route until it answers; `page` also checks the SPA */
-    const servesHello = async (build: string, serve: string, url: string, page?: string) => {
+    it('lints', ({skip}) => (hasScript('lint') ? run('npm run lint') : skip()), 300_000);
+    /** Each deploy target the starter has a preview script for: build it, run it, poll hello until it answers */
+    it.for([
+        ['node', 'build', 'preview:api', 3001],
+        ['bun', 'build:bun', 'preview:bun', 3001],
+        ['Cloudflare workerd', 'build:cloudflare', 'preview:cloudflare', 8787],
+    ] as const)('serves the built API with %s', async ([target, build, serve, port], {skip}) => {
+        if (!hasScript(serve) || (target === 'bun' && spawnSync('bun', ['--version']).status !== 0)) return skip();
         if (build !== 'build') run(`npm run ${build}`);
-        const api = spawn('npm', ['run', serve], {cwd: projectDir, env, detached: true, stdio: 'ignore'});
+        const api = spawn('npm', ['run', serve], {cwd: projectDir, env, detached: true, stdio: 'inherit'});
         try {
             const hello = () =>
-                fetch(url, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({hello: ['mion']})})
+                fetch(`http://localhost:${port}/api/mion/hello`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({hello: ['mion']}),
+                })
                     .then((res) => res.json())
                     .catch(() => undefined);
             await expect.poll(hello, {timeout: 60_000, interval: 500}).toEqual({hello: 'Hello mion!'});
-            if (page) expect((await fetch(page)).headers.get('content-type')).toContain('text/html');
+            // a Worker serves the SPA too
+            if (port === 8787) expect((await fetch(`http://localhost:${port}/mion-orders`)).headers.get('content-type')).toContain('text/html');
         } finally {
-            process.kill(-api.pid!);
+            if (api.exitCode === null) process.kill(-api.pid!);
         }
-    };
-    const hasBun = () => spawnSync('bun', ['--version']).status === 0;
-
-    it('serves the built API with node', async ({skip}) => {
-        if (!hasScript('preview:api')) return skip();
-        await servesHello('build', 'preview:api', 'http://localhost:3001/api/mion/hello');
-    }, 90_000);
-    it('serves the built API with bun', async ({skip}) => {
-        if (!hasScript('preview:bun') || !hasBun()) return skip();
-        await servesHello('build:bun', 'preview:bun', 'http://localhost:3001/api/mion/hello');
-    }, 300_000);
-    it('serves the built app on Cloudflare workerd', async ({skip}) => {
-        if (!hasScript('preview:cloudflare')) return skip();
-        await servesHello('build:cloudflare', 'preview:cloudflare', 'http://localhost:8787/api/mion/hello', 'http://localhost:8787/mion-orders');
     }, 300_000);
     it('passes playwright e2e tests', () => run('npx playwright test'), 300_000);
 });
