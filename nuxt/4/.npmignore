@@ -13,7 +13,6 @@ package-lock.json
 *.pem
 *.tsbuildinfo
 .env*
-.vercel
 .mion/*
 !.mion/enriched/
 dist-server/
