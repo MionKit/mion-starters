@@ -1,4 +1,4 @@
-import {execSync, spawn} from 'node:child_process';
+import {execSync, spawn, spawnSync} from 'node:child_process';
 import {readFileSync, rmSync, mkdirSync} from 'node:fs';
 import {resolve, join} from 'node:path';
 import {describe, it, expect, beforeAll, afterAll} from 'vitest';
@@ -30,22 +30,34 @@ describe.each([
     it('builds', () => run('npm run build'), 300_000);
     it('typechecks', ({skip}) => (hasScript('typecheck') ? run('npm run typecheck') : skip()), 300_000);
     it('passes unit tests', ({skip}) => (hasScript('test:unit') ? run('npm run test:unit') : skip()), 300_000);
-    it('serves the built API with node', async ({skip}) => {
-        if (!hasScript('preview:api')) return skip();
-        const api = spawn('npm', ['run', 'preview:api'], {cwd: projectDir, env, detached: true, stdio: 'ignore'});
+    /** Builds one deploy target, runs it and polls the hello route until it answers; `page` also checks the SPA */
+    const servesHello = async (build: string, serve: string, url: string, page?: string) => {
+        if (build !== 'build') run(`npm run ${build}`);
+        const api = spawn('npm', ['run', serve], {cwd: projectDir, env, detached: true, stdio: 'ignore'});
         try {
             const hello = () =>
-                fetch('http://localhost:3001/api/mion/hello', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({hello: ['Node']}),
-                })
+                fetch(url, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({hello: ['mion']})})
                     .then((res) => res.json())
                     .catch(() => undefined);
-            await expect.poll(hello, {timeout: 30_000, interval: 500}).toEqual({hello: 'Hello Node!'});
+            await expect.poll(hello, {timeout: 60_000, interval: 500}).toEqual({hello: 'Hello mion!'});
+            if (page) expect((await fetch(page)).headers.get('content-type')).toContain('text/html');
         } finally {
             process.kill(-api.pid!);
         }
-    }, 60_000);
+    };
+    const hasBun = () => spawnSync('bun', ['--version']).status === 0;
+
+    it('serves the built API with node', async ({skip}) => {
+        if (!hasScript('preview:api')) return skip();
+        await servesHello('build', 'preview:api', 'http://localhost:3001/api/mion/hello');
+    }, 90_000);
+    it('serves the built API with bun', async ({skip}) => {
+        if (!hasScript('preview:bun') || !hasBun()) return skip();
+        await servesHello('build:bun', 'preview:bun', 'http://localhost:3001/api/mion/hello');
+    }, 300_000);
+    it('serves the built app on Cloudflare workerd', async ({skip}) => {
+        if (!hasScript('preview:cloudflare')) return skip();
+        await servesHello('build:cloudflare', 'preview:cloudflare', 'http://localhost:8787/api/mion/hello', 'http://localhost:8787/mion-orders');
+    }, 300_000);
     it('passes playwright e2e tests', () => run('npx playwright test'), 300_000);
 });
