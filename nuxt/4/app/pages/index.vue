@@ -2,11 +2,11 @@
   <div class="page-wrapper">
     <main class="page-main">
       <div class="logos">
-        <img src="/nuxt.svg" alt="Nuxt logo"  height="60" />
+        <img src="/nuxt.svg" alt="Nuxt logo"  height="60" >
         <span class="logo-separator">+</span>
         <picture>
-          <source srcset="/mion-logo-dark.svg" media="(prefers-color-scheme: dark)" />
-          <img src="/mion-logo.svg" alt="Mion logo" height="60" />
+          <source srcset="/mion-logo-dark.svg" media="(prefers-color-scheme: dark)" >
+          <img src="/mion-logo.svg" alt="Mion logo" height="60" >
         </picture>
       </div>
       <div class="content-section">
