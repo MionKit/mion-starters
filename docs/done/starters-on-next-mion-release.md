@@ -1,7 +1,7 @@
 ---
 type: chore
 spec: guidelines
-status: ready
+status: done
 created: 2026-11-04
 ---
 
@@ -42,8 +42,9 @@ mion 0.14.0, published with those fixes, unblocks it.
 
 - All three starters on `@mionjs/*` 0.14.0, npm mode, version 0.4.0, with update logs.
 - Root tests pass cold and warm (46 passed, 4 skipped: targets or scripts a starter does not have);
-  each starter's `npm test` passes.
+  each starter's `npm test` passes; `scripts/pre-publish-test.mjs` passes for all three.
 - Checked gone on 0.14.0: `.vue` lint (Nuxt, Vue), Nuxt API hot reload (handler edit seen in about 3 s),
   workerd boot (Nuxt, Vue), `platform-bun` production install (64 MB with 0.13.2, 4.4 MB with 0.14.0).
 - Found on the way: React's `.npmignore` shipped `updatelogs/`; fixed, with a root test for every starter.
+- mion 0.14.0 needs Node 24 or newer: each starter declares `engines.node >=24`.
 - Publishing stays with the maintainer.
