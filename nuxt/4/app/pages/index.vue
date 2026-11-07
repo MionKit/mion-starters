@@ -20,9 +20,8 @@
       </div>
       <div class="actions">
         <NuxtLink class="btn btn-primary" to="/mion-orders">Mion Showcase</NuxtLink>
-        <a class="btn btn-secondary" href="https://nuxt.com/docs" target="_blank" rel="noopener noreferrer">
-          Documentation
-        </a>
+        <a class="btn btn-secondary" href="https://mion.io" target="_blank" rel="noopener noreferrer">Mion Docs</a>
+        <a class="btn btn-secondary" href="https://nuxt.com/docs" target="_blank" rel="noopener noreferrer">Nuxt Docs</a>
       </div>
     </main>
   </div>

@@ -24,3 +24,5 @@ mion 0.14.0 fixes these 0.13.2 bugs in this starter (each checked):
 ## Code Changes
 
 - `package.json` sets `engines.node >=24`, the minimum mion 0.14.0 needs.
+- The home page (`HomePage.vue`) adds a **Mion Docs** button (https://mion.io) between **Mion Showcase** and the framework docs
+  button, now labeled **Vue Docs**.
