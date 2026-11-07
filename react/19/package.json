@@ -1,6 +1,6 @@
 {
   "name": "@mionjs/create-starter-react",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "description": "Starter template for building full-stack apps with mion + React 19 (SPA). Run `npm create @mionjs/starter-react <project-name>` to scaffold.",
   "type": "module",
   "license": "MIT",

@@ -1,6 +1,6 @@
 {
   "name": "@mionjs/create-starter-vue",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Starter template for building full-stack apps with mion + Vue 3 (SPA). Run `npm create @mionjs/starter-vue <project-name>` to scaffold.",
   "type": "module",
   "license": "MIT",

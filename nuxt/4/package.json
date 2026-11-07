@@ -1,6 +1,6 @@
 {
   "name": "@mionjs/create-starter-nuxt",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Starter template for building full-stack apps with mion + Nuxt 4 (SPA). Run `npm create @mionjs/starter-nuxt <project-name>` to scaffold.",
   "type": "module",
   "license": "MIT",
