@@ -68,6 +68,11 @@ describe.each(STARTERS)('%s create.mjs', (starterDir) => {
         covers(join(projectDir, '.gitignore'), ['/.mion/*', '!/.mion/enriched/', '/dist-server', '/.wrangler', '/.data', '/test-results']);
         covers(resolve(ROOT, starterDir, '.npmignore'), ['.mion/*', '!.mion/enriched/', 'dist-server/', '.wrangler/', '.data/', 'test-results/']);
     });
+
+    /** update logs are starter history, not part of a new project */
+    it('keeps updatelogs out of the npm package', () => {
+        expect(readFileSync(resolve(ROOT, starterDir, '.npmignore'), 'utf-8').split('\n')).toContain('updatelogs/');
+    });
 });
 
 describe('create.mjs arguments', () => {
