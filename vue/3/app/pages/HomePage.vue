@@ -20,8 +20,9 @@
       </div>
       <div class="actions">
         <RouterLink class="btn btn-primary" to="/mion-orders">Mion Showcase</RouterLink>
+        <a class="btn btn-secondary" href="https://mion.io" target="_blank" rel="noopener noreferrer">Mion Docs</a>
         <a class="btn btn-secondary" href="https://vuejs.org/guide/introduction" target="_blank" rel="noopener noreferrer">
-          Documentation
+          Vue Docs
         </a>
       </div>
     </main>

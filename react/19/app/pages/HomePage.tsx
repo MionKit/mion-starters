@@ -32,13 +32,16 @@ export default function HomePage() {
                     <Link className={`${styles.btn} ${styles.btnPrimary}`} to="/mion-orders">
                         Mion Showcase
                     </Link>
+                    <a className={`${styles.btn} ${styles.btnSecondary}`} href="https://mion.io" target="_blank" rel="noopener noreferrer">
+                        Mion Docs
+                    </a>
                     <a
                         className={`${styles.btn} ${styles.btnSecondary}`}
                         href="https://react.dev/learn"
                         target="_blank"
                         rel="noopener noreferrer"
                     >
-                        Documentation
+                        React Docs
                     </a>
                 </div>
             </main>
