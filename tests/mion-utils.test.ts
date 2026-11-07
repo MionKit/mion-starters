@@ -112,7 +112,9 @@ describe('findStarterDirs', () => {
 describe('localModeEnv', () => {
     it('points npm at the local registry through /bin/sh, keeping the user config', () => {
         writeFileSync(join(DIR, 'user.npmrc'), 'save-exact=true\n');
+        // npm run sets the lower-case spelling, so stub both or the helper reads ~/.npmrc
         vi.stubEnv('NPM_CONFIG_USERCONFIG', join(DIR, 'user.npmrc'));
+        vi.stubEnv('npm_config_userconfig', join(DIR, 'user.npmrc'));
         const env = {...process.env, ...localModeEnv()};
         vi.unstubAllEnvs();
         const get = (key: string) => execSync(`npm config get ${key}`, {cwd: DIR, env, encoding: 'utf-8'}).trim();
