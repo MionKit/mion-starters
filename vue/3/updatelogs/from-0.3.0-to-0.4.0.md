@@ -23,4 +23,4 @@ No other dependency changed.
 
 ## Code Changes
 
-- None.
+- `package.json` declares `engines.node >=24`, the floor mion 0.14.0 sets.
