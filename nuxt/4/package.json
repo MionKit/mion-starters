@@ -1,6 +1,6 @@
 {
   "name": "@mionjs/create-starter-nuxt",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Starter template for building full-stack apps with mion + Nuxt 4 (SPA). Run `npm create @mionjs/starter-nuxt <project-name>` to scaffold.",
   "type": "module",
   "license": "MIT",
@@ -33,6 +33,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "dev": "nuxt dev",
     "build": "nuxt build && npm run build:api",
@@ -54,20 +57,20 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@mionjs/client": "0.13.2",
-    "@mionjs/core": "0.13.2",
-    "@mionjs/platform-bun": "0.13.2",
-    "@mionjs/platform-cloudflare": "0.13.2",
-    "@mionjs/platform-node": "0.13.2",
-    "@mionjs/router": "0.13.2",
-    "@mionjs/run-types": "0.13.2",
+    "@mionjs/client": "0.14.0",
+    "@mionjs/core": "0.14.0",
+    "@mionjs/platform-bun": "0.14.0",
+    "@mionjs/platform-cloudflare": "0.14.0",
+    "@mionjs/platform-node": "0.14.0",
+    "@mionjs/router": "0.14.0",
+    "@mionjs/run-types": "0.14.0",
     "nuxt": "^4.6.4",
     "vue": "^3.5.44",
     "vue-router": "^5.4.0"
   },
   "devDependencies": {
-    "@mionjs/bin-compiler": "0.13.2",
-    "@mionjs/devtools": "0.13.2",
+    "@mionjs/bin-compiler": "0.14.0",
+    "@mionjs/devtools": "0.14.0",
     "@nuxt/eslint": "^1.17.0",
     "@playwright/test": "^1.64.1",
     "@types/node": "^24.19.2",

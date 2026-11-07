@@ -8,6 +8,7 @@ dist-server/
 .wrangler/
 .data/
 test-results/
+updatelogs/
 package-lock.json
 .DS_Store
 *.pem

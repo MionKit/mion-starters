@@ -134,6 +134,6 @@ The registry keeps running after `mionlink`, so later installs and the root test
 
 ## Root Tests
 Run with `npm test` from root (vitest).
-- `tests/create-output.test.ts` (fast, no install): each starter's `package.json` links to the real repository; each `create.mjs` names the package after the folder, drops starter-only fields and copies no generated state.
+- `tests/create-output.test.ts` (fast, no install): each starter's `package.json` links to the real repository; each `create.mjs` names the package after the folder, drops starter-only fields and copies no generated state; each `.npmignore` leaves out `updatelogs/`.
 - `tests/mion-utils.test.ts` (fast): the dependency switching helpers.
 - `tests/create-e2e.test.ts` (one block per starter): create a project, install, then `npm run build`, `typecheck`, `test:unit` and `lint` when the starter has them, and Playwright. Each built API target with a preview script (`preview:api`, `preview:bun`, `preview:cloudflare`) must answer `hello`; bun's is skipped when bun is missing. A starter with `test:e2e:build` also runs Playwright on the build output, right after `npm run build`. A starter in local mode installs from the local registry.
