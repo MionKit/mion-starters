@@ -51,19 +51,19 @@
     "test:install": "playwright install chromium"
   },
   "dependencies": {
-    "@mionjs/client": "0.13.2",
-    "@mionjs/core": "0.13.2",
-    "@mionjs/platform-bun": "0.13.2",
-    "@mionjs/platform-cloudflare": "0.13.2",
-    "@mionjs/platform-node": "0.13.2",
-    "@mionjs/router": "0.13.2",
-    "@mionjs/run-types": "0.13.2",
+    "@mionjs/client": "0.14.0",
+    "@mionjs/core": "0.14.0",
+    "@mionjs/platform-bun": "0.14.0",
+    "@mionjs/platform-cloudflare": "0.14.0",
+    "@mionjs/platform-node": "0.14.0",
+    "@mionjs/router": "0.14.0",
+    "@mionjs/run-types": "0.14.0",
     "vue": "^3.5.44",
     "vue-router": "^5.4.0"
   },
   "devDependencies": {
-    "@mionjs/bin-compiler": "0.13.2",
-    "@mionjs/devtools": "0.13.2",
+    "@mionjs/bin-compiler": "0.14.0",
+    "@mionjs/devtools": "0.14.0",
     "@playwright/test": "^1.64.1",
     "@types/node": "^24.19.2",
     "@vitejs/plugin-vue": "^6.0.10",
