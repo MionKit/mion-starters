@@ -19,4 +19,4 @@ No other dependency changed.
 
 ## Code Changes
 
-- `package.json` declares `engines.node >=24`, the floor mion 0.14.0 sets.
+- `package.json` sets `engines.node >=24`, the minimum mion 0.14.0 needs.

@@ -14,14 +14,14 @@ No other dependency changed.
 
 ## Issues & Fixes
 
-0.13.2 lacked mion fixes this starter relies on. Checked gone on 0.14.0:
+mion 0.14.0 fixes these 0.13.2 bugs in this starter (each checked):
 
 - **mion lint on `.vue` files:** `npm run lint` no longer fails with `source file not in program`.
-- **API hot reload:** editing an API handler during `nuxt dev` reaches the next request within seconds.
+- **API hot reload:** an edited API handler takes effect within seconds during `nuxt dev`.
 - **Cloudflare Worker:** the `build:cloudflare` output boots on workerd and answers `hello`.
-- **`@mionjs/platform-bun` production install:** no longer pulls `@mionjs/devtools`, `@mionjs/bin-compiler`,
+- **`@mionjs/platform-bun` production install:** no longer installs `@mionjs/devtools`, `@mionjs/bin-compiler`,
   the native compiler or `typescript`. `npm install --omit=dev @mionjs/platform-bun` went from 64 MB to 4.4 MB.
 
 ## Code Changes
 
-- `package.json` declares `engines.node >=24`, the floor mion 0.14.0 sets.
+- `package.json` sets `engines.node >=24`, the minimum mion 0.14.0 needs.
